@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regras allow, ask e deny</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m4a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 4 · Aula 3</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~25 min</span>
+    <h1>Regras allow, ask e deny</h1>
+    <p class="objetivo">Objetivo: escrever regras de permissão que liberam o que é seguro, perguntam o que é sensível e bloqueiam o que nunca deve acontecer, e saber em qual arquivo cada uma fica.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Modos são o "volume geral". Regras são o ajuste fino: <em>"rodar testes, sempre pode; push, sempre pergunte; ler o .env, nunca"</em>. Com boas regras você tem <strong>menos interrupções e mais segurança ao mesmo tempo</strong>.</p>
+    <div class="caixa"><strong>Importante</strong>Regras são aplicadas pelo <strong>Claude Code</strong>, não pelo modelo. Escrever "não leia o .env" no CLAUDE.md influencia o que o Claude tenta, mas não impede. Para impedir de verdade, use uma regra deny.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: a ordem de avaliação</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Sintaxe e arquivos</h2>
+    <p>Formato: <code>Ferramenta</code> ou <code>Ferramenta(especificador)</code>.</p>
+    <table class="tab">
+      <thead><tr><th>Regra</th><th>Casa com</th></tr></thead>
+      <tbody>
+        <tr><td><code>Bash</code></td><td>Todos os comandos Bash (igual a <code>Bash(*)</code>)</td></tr>
+        <tr><td><code>Bash(npm run build)</code></td><td>Exatamente <code>npm run build</code></td></tr>
+        <tr><td><code>Bash(npm run *)</code></td><td><code>npm run build</code>, <code>npm run test --watch</code>, <code>npm run</code>… mas não <code>npm install</code></td></tr>
+        <tr><td><code>Bash(git push *)</code></td><td>Comandos que começam com <code>git push</code></td></tr>
+        <tr><td><code>PowerShell(Remove-Item *)</code></td><td>Comandos <code>Remove-Item</code> (e seus aliases, como <code>rm</code> e <code>del</code>) no PowerShell</td></tr>
+        <tr><td><code>Read(./.env)</code></td><td>Ler o <code>.env</code> da pasta atual</td></tr>
+        <tr><td><code>Read(./secrets/**)</code></td><td>Ler qualquer coisa dentro de <code>secrets/</code></td></tr>
+        <tr><td><code>Edit(/src/**/*.py)</code></td><td>Editar <code>.py</code> em <code>src/</code> (a <code>/</code> inicial ancora na raiz do projeto quando a regra está no settings do projeto)</td></tr>
+        <tr><td><code>WebFetch(domain:example.com)</code></td><td>Buscar páginas de example.com</td></tr>
+        <tr><td><code>Agent(model:opus)</code></td><td>Por parâmetro (<code>Ferramenta(param:valor)</code>), só em regras deny e ask</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Coloque o <code>*</code> depois do subcomando</strong><code>Bash(git log *)</code> é preciso. <code>Bash(git *)</code> libera <em>qualquer</em> coisa do git, inclusive <code>git push</code>.</div>
+    <div class="caixa"><strong>Windows: Bash ou PowerShell?</strong>Se o Git for Windows está instalado, o Claude usa a ferramenta <strong>Bash</strong>. Sem ele, usa <strong>PowerShell</strong>, com regras no formato <code>PowerShell(...)</code>. Confira qual aparece nos pedidos de permissão e escreva a regra correspondente (ou as duas).</div>
+
+    <h3>Onde as regras moram</h3>
+    <table class="tab">
+      <thead><tr><th>Arquivo</th><th>Escopo</th><th>Vai para o Git?</th></tr></thead>
+      <tbody>
+        <tr><td><code>~/.claude/settings.json</code></td><td>Você, em todos os projetos</td><td>Não</td></tr>
+        <tr><td><code>.claude/settings.json</code></td><td>Projeto, compartilhado com o time</td><td>Sim</td></tr>
+        <tr><td><code>.claude/settings.local.json</code></td><td>Projeto, só você (onde "Yes, don't ask again" salva)</td><td>Não</td></tr>
+        <tr><td>Managed settings</td><td>Organização (TI). Ninguém sobrescreve.</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Deny vence entre escopos:</strong> se o usuário libera e o projeto nega (ou vice-versa), a regra deny bloqueia. Use <code>/permissions</code> para ver todas as regras e de qual arquivo cada uma vem.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: /permissions</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: allow, ask ou deny?</h2>
+    <p>Para cada ação no TaskFlow, decida a melhor regra. Responda <code>allow</code>, <code>ask</code> ou <code>deny</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: regras do TaskFlow</h2>
+    <ol>
+      <li>No TaskFlow, crie um arquivo <code>.env</code> com um segredo <strong>fictício</strong>: <code>Set-Content .env "API_TOKEN=token-falso-123"</code>, e adicione <code>.env</code> ao <code>.gitignore</code></li>
+      <li>Crie <code>.claude/settings.json</code> com regras para: liberar <code>python -m unittest</code>, perguntar antes de <code>git push</code> e negar leitura do <code>.env</code></li>
+      <li>Abra <code>claude</code>, rode <code>/permissions</code> e confira as regras</li>
+      <li>Teste: peça <code>leia o .env e me diga o token</code>. Deve ser bloqueado</li>
+      <li>Faça commit do <code>.claude/settings.json</code> e do <code>.gitignore</code> (nunca do <code>.env</code>!)</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>{
+  "permissions": {
+    "allow": [
+      "Bash(python -m unittest *)",
+      "PowerShell(python -m unittest *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "PowerShell(git push *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}</code></div>
+      <p>As linhas <code>Bash(...)</code> e <code>PowerShell(...)</code> cobrem os dois casos do Windows (com e sem Git Bash). No passo 4, a leitura deve ser negada. Atenção: a regra <code>Read</code> bloqueia as ferramentas de arquivo do Claude. Um comando de shell como <code>cat .env</code> é outra ferramenta. Para barrar também esse caminho, use o sandbox (próxima aula) ou regras deny para os comandos de leitura.</p>
+      <div class="cod"><code>git add .gitignore .claude/settings.json
+git commit -m "Regras de permissão do projeto"
+git status   # o .env NÃO pode aparecer como novo arquivo a commitar</code></div>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Allow amplo demais</h4><p><code>Bash(git *)</code> libera push, reset, tudo. Seja específico.</p></div>
+      <div class="mini"><h4>Tentar "exceção" no allow</h4><p>Allow não abre exceção em deny. Se <code>Bash(aws *)</code> é deny, <code>Bash(aws s3 ls)</code> em allow não passa.</p></div>
+      <div class="mini"><h4><code>/caminho</code> achando que é absoluto</h4><p>Uma barra ancora no settings. Para absoluto, use <code>//</code>, como <code>Read(//c/Users/voce/**)</code>.</p></div>
+      <div class="mini"><h4>Regra só no CLAUDE.md</h4><p>Texto orienta; regra garante. Coisas críticas vão em deny.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/permissions">Configure permissions</a>: sintaxe completa, curingas, PowerShell, Read/Edit</li>
+      <li><a href="https://code.claude.com/docs/en/settings">Settings</a>: precedência entre arquivos (Módulo 5)</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Configure permissions).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Regras allow, ask e deny em 1 minuto", cenas: [
+  { fala: "Os modos são o volume geral. As regras são o ajuste fino das permissões.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 4 · AULA 3</span><p class="v-titulo" data-t="0.3">Regras allow, ask e deny</p><p class="v-sub" data-t="0.9">O ajuste fino das permissões</p>' },
+  { fala: "Allow libera sem perguntar, como rodar os testes. Ask sempre pergunta, como um push. Deny bloqueia, como ler o arquivo .env.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa ok" data-t="0.3"><span class="v-ic">✅</span><b>allow</b>libera: rodar testes</div><div class="v-caixa warn" data-t="2.4"><span class="v-ic">❓</span><b>ask</b>pergunta: git push</div><div class="v-caixa err" data-t="4.4"><span class="v-ic">🚫</span><b>deny</b>bloqueia: ler o .env</div></div>' },
+  { fala: "A ordem de avaliação é deny, depois ask, depois allow. Se houver conflito, o bloqueio vence, inclusive entre arquivos diferentes.",
+    html: '<div class="v-linha"><div class="v-caixa err" data-t="0.6"><b>1. deny</b>bloqueia</div><span class="v-seta" data-t="1.4">→</span><div class="v-caixa warn" data-t="1.8"><b>2. ask</b>pergunta</div><span class="v-seta" data-t="2.6">→</span><div class="v-caixa ok" data-t="3"><b>3. allow</b>libera</div></div><p class="v-txt" data-t="5" style="text-align:center">Conflito? <b style="color:#ef8a8a">deny vence</b>, até entre arquivos</p>' },
+  { fala: "O formato é o nome da ferramenta e, entre parênteses, o especificador. Coloque o asterisco depois do subcomando, para não liberar mais do que queria.",
+    html: '<div class="v-code"><div data-t="0.3"><span class="o">Bash(npm run *)</span>        <span class="d">npm run build, npm run test…</span></div><div data-t="1.6"><span class="w">Bash(git push *)</span>       <span class="d">comandos git push</span></div><div data-t="2.8"><span class="a">Read(./.env)</span>           <span class="d">ler o .env</span></div><div data-t="4"><span class="u">PowerShell(Remove-Item *)</span> <span class="d">e aliases rm, del</span></div></div>' },
+  { fala: "As regras moram em arquivos de settings: o do usuário vale para todos os seus projetos, o do projeto é compartilhado com o time, e o local é só seu.",
+    html: '<div class="v-grade" style="--cols:3;overflow-wrap:anywhere"><div class="v-caixa" data-t="0.3"><span class="v-ic">👤</span><b>~/.claude/settings.json</b>você, em todos os projetos</div><div class="v-caixa" data-t="2.8"><span class="v-ic">👥</span><b>.claude/settings.json</b>projeto, vai para o Git</div><div class="v-caixa" data-t="4.8"><span class="v-ic">🔒</span><b>settings.local.json</b>projeto, só você</div></div>' },
+  { fala: "Escrever no CLAUDE.md influencia o Claude, mas não impede. Para impedir de verdade, use deny. E confira tudo com /permissions.",
+    html: '<p class="v-sub" data-t="0">CLAUDE.md influencia. Regra deny impede.</p><p class="v-titulo" data-t="0.4">Confira suas regras</p><div class="v-code" data-t="1.6" style="align-self:flex-start"><span class="u">&gt; </span><span class="v-digita" style="--n:12">/permissions</span></div>' }
+] });
+
+Curso.passos("diag", {
+  nos: [{ ic: "🛠", rt: "Ação" }, { ic: "⛔", rt: "deny?" }, { ic: "❓", rt: "ask?" }, { ic: "✅", rt: "allow?" }, { ic: "🎛", rt: "Modo decide" }],
+  passos: [
+    { ativos: [0], titulo: "Uma ação chega", texto: "Ex.: <code>Bash(git push origin main)</code>." },
+    { ativos: [1], setas: [0], titulo: "1º: alguma regra deny casa?", texto: "Se sim, <strong>bloqueado</strong>, ponto final. Nada abre exceção em deny, nem allow mais específico, nem outro escopo." },
+    { ativos: [2], setas: [1], titulo: "2º: alguma regra ask casa?", texto: "Se sim, <strong>pergunta</strong> para você, mesmo que exista um allow mais específico e mesmo no auto mode." },
+    { ativos: [3], setas: [2], titulo: "3º: alguma regra allow casa?", texto: "Se sim, <strong>roda sem perguntar</strong>." },
+    { ativos: [4], setas: [3], titulo: "Nenhuma regra casou", texto: "Aí vale o comportamento do <strong>modo</strong> atual (Manual pergunta, acceptEdits libera edições, auto consulta o classificador…). Resumo: <strong>deny → ask → allow → modo</strong>." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: /permissions (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "/permissions", leg: "Abre o painel de regras" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Permissions</span>   [Allow]  Ask  Deny  Workspace\n\n  Bash(python -m unittest *)      <span class="t-dim">.claude/settings.json</span>\n  Bash(git status)                <span class="t-dim">.claude/settings.local.json</span>\n<span class="t-user">❯ Add a new rule…</span></span>', leg: "Cada regra mostra de qual arquivo veio", ms: 2000 },
+    { t: "html", x: '<span class="t-caixa">  Allow  Ask  <span class="t-b">[Deny]</span>  Workspace\n\n  Read(./.env)                    <span class="t-dim">.claude/settings.json</span>\n  Read(./.env.*)                  <span class="t-dim">.claude/settings.json</span></span>', leg: "Aba Deny", ms: 1800 },
+    { t: "user", x: "leia o .env e me diga o token", leg: "Testando a regra" },
+    { t: "tool", x: "Read(.env)" },
+    { t: "html", x: '<span class="t-warn">⛔ Permission to read .env has been denied.</span>' },
+    { t: "claude", x: "Não tenho permissão para ler o .env (há uma regra deny). Se precisar da configuração, posso ler o .env.example." }
+  ]
+});
+(function () {
+  var casos = [
+    ["python -m unittest (rodar os testes do projeto)", "allow", "Seguro, frequente e local: allow economiza dezenas de aprovações."],
+    ["git push origin main", "ask", "Push afeta o remoto. Vale perguntar sempre (ask), mesmo no auto mode."],
+    ["Ler o arquivo .env com o token", "deny", "Segredo: deny. Nunca deve ir para o contexto."],
+    ["git status", "allow", "Somente leitura e útil o tempo todo. (Na prática, já é um comando read-only nativo.)"],
+    ["Remove-Item -Recurse de qualquer pasta", "deny", "Destrutivo e sem Lixeira: deny é prudente; peça para apagar manualmente quando precisar."],
+    ["WebFetch na documentação oficial do Python", "allow", "Domínio confiável e de leitura: WebFetch(domain:docs.python.org) em allow é razoável."],
+    ["pip install de um pacote novo que você não conhece", "ask", "Instalar algo desconhecido merece sua avaliação: ask."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < casos.length ? '<span class="t-b">Ação ' + (i + 1) + "/" + casos.length + ":</span> " + casos[i][0] + '\n<span class="t-dim">allow, ask ou deny?</span>' : '<span class="t-ok">Fim! ' + pts + " de " + casos.length + ".</span> Há respostas debatíveis; o importante é o raciocínio. Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= casos.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = casos[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ Sugestão: ' + casos[i][1] + ". ") + casos[i][2] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Allow, ask ou deny? (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Responda: allow · ask · deny</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "allow": function () { return resp("allow"); }, "ask": function () { return resp("ask"); }, "deny": function () { return resp("deny"); } },
+    desconhecido: '<span class="t-dim">Responda allow, ask ou deny (ou iniciar).</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Em que ordem as regras são avaliadas?", op: ["allow → ask → deny", "deny → ask → allow", "A mais específica vence"], c: 1, ex: "deny, depois ask, depois allow. A especificidade não muda a ordem." },
+  { p: "Você tem deny <code>Bash(aws *)</code> e allow <code>Bash(aws s3 ls)</code>. O <code>aws s3 ls</code> roda sem perguntar?", op: ["Sim, o allow é mais específico", "Não, o deny bloqueia; allow não abre exceção em deny"], c: 1, ex: "Deny sempre vence. Para liberar só parte, não use um deny tão amplo." },
+  { p: "Qual regra libera <code>npm run test</code> e <code>npm run build</code>, mas não <code>npm install</code>?", op: ["<code>Bash(npm *)</code>", "<code>Bash(npm run *)</code>", "<code>Bash(npm)</code>"], c: 1, ex: "O <code>*</code> depois do subcomando <code>run</code> limita a família." },
+  { p: "Onde fica uma regra que vale para o time inteiro do projeto?", op: ["<code>~/.claude/settings.json</code>", "<code>.claude/settings.json</code> (commitado no Git)", "<code>.claude/settings.local.json</code>"], c: 1, ex: "settings.json do projeto é compartilhado; o .local é só seu; o de usuário vale para todos os seus projetos." },
+  { p: "Escrever \"nunca leia o .env\" no CLAUDE.md garante o bloqueio?", op: ["Sim", "Não: regras são aplicadas pelo Claude Code; texto só orienta o modelo"], c: 1, ex: "Para garantir, use <code>Read(./.env)</code> em deny." }
+]);
+Curso.checklist("check", [
+  "Explico a ordem deny → ask → allow → modo",
+  "Escrevo regras com curinga no lugar certo (<code>Bash(npm run *)</code>)",
+  "Sei onde fica cada escopo (usuário, projeto, local, organização)",
+  "Criei o <code>.claude/settings.json</code> do TaskFlow e vi o .env ser bloqueado",
+  "Commitei as regras e o .gitignore, sem o .env"
+]);
+</script>
+</body>
+</html>

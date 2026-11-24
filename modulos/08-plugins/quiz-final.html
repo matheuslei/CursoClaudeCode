@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 8</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m8qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 8 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Plugins</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 8</a>
+    <a class="prox" href="../09-automacao/01-claude-p.html"><small>Próximo módulo →</small>Módulo 9: Automação</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 8 · Plugins › Quiz final");
+Curso.quiz("quiz", [{"p": "Você quer testar um plugin só neste repositório, sem afetar o time. Qual escopo?", "op": ["Usuário", "Projeto", "Local"], "c": 2, "ex": "Local grava em .claude/settings.local.json. <span class=\"t-dim\">(aula: O que é um plugin, instalar e gerenciar)</span>"}, {"p": "Como a skill <code>revisar-taskflow</code> se chama dentro do plugin <code>taskflow</code>?", "op": ["<code>/revisar-taskflow</code>", "<code>/taskflow:revisar-taskflow</code>", "<code>/plugin:revisar</code>"], "c": 1, "ex": "Plugin e skill separados por dois pontos. <span class=\"t-dim\">(aula: Criar o plugin do TaskFlow)</span>"}, {"p": "Qual grader é grátis?", "op": ["<code>llm</code>", "<code>regex</code>", "<code>baseline</code>"], "c": 1, "ex": "regex, tool_used, tool_order e file_exists não chamam modelo. <span class=\"t-dim\">(aula: Medir com claude plugin eval)</span>"}, {"p": "Qual é o id para instalar o plugin <code>taskflow</code> do marketplace <code>treino-taskflow</code>?", "op": ["<code>treino-taskflow/taskflow</code>", "<code>taskflow@treino-taskflow</code>", "<code>taskflow:treino-taskflow</code>"], "c": 1, "ex": "plugin@marketplace. <span class=\"t-dim\">(aula: Marketplace local)</span>"}, {"p": "O que é um marketplace?", "op": ["Uma loja que cobra pelos plugins", "Um catálogo que lista plugins e onde buscar cada um", "O site claude.com/marketplace"], "c": 1, "ex": "É um arquivo de catálogo num repositório ou pasta. O site é uma vitrine à parte. <span class=\"t-dim\">(aula: O que é um plugin, instalar e gerenciar)</span>"}, {"p": "Você colocou <code>skills/</code> dentro de <code>.claude-plugin/</code>. O que acontece?", "op": ["Funciona normalmente", "As skills não carregam", "O Claude move a pasta sozinho"], "c": 1, "ex": "Só o manifesto vai em .claude-plugin/. <span class=\"t-dim\">(aula: Criar o plugin do TaskFlow)</span>"}, {"p": "O que significa <code>Δ</code> perto de zero?", "op": ["O plugin está quebrado", "Com e sem o plugin deram a mesma nota: ele não fez diferença", "A avaliação não rodou"], "c": 1, "ex": "O Claude já fazia aquilo, ou a skill não foi usada. <span class=\"t-dim\">(aula: Medir com claude plugin eval)</span>"}, {"p": "O <code>source</code> relativo parte de onde?", "op": ["De dentro de <code>.claude-plugin/</code>", "Da raiz do marketplace", "Da sua pasta de usuário"], "c": 1, "ex": "E não pode conter <code>..</code>. <span class=\"t-dim\">(aula: Marketplace local)</span>"}, {"p": "Por que conferir o \"Context cost\" antes de instalar?", "op": ["Porque o plugin cobra por instalação", "Porque as descrições das peças entram em toda mensagem, mesmo sem uso", "Não faz diferença"], "c": 1, "ex": "Plugins ativos somam tokens a cada turno. <span class=\"t-dim\">(aula: O que é um plugin, instalar e gerenciar)</span>"}, {"p": "Para que serve <code>${CLAUDE_PLUGIN_ROOT}</code>?", "op": ["Apontar para a pasta do plugin, onde quer que ele esteja instalado", "Apontar para a pasta do projeto", "Guardar senhas"], "c": 0, "ex": "A pasta do projeto é ${CLAUDE_PROJECT_DIR}. <span class=\"t-dim\">(aula: Criar o plugin do TaskFlow)</span>"}]);
+</script>
+</body>
+</html>

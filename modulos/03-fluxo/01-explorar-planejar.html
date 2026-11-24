@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explorar, planejar, codar, commitar</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Aula 1</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Explorar → Planejar → Codar → Commitar</h1>
+    <p class="objetivo">Objetivo: trocar o "pede e torce" por um fluxo de 4 etapas que funciona em qualquer tarefa que não seja trivial.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Quando você pede "adicione prazos às tarefas" de uma vez, o Claude escolhe sozinho onde mexer, qual formato de data usar e o que conta como "pronto". Às vezes acerta. Quando erra, você descobre tarde, depois de várias edições.</p>
+    <p>Separar o trabalho em <strong>etapas com pausa entre elas</strong> deixa você corrigir o rumo enquanto ainda é barato: antes de qualquer linha de código ser escrita.</p>
+    <div class="caixa"><strong>Quando pular etapas</strong>Mudança pequena e óbvia (corrigir um texto, renomear uma variável)? Peça direto. O fluxo completo vale para tarefas em que você não consegue descrever o resultado em uma frase.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: as quatro etapas</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Pedidos-modelo para cada etapa</h2>
+    <table class="tab">
+      <thead><tr><th>Etapa</th><th>Exemplo de pedido</th><th>O que você faz</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Explorar</strong></td><td><code>me dê uma visão geral deste projeto. ainda não mude nada</code><br><code>como os dados são salvos e onde os números das tarefas são validados?</code></td><td>Lê as respostas e aprende o código junto</td></tr>
+        <tr><td><strong>Planejar</strong></td><td><code>/plan quero que tarefas tenham data de vencimento. proponha um plano</code></td><td>Lê o plano, questiona, ajusta e só então aprova</td></tr>
+        <tr><td><strong>Codar</strong></td><td><code>implemente o plano. rode python -m unittest no fim e mostre a saída</code></td><td>Acompanha o primeiro minuto e aperta <kbd>Esc</kbd> se desviar</td></tr>
+        <tr><td><strong>Commitar</strong></td><td><code>! git diff</code> e depois <code>faça commit com uma mensagem descritiva</code></td><td>Revisa o diff antes de salvar</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>"Ainda não mude nada"</strong>Na exploração, deixe claro que você só quer entender. Melhor ainda: use o plan mode (próxima aula), em que o Claude nem consegue editar arquivos.</div>
+    <h3>Dar uma forma de verificar</h3>
+    <p>A documentação oficial insiste num ponto: o Claude para quando o trabalho <em>parece</em> pronto. Se ele tiver algo para rodar que responda "passou" ou "falhou" (testes, o próprio programa), ele fecha o ciclo sozinho. Por isso o TaskFlow ganhou testes nesta etapa, e o <code>CLAUDE.md</code> já diz como rodá-los.</p>
+    <h3>Quando a correção não pega</h3>
+    <p>Corrigiu a mesma coisa duas vezes e continua errado? A recomendação oficial é <code>/clear</code> e um pedido novo, mais completo, incorporando o que você aprendeu. Uma terceira correção só soma tentativas falhas ao contexto.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual é a etapa?</h2>
+    <p>O terminal mostra situações. Responda com <code>e</code> (explorar), <code>p</code> (planejar), <code>c</code> (codar) ou <code>m</code> (commitar). Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Use o TaskFlow da <code>etapa-03</code> (ou o seu, se já tiver testes). Copie para a pasta de estudos, faça <code>git init</code> e o commit inicial, como na aula 1.2.</p>
+    <ol>
+      <li><strong>Explorar:</strong> pergunte como os testes estão organizados e o que o <code>CLAUDE.md</code> pede</li>
+      <li><strong>Planejar:</strong> peça um plano para o comando <code>editar &lt;numero&gt; "novo título"</code>, ainda sem implementar</li>
+      <li>Questione o plano pelo menos uma vez (ex.: "e se o título vier vazio?")</li>
+      <li><strong>Codar:</strong> peça a implementação com critério de pronto: testes passando</li>
+      <li><strong>Commitar:</strong> <code>! git diff</code>, revise, e peça o commit</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Um bom pedido de plano:</p>
+      <div class="cod"><code>quero o comando editar &lt;numero&gt; "novo título" no tarefas.py.
+não implemente ainda: proponha um plano com os arquivos que vai mudar,
+os casos de erro (número inválido, título vazio) e os testes que vai adicionar.</code></div>
+      <p>Resultado esperado: uma função <code>editar(numero, titulo)</code> que reaproveita <code>_indice_valido</code>, rejeita título vazio, o subcomando no <code>argparse</code>, e 2 ou 3 testes novos em <code>tests/test_tarefas.py</code>. <code>python -m unittest</code> deve terminar em <code>OK</code>.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Pular a exploração</h4><p>O plano sai genérico porque nem você nem o Claude conhecem o código.</p></div>
+      <div class="mini"><h4>Aprovar plano sem ler</h4><p>O plano é o ponto mais barato para corrigir. Leia como se fosse revisar código.</p></div>
+      <div class="mini"><h4>Codar sem critério de pronto</h4><p>Sem um teste ou comando para rodar, "pronto" vira opinião.</p></div>
+      <div class="mini"><h4>Terceira correção seguida</h4><p>Duas tentativas falharam? <code>/clear</code> e um pedido melhor.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a>: "Give Claude a check to run" e "Steer the session"</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">Common workflows</a>: receitas de exploração, bugs, refatoração e testes</li>
+      <li><a href="https://academy.claude.com/courses/claude-code-101">Claude Code 101</a> (Anthropic Academy, em inglês): lição sobre o fluxo explorar → planejar → codar → commitar.</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Explorar, planejar, codar, commitar em 1 minuto", cenas: [
+  { fala: "Pedir tudo de uma vez e torcer funciona às vezes. Este vídeo mostra um fluxo que funciona em qualquer tarefa que não seja trivial.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 3 · AULA 1</span><p class=\"v-titulo\" data-t=\"0.3\">Explorar → Planejar → Codar → Commitar</p><p class=\"v-sub\" data-t=\"0.9\">Trocar o \"pede e torce\" por um fluxo</p>" },
+  { fala: "Quando você pede adicione prazos às tarefas de uma vez, o Claude escolhe sozinho onde mexer, o formato da data e o que conta como pronto. Se errar, você descobre tarde.",
+    html: "<div class=\"v-code\" data-t=\"0.2\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:26\">adicione prazos às tarefas</span></div><div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa warn\" data-t=\"3\"><span class=\"v-ic\">📍</span>onde mexer?</div><div class=\"v-caixa warn\" data-t=\"4\"><span class=\"v-ic\">📅</span>formato da data?</div><div class=\"v-caixa warn\" data-t=\"5\"><span class=\"v-ic\">🏁</span>o que é pronto?</div></div>" },
+  { fala: "A saída é separar o trabalho em quatro etapas, com uma pausa entre elas, para você corrigir o rumo enquanto ainda é barato.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa\" data-t=\"0.4\"><span class=\"v-ic\">🔎</span><b>Explorar</b>entender</div><div class=\"v-caixa\" data-t=\"1.4\"><span class=\"v-ic\">🗺</span><b>Planejar</b>decidir o caminho</div><div class=\"v-caixa\" data-t=\"2.4\"><span class=\"v-ic\">🛠</span><b>Codar</b>implementar</div><div class=\"v-caixa ok\" data-t=\"3.4\"><span class=\"v-ic\">💾</span><b>Commitar</b>salvar revisado</div></div>" },
+  { fala: "Na prática: explorando, você só pergunta e avisa que não é para mudar nada. Planejando, usa o /plan. Codando, pede para rodar os testes. E antes do commit, revisa o diff.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">&gt;</span> como os dados são salvos? <span class=\"w\">ainda não mude nada</span></div><div data-t=\"3.2\"><span class=\"u\">&gt;</span> <span class=\"a\">/plan</span> quero data de vencimento. proponha um plano</div><div data-t=\"5.2\"><span class=\"u\">&gt;</span> implemente o plano e rode <span class=\"o\">python -m unittest</span></div><div data-t=\"7.2\"><span class=\"u\">&gt;</span> <span class=\"a\">! git diff</span>   <span class=\"d\">… e depois o commit</span></div></div>" },
+  { fala: "Um ponto essencial: dê ao Claude algo que responda passou ou falhou, como os testes. O Claude para quando o trabalho parece pronto; com testes, ele fecha o ciclo sozinho.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">🤔</span><b>\"Parece pronto\"</b>sem forma de checar</div><span class=\"v-seta\" data-t=\"2.5\">→</span><div class=\"v-caixa ok\" data-t=\"3\">  <span class=\"v-ic\">🧪</span><b>Passou / falhou</b>testes fecham o ciclo</div></div>" },
+  { fala: "Corrigiu a mesma coisa duas vezes e continua errado? Não insista: use /clear e faça um pedido novo, mais completo, com o que você aprendeu.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa\" data-t=\"0.3\"><span class=\"v-ic\">🔧</span><b>1ª correção</b></div><div class=\"v-caixa\" data-t=\"1.2\"><span class=\"v-ic\">🔧</span><b>2ª correção</b></div><div class=\"v-caixa err v-risca\" data-t=\"2.4\"><span class=\"v-ic\">🔧</span><b>3ª?</b></div><span class=\"v-seta\" data-t=\"3.6\">→</span><div class=\"v-caixa acc\" data-t=\"4\"><span class=\"v-ic\">✨</span><b>/clear</b>pedido melhor</div></div>" },
+  { fala: "Mudança pequena e óbvia? Peça direto. Tarefa que não cabe numa frase? Use as quatro etapas.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A regra prática</p><p class=\"v-titulo\" data-t=\"0.4\">Não cabe numa frase? Quatro etapas.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🔎", rt: "Explorar" }, { ic: "🗺", rt: "Planejar" }, { ic: "🛠", rt: "Codar" }, { ic: "💾", rt: "Commitar" }],
+  passos: [
+    { ativos: [0], titulo: "Explorar: entender antes de mudar", texto: "Perguntas abertas sobre o código: estrutura, onde fica cada coisa, como rodar os testes. Nenhuma edição. Você e o Claude ficam com o mesmo mapa do projeto." },
+    { ativos: [1], setas: [0], titulo: "Planejar: decidir o caminho", texto: "O Claude propõe <strong>o que vai mudar, onde e como vai verificar</strong>. Você questiona, ajusta e aprova. Corrigir aqui custa uma frase; depois do código, custa retrabalho." },
+    { ativos: [2], setas: [1], titulo: "Codar: executar o plano", texto: "Com o plano aprovado, o Claude implementa e roda a verificação (testes, o programa). Você acompanha o primeiro minuto e interrompe com <kbd>Esc</kbd> se ele sair do plano." },
+    { ativos: [3], setas: [2], titulo: "Commitar: salvar com consciência", texto: "<code>git diff</code> para revisar e commit com mensagem descritiva. Cada ciclo termina num ponto seguro para onde você pode voltar." },
+    { ativos: [0, 1, 2, 3], setas: [0, 1, 2], titulo: "Proporcional ao tamanho", texto: "Tarefa pequena: vá direto ao código. Tarefa média: plano rápido. Tarefa grande ou ambígua: escreva uma <strong>spec</strong> antes (aula 3.3)." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: taskflow (demonstração)", altura: 320,
+  passos: [
+    { t: "user", x: "como os números das tarefas são validados? ainda não mude nada", leg: "1. Explorar" },
+    { t: "tool", x: "Read(tarefas.py)" },
+    { t: "out", x: "Read 84 lines" },
+    { t: "claude", x: "A função _indice_valido checa se o número está entre 1 e o total. concluir e remover usam ela.", ms: 1400 },
+    { t: "user", x: "/plan quero um comando editar <numero> \"novo título\"", leg: "2. Planejar" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Plano</span>\n1. Função editar(numero, titulo) usando _indice_valido\n2. Rejeitar título vazio com mensagem clara\n3. Subcomando editar no argparse\n4. 3 testes em tests/test_tarefas.py\n5. Rodar python -m unittest</span>', ms: 1800 },
+    { t: "user", x: "ok, aprovado. rode os testes no fim", leg: "Você aprovou: agora sim, código" },
+    { t: "tool", x: "Update(tarefas.py)", leg: "3. Codar" },
+    { t: "tool", x: "Update(tests/test_tarefas.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "Ran 9 tests in 0.05s\nOK" },
+    { t: "user", x: "! git diff --stat", leg: "4. Revisar e commitar" },
+    { t: "out", x: " tarefas.py             | 18 ++++++\n tests/test_tarefas.py  | 21 +++++++" },
+    { t: "user", x: "faça commit com uma mensagem descritiva" },
+    { t: "out", x: "[main 4b9e1a2] Adiciona comando editar com validação de título" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Você entrou num projeto novo e quer saber como ele salva os dados.", "e", "Entender antes de mudar é explorar."],
+    ["O Claude listou 4 arquivos que vai mudar e 3 testes que vai criar. Você está lendo.", "p", "Isso é um plano: revise antes de aprovar."],
+    ["Plano aprovado. O Claude está editando tarefas.py e rodando os testes.", "c", "Execução do plano, com verificação."],
+    ["Testes passaram. Você roda git diff e pede uma mensagem descritiva.", "m", "Revisar o diff e salvar: commitar."],
+    ["Você pergunta \"onde ficam os testes e como eu rodo?\"", "e", "Pergunta sobre o projeto: explorar."],
+    ["Você responde \"e se o título vier vazio?\" antes de aprovar.", "p", "Questionar o plano faz parte de planejar."]
+  ], i = -1, pts = 0, map = { e: "explorar", p: "planejar", c: "codar", m: "commitar" };
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">e · p · c · m</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + " certas.</span> Digite iniciar para repetir."; }
+  function resp(l) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === l; if (ok) pts++; var r = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ Era ' + map[itens[i][1]] + ". ") + itens[i][2] + "</span>\n\n"; i++; return r + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Qual é a etapa? (simulação)", prompt: ">",
+    intro: '<span class="t-dim">e = explorar · p = planejar · c = codar · m = commitar</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "e": function () { return resp("e"); }, "p": function () { return resp("p"); }, "c": function () { return resp("c"); }, "m": function () { return resp("m"); } }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Por que planejar antes de codar numa tarefa média?", op: ["Porque o Claude não consegue codar sem plano", "Porque corrigir o rumo no plano custa uma frase; depois do código, custa retrabalho", "Porque o plano deixa o código mais rápido"], c: 1, ex: "O plano é o momento mais barato para mudar de ideia." },
+  { p: "Qual é a melhor forma de o Claude saber que terminou de verdade?", op: ["Ele avisar que está pronto", "Ter algo para rodar que responda passou/falhou, como testes", "Usar o modelo mais caro"], c: 1, ex: "Com um teste ou comando de verificação, ele fecha o ciclo sozinho e você recebe evidência, não opinião." },
+  { p: "Você corrigiu o Claude duas vezes e ainda está errado. O que a documentação recomenda?", op: ["Corrigir uma terceira vez com mais ênfase", "<code>/clear</code> e um pedido novo que incorpore o que você aprendeu", "Trocar de computador"], c: 1, ex: "Cada tentativa falha fica no contexto. Recomeçar limpo com um pedido melhor funciona melhor." },
+  { p: "Você quer corrigir um erro de digitação numa mensagem do programa. O que fazer?", op: ["O fluxo completo com plano e spec", "Pedir direto: é pequeno e óbvio", "Abrir uma branch e escrever testes antes"], c: 1, ex: "O fluxo é proporcional ao tamanho da tarefa. Tarefas triviais vão direto." }
+]);
+Curso.checklist("check", [
+  "Explico as 4 etapas e quando cada uma vale a pena",
+  "Escrevo pedidos de exploração que não mudam nada",
+  "Peço um plano e questiono antes de aprovar",
+  "Dou ao Claude uma forma de verificar (testes, rodar o programa)",
+  "Adicionei o comando <code>editar</code> ao TaskFlow seguindo o fluxo"
+]);
+</script>
+</body>
+</html>

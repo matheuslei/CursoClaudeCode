@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atalhos, shell, menções e prompts</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m1a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 1 · Aula 4</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~20 min</span>
+    <h1>Atalhos, <code>!</code> shell, <code>@</code> menções e bons prompts</h1>
+    <p class="objetivo">Objetivo: trabalhar com fluidez (interromper, voltar, rodar comandos, apontar arquivos) e escrever pedidos que dão certo na primeira tentativa.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Dois hábitos separam iniciantes de quem domina o Claude Code: <strong>interromper cedo</strong> quando algo vai pelo caminho errado (em vez de esperar terminar) e <strong>dar contexto preciso</strong> no pedido. Esta aula treina os dois.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: os 3 prefixos mágicos</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Atalhos que você vai usar todo dia</h2>
+    <table class="tab">
+      <thead><tr><th>Atalho</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>Esc</kbd></td><td><strong>Interrompe</strong> o Claude no meio. O que já foi feito fica, e você redireciona.</td></tr>
+        <tr><td><kbd>Esc</kbd> <kbd>Esc</kbd></td><td>Com texto: limpa o rascunho. Com campo vazio: abre o <strong>rewind</strong>.</td></tr>
+        <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Alterna o modo de permissão (em alguns terminais Windows: <kbd>Alt</kbd>+<kbd>M</kbd>)</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Interrompe; com nada rodando, limpa o campo; 2× sai</td></tr>
+        <tr><td><kbd>↑</kbd> / <kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Histórico de mensagens / busca no histórico</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>J</kbd> ou <kbd>\</kbd>+<kbd>Enter</kbd></td><td>Nova linha sem enviar (no Windows Terminal recente, <kbd>Shift</kbd>+<kbd>Enter</kbd> também)</td></tr>
+        <tr><td><kbd>Alt</kbd>+<kbd>V</kbd></td><td>Cola imagem (print de tela, por exemplo) no Windows</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>O</kbd></td><td>Mostra os detalhes das ferramentas usadas</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Com o campo vazio, mostra todos os atalhos</td></tr>
+      </tbody>
+    </table>
+    <h3>Anatomia de um bom pedido</h3>
+    <div class="grade">
+      <div class="mini"><h4>🎯 O quê</h4><p>A mudança exata. "Adicione o comando <code>remover &lt;numero&gt;</code>"</p></div>
+      <div class="mini"><h4>📍 Onde</h4><p>Arquivos com <code>@</code>. "em @tarefas.py"</p></div>
+      <div class="mini"><h4>📏 Restrições</h4><p>"sem bibliotecas novas; mantenha o estilo atual"</p></div>
+      <div class="mini"><h4>✅ Pronto quando…</h4><p>"teste removendo a tarefa 2 e listando"</p></div>
+    </div>
+    <div class="caixa erro"><strong>Dados sensíveis</strong>Não cole senhas, tokens, chaves de API, dados pessoais reais nem informações internas da organização nos prompts nem nas imagens. Em estudos, use sempre dados fictícios.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: interromper e redirecionar</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: melhore o prompt</h2>
+    <p>O avaliador simulado dá nota a pedidos. Envie o prompt fraco (<code>arruma o código</code>) e depois tente escrever um pedido completo sobre o TaskFlow, com <strong>o quê</strong>, <strong>onde (@)</strong>, <strong>restrição</strong> e <strong>critério de pronto</strong>. Também teste <code>! git status</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow, com <code>claude</code> aberto:</p>
+    <ol>
+      <li>Rode <code>! python tarefas.py listar</code> e veja o Claude comentar a saída</li>
+      <li>Envie um pedido completo usando <code>@tarefas.py</code> para adicionar o comando <code>remover &lt;numero&gt;</code>, com restrição e critério de pronto</li>
+      <li>Enquanto ele trabalha, pressione <kbd>Esc</kbd> uma vez, digite "use a mesma validação de número do concluir" e continue</li>
+      <li>Escreva um pedido de 3 linhas usando <kbd>Ctrl</kbd>+<kbd>J</kbd> para quebrar linhas</li>
+      <li>Revise com <code>! git diff</code> e faça commit</li>
+    </ol>
+    <details class="gabarito"><summary>Ver um prompt-modelo</summary>
+      <div class="cod"><code>Adicione o comando "remover &lt;numero&gt;" em @tarefas.py.
+Restrições: sem bibliotecas novas; reaproveite a validação de número do concluir.
+Pronto quando: remover 2 tira a tarefa 2, a lista se renumera, e um número inválido mostra mensagem clara. Rode os dois casos e me mostre a saída.</code></div>
+      <p>Repare que o critério de pronto faz o Claude <strong>verificar sozinho</strong> e mostrar evidências.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Esperar terminar algo errado</h4><p>Viu que foi pelo caminho errado? <kbd>Esc</kbd> na hora. Economiza tempo e limite.</p></div>
+      <div class="mini"><h4>Ctrl+C para interromper</h4><p>Funciona, mas pode limpar o campo ou sair. Para redirecionar, prefira <kbd>Esc</kbd>.</p></div>
+      <div class="mini"><h4>Pedido sem critério de pronto</h4><p>Sem saber o que é "pronto", o Claude decide por você.</p></div>
+      <div class="mini"><h4>Enter no meio do pedido</h4><p>Enter envia. Para quebrar linha: <kbd>Ctrl</kbd>+<kbd>J</kbd>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/interactive-mode">Interactive mode</a>: todos os atalhos</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a>: como escrever bons pedidos</li>
+      <li><a href="https://code.claude.com/docs/en/terminal-config">Configurar o terminal</a> (Shift+Enter etc.)</li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026 (Interactive mode e Quickstart).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Atalhos e bons prompts em 1 minuto", cenas: [
+  { fala: "Dois hábitos separam iniciantes de quem domina o Claude Code: interromper cedo e dar contexto preciso.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 1 · AULA 4</span><p class=\"v-titulo\" data-t=\"0.3\">Atalhos, shell, menções e bons prompts</p><p class=\"v-sub\" data-t=\"0.9\">Interromper cedo e dar contexto preciso</p>" },
+  { fala: "Viu o Claude indo pelo caminho errado? Aperte Esc na hora. Ele para, mantém o que já fez, e você redireciona.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"o\">●</span> Write(banco.py)</div><div data-t=\"1.6\"><span class=\"w\">⎋ Interrupted by user</span></div><div data-t=\"3.4\"><span class=\"u\">&gt; </span>mantenha o tarefas.json e só adicione o remover</div></div>" },
+  { fala: "Três prefixos: barra para comandos, exclamação para rodar um comando direto, e arroba para apontar um arquivo.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa\" data-t=\"0.6\"><span class=\"v-ic\">/</span><b>Comandos</b>/clear, /model…</div><div class=\"v-caixa\" data-t=\"2\"><span class=\"v-ic\">!</span><b>Shell mode</b>! git status</div><div class=\"v-caixa\" data-t=\"4\"><span class=\"v-ic\">@</span><b>Menção</b>@tarefas.py</div></div>" },
+  { fala: "Com a exclamação, o comando roda direto, sem pedir permissão. A saída entra no contexto e o Claude comenta o resultado.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:12\">! git status</span></div><div data-t=\"2.4\"><span class=\"w\">modified:   tarefas.py</span></div><div data-t=\"4\"><span class=\"a\">●</span> Há mudanças não commitadas em tarefas.py.</div></div>" },
+  { fala: "Um bom pedido tem quatro partes: o quê, onde, com arroba no arquivo, as restrições e o critério de pronto.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">🎯</span><b>O quê</b>a mudança exata</div><div class=\"v-caixa\" data-t=\"1.6\"><span class=\"v-ic\">📍</span><b>Onde</b>@arquivo</div><div class=\"v-caixa\" data-t=\"3.2\"><span class=\"v-ic\">📏</span><b>Restrições</b>sem libs novas</div><div class=\"v-caixa ok\" data-t=\"4.4\"><span class=\"v-ic\">✅</span><b>Pronto quando…</b>teste e mostre</div></div>" },
+  { fala: "E três atalhos úteis: Ctrl+J quebra linha sem enviar, Alt+V cola uma imagem, e o ponto de interrogação, com o campo vazio, mostra todos os atalhos.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">↵</span><b>Ctrl+J</b>nova linha</div><div class=\"v-caixa\" data-t=\"2.6\"><span class=\"v-ic\">🖼</span><b>Alt+V</b>colar imagem</div><div class=\"v-caixa\" data-t=\"4.2\"><span class=\"v-ic\">?</span><b>? (campo vazio)</b>todos os atalhos</div></div>" },
+  { fala: "E nunca cole senhas, tokens ou dados pessoais nos prompts. Nos estudos, use sempre dados fictícios.",
+    html: "<div class=\"v-caixa err\" data-t=\"0.3\"><span class=\"v-ic\">🔒</span><b>Nunca cole senhas, tokens ou dados pessoais</b>nos estudos, use sempre dados fictícios</div>" }
+] });
+Curso.passos("diag", {
+  seta: "·",
+  nos: [{ ic: "/", rt: "Comandos" }, { ic: "!", rt: "Shell mode" }, { ic: "@", rt: "Menção" }],
+  passos: [
+    { ativos: [0], titulo: "/ fala com a ferramenta", texto: "<code>/clear</code>, <code>/model</code>, <code>/context</code>… Só funciona no <strong>início</strong> da mensagem. Você viu isso na aula anterior." },
+    { ativos: [1], titulo: "! roda um comando direto", texto: "<code>! git status</code> roda o comando <strong>sem passar pelo Claude</strong> e sem pedir permissão. A saída entra no contexto e <strong>o Claude comenta o resultado automaticamente</strong>. Ótimo para <code>! python tarefas.py listar</code> e receber a análise junto." },
+    { ativos: [2], titulo: "@ aponta arquivos", texto: "Digite <code>@</code> e comece o nome: aparece um autocompletar. <code>explique @tarefas.py</code> diz exatamente qual arquivo usar, sem o Claude ter que procurar." },
+    { ativos: [0, 1, 2], titulo: "Combinando", texto: "Um fluxo típico: <code>! python -m pytest</code> (vê a falha) → <em>\"corrija o teste que falhou em @test_tarefas.py\"</em> → <code>! git diff</code> (revisa) → <code>/clear</code> (próxima tarefa)." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: Esc para redirecionar (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "adicione o comando remover <numero>", leg: "Pedido sem restrições…" },
+    { t: "claude", x: "Vou adicionar o comando e também migrar o armazenamento para SQLite.", ms: 1200 },
+    { t: "tool", x: "Write(banco.py)", leg: "Hum… não era isso" },
+    { t: "html", x: '<span class="t-warn">⎋ Interrupted by user</span>', leg: "Você apertou Esc: o Claude para na hora" },
+    { t: "user", x: "não mude o armazenamento. mantenha o tarefas.json e só adicione o remover", leg: "Redirecione com uma restrição clara" },
+    { t: "claude", x: "Entendido, mantenho o JSON. Vou só adicionar o comando.", ms: 1000 },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "Updated tarefas.py with 11 additions" },
+    { t: "user", x: "! python tarefas.py remover 1", leg: "! roda direto e o Claude comenta a saída" },
+    { t: "out", x: "Tarefa 1 removida." },
+    { t: "claude", x: "Funcionou: a tarefa 1 foi removida e as demais foram renumeradas." }
+  ]
+});
+(function () {
+  function avalia(t) {
+    var low = t.toLowerCase(), pts = [], falta = [];
+    var oque = /(adicione|crie|corrija|remova|altere|implemente|escreva|renomeie|mude)/.test(low) && t.length > 25;
+    var onde = /@\S+/.test(t);
+    var restr = /(sem |não |nao |mantenha|reaproveite|apenas|somente|só )/.test(low);
+    var pronto = /(pronto quando|teste|rode|verifique|mostre a saída|mostre a saida|critério|criterio)/.test(low);
+    [[oque, "o quê (verbo de ação + detalhe)"], [onde, "onde (@arquivo)"], [restr, "restrição (sem/mantenha/apenas…)"], [pronto, "critério de pronto (teste/rode/pronto quando…)"]].forEach(function (x) { (x[0] ? pts : falta).push(x[1]); });
+    var nota = pts.length;
+    var barra = "★".repeat(nota) + "☆".repeat(4 - nota);
+    var s = '<span class="t-b">Nota do prompt: <span class="' + (nota >= 4 ? "t-ok" : nota >= 2 ? "t-warn" : "t-warn") + '">' + barra + " (" + nota + "/4)</span></span>";
+    if (pts.length) s += '\n<span class="t-ok">✓ Tem: ' + pts.join(" · ") + "</span>";
+    if (falta.length) s += '\n<span class="t-warn">✗ Falta: ' + falta.join(" · ") + "</span>";
+    if (nota === 4) s += '\n<span class="t-ok">Excelente! Esse pedido tem tudo para dar certo na primeira tentativa.</span>';
+    return s;
+  }
+  Curso.terminal("term", {
+    titulo: "Avaliador de prompts (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Envie pedidos e receba uma nota. Também aceita: ! git status · ! python tarefas.py listar · @ (lista arquivos)</span>',
+    metas: ["arruma o código", "! git status", "@"],
+    comandos: {
+      "! git status": 'On branch main\n<span class="t-warn">modified:   tarefas.py</span>\n\n<span class="t-acc">●</span> Há mudanças não commitadas em tarefas.py. Quer que eu mostre o diff ou faça o commit?\n<span class="t-dim">(repare: o comando rodou direto, e o Claude comentou a saída)</span>',
+      "! python tarefas.py listar": '1. [ ] Estudar o Módulo 1\n2. [x] Instalar o Claude Code\n\n<span class="t-acc">●</span> Você tem 2 tarefas, 1 concluída.',
+      "@": '<span class="t-dim">Autocompletar:</span>\n  @tarefas.py\n  @tarefas.json\n  @README.md\n  @test_tarefas.py'
+    },
+    padroes: [[/^!\s*(.+)/, function (m) { return '<span class="t-dim">(shell mode: rodaria "' + m[1] + '" direto e o Claude comentaria a saída)</span>'; }], [/^\//, function () { return '<span class="t-dim">Comandos / foram a aula anterior. Aqui, avalie prompts!</span>'; }]],
+    desconhecido: avalia
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "O Claude começou a reescrever um arquivo que você não pediu. O que fazer?", op: ["Esperar terminar e desfazer depois", "Apertar <kbd>Esc</kbd> e redirecionar com uma instrução clara", "Fechar o terminal"], c: 1, ex: "<kbd>Esc</kbd> interrompe na hora e mantém o que já foi feito. Você corrige o rumo sem perder a sessão." },
+  { p: "O que <code>! python -m pytest</code> faz dentro do Claude Code?", op: ["Pede ao Claude para escrever testes", "Roda o comando direto, adiciona a saída ao contexto e o Claude comenta o resultado", "Abre o PowerShell em outra janela"], c: 1, ex: "Shell mode: execução direta, sem pedido de permissão, e o Claude analisa a saída." },
+  { p: "Qual pedido é melhor?", op: ["\"melhora o tarefas.py\"", "\"Em @tarefas.py, adicione o comando remover &lt;numero&gt;, sem bibliotecas novas. Pronto quando remover 2 funcionar e número inválido der mensagem clara; rode e mostre.\""], c: 1, ex: "Tem o quê, onde, restrição e critério de pronto. O Claude sabe exatamente o que entregar e como provar." },
+  { p: "Como quebrar linha no prompt sem enviar a mensagem?", op: ["<kbd>Enter</kbd>", "<kbd>Ctrl</kbd>+<kbd>J</kbd> (ou <kbd>\\</kbd> + <kbd>Enter</kbd>)", "<kbd>Tab</kbd>"], c: 1, ex: "<kbd>Ctrl</kbd>+<kbd>J</kbd> funciona em qualquer terminal. No Windows Terminal recente, <kbd>Shift</kbd>+<kbd>Enter</kbd> também." }
+]);
+Curso.checklist("check", [
+  "Interrompo com <kbd>Esc</kbd> e redireciono sem perder a sessão",
+  "Uso <code>!</code> para rodar comandos e <code>@</code> para apontar arquivos",
+  "Escrevo pedidos com o quê, onde, restrição e critério de pronto",
+  "Quebro linhas com <kbd>Ctrl</kbd>+<kbd>J</kbd>",
+  "Adicionei o comando <code>remover</code> ao TaskFlow e fiz commit"
+]);
+</script>
+</body>
+</html>

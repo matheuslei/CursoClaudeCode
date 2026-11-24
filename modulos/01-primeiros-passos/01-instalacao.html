@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalação no Windows</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m1a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 1 · Aula 1</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~15 min</span>
+    <h1>Instalação no Windows</h1>
+    <p class="objetivo">Objetivo: instalar o Claude Code, confirmar que funciona e saber resolver os dois problemas mais comuns.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Instalação mal feita é o motivo nº 1 de desistência. Em 15 minutos você deixa tudo funcionando e entende <em>o que</em> foi instalado, para resolver problemas sozinho no futuro.</p>
+    <div class="caixa alerta"><strong>Antes de começar: máquina corporativa</strong>Confirme com a TI da sua organização se você pode instalar o Claude Code e usá-lo com sua conta. Ambientes corporativos podem ter proxy, bloqueio de instalação ou política sobre ferramentas de IA. Para estudar, use só projetos de teste com dados fictícios.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o que você precisa</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Passo a passo</h2>
+    <h3>Opção A: instalador nativo (recomendado)</h3>
+    <p>Abra o <strong>PowerShell</strong> (prompt começa com <code>PS</code>) e rode:</p>
+    <div class="cod"><code>irm https://claude.ai/install.ps1 | iex</code></div>
+    <p>O comando não mostra progresso enquanto baixa, então espere terminar. A versão nativa <strong>se atualiza sozinha</strong> em segundo plano.</p>
+    <h3>Opção B: WinGet</h3>
+    <div class="cod"><code>winget install Anthropic.ClaudeCode</code></div>
+    <p>Pelo WinGet <strong>não</strong> há atualização automática. Rode de vez em quando: <code>winget upgrade Anthropic.ClaudeCode</code>.</p>
+    <h3>Confirmar</h3>
+    <p><strong>Abra um terminal novo</strong> e rode:</p>
+    <div class="cod"><code>claude --version</code></div>
+    <p>Deve aparecer um número de versão seguido de <code>(Claude Code)</code>.</p>
+    <h3>Primeiro login</h3>
+    <div class="cod"><code>cd ~\estudos-claude
+claude</code></div>
+    <p>Na primeira vez, o Claude Code abre o navegador para você entrar na conta. Tipos de conta aceitos: assinatura Claude (Pro, Max, Team, Enterprise), conta do Claude Console (créditos de API) ou provedores de nuvem corporativos. As credenciais ficam salvas, e para trocar de conta depois use <code>/login</code>.</p>
+    <div class="caixa"><strong>Git for Windows: recomendado</strong>Com o Git for Windows instalado (aula 0.2), o Claude Code consegue usar o Bash. Sem ele, usa o PowerShell como shell. Os dois funcionam.</div>
+    <div class="caixa"><strong>Prefere interface gráfica?</strong>O app <strong>Claude Desktop</strong> tem a aba <strong>Code</strong>, que já inclui o Claude Code (exige plano pago). Você pode usar os dois: o que aprender no terminal vale lá também.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: diagnostique os erros</h2>
+    <p>Este terminal simula erros comuns de instalação. Rode os comandos do desafio e leia as dicas.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>Instale o Claude Code (opção A ou B)</li>
+      <li>Abra um terminal <strong>novo</strong> e rode <code>claude --version</code></li>
+      <li>Entre na pasta <code>estudos-claude</code>, rode <code>claude</code> e faça login</li>
+      <li>Dentro da sessão, digite <code>/status</code> e anote no <code>diario.md</code> a versão e o modelo</li>
+      <li>Rode <code>/doctor</code> para o checkup completo e saia com <code>/exit</code></li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Se tudo deu certo, <code>/status</code> mostra versão, modelo, conta e conectividade, e o <code>/doctor</code> não aponta problemas graves. Exemplo de anotação no diário:</p>
+      <div class="cod"><code>Dia 3: Claude Code instalado. Versão 2.1.xxx, modelo padrão: (o que aparecer no /status)</code></div>
+      <p>Se o <code>/doctor</code> apontar algo, leia a sugestão: ele diagnostica a instalação e as configurações e pode corrigir alguns problemas sozinho.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <table class="tab">
+      <thead><tr><th>Mensagem</th><th>Causa</th><th>Solução</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude</code> não é reconhecido</td><td>Pasta de instalação fora do PATH, ou terminal aberto antes da instalação</td><td>Feche e abra o terminal. Persistindo, veja <a href="https://code.claude.com/docs/en/troubleshoot-install">Fix your PATH</a></td></tr>
+        <tr><td><code>'irm' is not recognized</code></td><td>Você está no CMD, não no PowerShell</td><td>Abra o PowerShell (prompt <code>PS</code>)</td></tr>
+        <tr><td><code>The token '&amp;&amp;' is not a valid statement separator</code></td><td>Comando do CMD rodado no PowerShell</td><td>Use o comando da versão PowerShell</td></tr>
+        <tr><td>403, erro de rede ou certificado</td><td>Proxy ou firewall corporativo</td><td>Fale com a TI; veja <a href="https://code.claude.com/docs/en/troubleshoot-install">Troubleshoot installation</a></td></tr>
+      </tbody>
+    </table>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart oficial</a></li>
+      <li><a href="https://code.claude.com/docs/en/setup">Advanced setup</a>: atualizar, desinstalar, outras formas</li>
+      <li><a href="https://code.claude.com/docs/en/desktop-quickstart">App Desktop</a></li>
+      <li><a href="https://academy.claude.com/courses/claude-code-101">Claude Code 101</a> (Anthropic Academy, gratuito, em inglês): o curso introdutório oficial, bom para revisar os Módulos 1 a 3.</li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026 (Quickstart e Overview oficiais).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Instalação em 1 minuto", cenas: [
+  { fala: "Vamos instalar o Claude Code no Windows, conferir que funciona e resolver os erros mais comuns.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 1 · AULA 1</span><p class=\"v-titulo\" data-t=\"0.3\">Instalação no Windows</p><p class=\"v-sub\" data-t=\"0.9\">Instalar, conferir e resolver os erros comuns</p>" },
+  { fala: "Você precisa de quatro coisas: uma conta com acesso, como uma assinatura Claude paga ou o Claude Console; um terminal, aqui o PowerShell; o Claude Code instalado; e uma pasta de projeto.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa\" data-t=\"0.4\"><span class=\"v-ic\">🪪</span><b>Conta</b>assinatura paga ou Console</div><div class=\"v-caixa\" data-t=\"3.6\"><span class=\"v-ic\">💻</span><b>Terminal</b>PowerShell</div><div class=\"v-caixa\" data-t=\"5.6\"><span class=\"v-ic\">⬇</span><b>Claude Code</b>instalado</div><div class=\"v-caixa\" data-t=\"7\"><span class=\"v-ic\">📁</span><b>Projeto</b>uma pasta</div></div>" },
+  { fala: "No PowerShell, rode o instalador nativo. Ele não mostra progresso enquanto baixa, então aguarde. E essa versão se atualiza sozinha.",
+    html: "<p class=\"v-txt\" data-t=\"0\">Instalador nativo (PowerShell)</p><div class=\"v-code\" data-t=\"0.5\"><span class=\"a\">PS&gt;</span> <span class=\"v-digita\" style=\"--n:39\">irm https://claude.ai/install.ps1 | iex</span></div><div class=\"v-grade\" data-t=\"3.5\"><div class=\"v-caixa warn\"><b>Sem barra de progresso</b>aguarde terminar</div><div class=\"v-caixa ok\"><b>Atualiza sozinho</b>versão nativa</div></div>" },
+  { fala: "Depois, abra um terminal novo e rode claude --version. Deve aparecer o número da versão.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"d\"># em um terminal NOVO</span></div><div data-t=\"1.6\"><span class=\"a\">PS&gt;</span> <span class=\"u\">claude --version</span></div><div data-t=\"3.6\"><span class=\"o\">2.1.xxx (Claude Code)</span></div></div>" },
+  { fala: "Entre na pasta do projeto e digite claude. Na primeira vez, o navegador abre para você entrar na conta, e as credenciais ficam salvas.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">PS&gt;</span> <span class=\"u\">cd ~\\estudos-claude</span></div><div data-t=\"1.6\"><span class=\"a\">PS&gt;</span> <span class=\"u\">claude</span></div></div><div class=\"v-linha\" data-t=\"3.4\"><div class=\"v-caixa acc\"><span class=\"v-ic\">🌐</span><b>Login no navegador</b>só na primeira vez</div></div>" },
+  { fala: "Dois erros comuns: se claude não for reconhecido, abra um terminal novo. Se irm não for reconhecido, você está no CMD, não no PowerShell.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa err\" data-t=\"0.4\"><span class=\"v-ic\">❓</span><b>\"claude\" não é reconhecido</b>abra um terminal novo</div><div class=\"v-caixa err\" data-t=\"3.6\"><span class=\"v-ic\">❓</span><b>\"irm\" não é reconhecido</b>você está no CMD: abra o PowerShell</div></div>" },
+  { fala: "E se for a máquina do trabalho, confirme com a TI antes de instalar.",
+    html: "<p class=\"v-sub\" data-t=\"0\">Antes de tudo</p><p class=\"v-titulo\" data-t=\"0.4\">Máquina corporativa? Fale com a TI</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🪪", rt: "Conta" }, { ic: "💻", rt: "Terminal" }, { ic: "⬇", rt: "Claude Code" }, { ic: "📁", rt: "Projeto" }],
+  passos: [
+    { ativos: [0], titulo: "Uma conta com acesso", texto: "Assinatura Claude (Pro, Max, Team ou Enterprise), conta do Claude Console (paga por uso) ou acesso por um provedor de nuvem da empresa. <strong>O plano gratuito do Claude.ai não inclui o Claude Code.</strong> Confira a página de preços." },
+    { ativos: [1], setas: [0], titulo: "Um terminal", texto: "No Windows, o <strong>PowerShell</strong> (ou o Windows Terminal com PowerShell). Também funciona no WSL." },
+    { ativos: [2], setas: [1], titulo: "O Claude Code instalado", texto: "Um programa de linha de comando chamado <code>claude</code>. A instalação nativa coloca o executável no seu usuário e atualiza sozinha." },
+    { ativos: [3], setas: [2], titulo: "Uma pasta de projeto", texto: "O Claude Code trabalha <strong>na pasta onde você o abre</strong>. Por isso sempre <code>cd</code> para o projeto antes de rodar <code>claude</code>." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell (demonstração)", prompt: "PS C:\\Users\\ana>", altura: 260,
+  passos: [
+    { t: "cmd", x: "irm https://claude.ai/install.ps1 | iex", leg: "Instalador nativo: não mostra progresso, aguarde" },
+    { t: "html", x: '<span class="t-dim">(baixando…)</span>', ms: 1500 },
+    { t: "html", x: '<span class="t-ok">✔ Claude Code successfully installed!</span>' },
+    { t: "nota", x: "Feche este terminal e abra um novo", ms: 1200 },
+    { t: "cmd", x: "claude --version", leg: "Confirma a instalação" },
+    { t: "html", x: "2.1.xxx (Claude Code)" },
+    { t: "cmd", x: "cd ~\\estudos-claude" },
+    { t: "cmd", x: "claude", leg: "Primeira execução: login no navegador" },
+    { t: "html", x: '<span class="t-acc">Welcome to Claude Code!</span>\nSelect login method:\n<span class="t-user">❯ 1. Claude account with subscription</span>\n  2. Anthropic Console account\n  3. 3rd-party platform' },
+    { t: "html", x: '<span class="t-dim">Abrindo o navegador para autenticação…</span>', ms: 1300 },
+    { t: "html", x: '<span class="t-ok">Login successful.</span>', leg: "Pronto! Credenciais salvas para as próximas vezes" }
+  ]
+});
+Curso.terminal("term", {
+  titulo: "Diagnóstico (simulação)", prompt: "C:\\Users\\voce>",
+  intro: '<span class="t-dim">Atenção ao prompt: ele começa sem "PS". Que terminal é este?</span>',
+  metas: ["irm https://claude.ai/install.ps1 | iex", "powershell", "claude --version", "claude doctor"],
+  comandos: {
+    "irm https://claude.ai/install.ps1 | iex": function () { var p = document.querySelector("#term .pr").textContent; if (p.indexOf("PS") === 0) return '<span class="t-ok">✔ Claude Code successfully installed!</span>\n<span class="t-dim">Agora abra um terminal novo e rode claude --version (aqui pode rodar direto).</span>'; return "<span class=\"t-warn\">'irm' is not recognized as an internal or external command.</span>\n<span class=\"t-dim\">Diagnóstico: você está no CMD (sem PS no prompt). Digite powershell para trocar.</span>"; },
+    "powershell": function () { var p = document.querySelector("#term .pr"); p.textContent = "PS C:\\Users\\voce>"; return "Windows PowerShell\n<span class=\"t-dim\">Repare: agora o prompt começa com PS. Tente instalar de novo.</span>"; },
+    "claude --version": "2.1.xxx (Claude Code)",
+    "claude doctor": '<span class="t-dim">Dica: o checkup roda DENTRO da sessão, com /doctor. Abra com claude e digite /doctor.</span>',
+    "claude": '<span class="t-acc">✻ Claude Code</span> <span class="t-dim">(sessão simulada aberta; aqui só praticamos instalação. Digite /doctor ou /exit)</span>',
+    "/doctor": '<span class="t-ok">✔ Installation: native, auto-updates on\n✔ Authentication: OK\n✔ Settings: no problems found</span>\n<span class="t-dim">(saída ilustrativa)</span>',
+    "/exit": '<span class="t-dim">Sessão encerrada.</span>'
+  }
+});
+Curso.quiz("quiz", [
+  { p: "Você rodou <code>irm https://claude.ai/install.ps1 | iex</code> e recebeu <code>'irm' is not recognized</code>. Por quê?", op: ["Sem internet", "Você está no CMD, não no PowerShell", "O Claude Code já está instalado"], c: 1, ex: "<code>irm</code> é um comando do PowerShell. No CMD ele não existe. Olhe o prompt: PowerShell começa com <code>PS</code>." },
+  { p: "Acabou de instalar e <code>claude</code> \"não é reconhecido\". Qual a primeira coisa a tentar?", op: ["Reinstalar o Windows", "Fechar e abrir um terminal novo", "Comprar outro plano"], c: 1, ex: "O terminal antigo não conhece o PATH atualizado. Um terminal novo resolve na maioria dos casos." },
+  { p: "Instalou pelo WinGet. Como fica a atualização?", op: ["É automática", "Manual: <code>winget upgrade Anthropic.ClaudeCode</code>", "Não existe atualização"], c: 1, ex: "Só a instalação nativa se atualiza sozinha. Pelo WinGet, atualize de vez em quando." },
+  { p: "Em qual pasta o Claude Code trabalha?", op: ["Sempre em C:\\", "Na pasta onde você rodou <code>claude</code>", "Na pasta Documentos"], c: 1, ex: "Por isso, sempre faça <code>cd</code> para o projeto antes de abrir o Claude." }
+]);
+Curso.checklist("check", [
+  "<code>claude --version</code> mostra a versão",
+  "Fiz login e a sessão abriu na pasta <code>estudos-claude</code>",
+  "Usei <code>/status</code> e <code>/doctor</code>",
+  "Sei resolver \"não é reconhecido\" e a confusão CMD × PowerShell"
+]);
+</script>
+</body>
+</html>

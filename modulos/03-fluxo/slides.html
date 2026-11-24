@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 3</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 3 · Revisão</p>
+    <h1>Fluxo profissional</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>As 4 etapas</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">🔎 Explorar → 🗺 Planejar → 🛠 Codar → 💾 Commitar</p>
+    <ul>
+      <li>Proporcional ao tamanho: tarefa trivial vai direto</li>
+      <li>Dê ao Claude algo que responda passou/falhou</li>
+      <li>Duas correções falharam? <code>/clear</code> + pedido melhor</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Plan mode</h2>
+    <ul>
+      <li>Entrar: <kbd>Shift</kbd>+<kbd>Tab</kbd> (<code>⏸ plan mode on</code>), <code>/plan</code>, <code>claude --permission-mode plan</code></li>
+      <li>Investiga à vontade; <strong>não edita</strong> antes da aprovação</li>
+      <li><em>No, keep planning</em> para ajustar · <kbd>Ctrl</kbd>+<kbd>G</kbd> edita no seu editor</li>
+      <li>Sair sem aprovar: <kbd>Esc</kbd> antes do <kbd>Shift</kbd>+<kbd>Tab</kbd></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>A spec em 5 seções</h2>
+    <div class="cod" style="max-width:720px"><code>## Objetivo
+## Requisitos          (R1, R2…)
+## Fora de escopo
+## Critérios de aceite  (dado / quando / então)
+## Casos de borda</code></div>
+  </section>
+  <section class="slide">
+    <h2>Deixe o Claude te entrevistar</h2>
+    <div class="cod" style="max-width:860px"><code>quero prazo nas tarefas. me entreviste até conseguir
+escrever a spec, depois escreva em specs/prazo.md</code></div>
+    <ul><li>Revise e edite a spec: ela é sua</li><li>Commit da spec · <code>/clear</code> · implemente a partir do arquivo</li></ul>
+  </section>
+  <section class="slide">
+    <h2>TDD com IA</h2>
+    <ol>
+      <li>Só os testes, um por critério → confirmar 🔴</li>
+      <li>Revisar e <strong>commitar os testes</strong></li>
+      <li>Implementar até 🟢, <strong>sem alterar tests/</strong></li>
+      <li><code>git diff HEAD -- tests/</code> vazio</li>
+    </ol>
+  </section>
+  <section class="slide">
+    <h2>Verificação em camadas</h2>
+    <ul>
+      <li>🧪 Testes · ▶ rodar o app (<code>/verify</code>)</li>
+      <li>👀 Seu diff: faz o que a spec pede? só isso? bordas? nada apagado?</li>
+      <li>🔍 <code>/code-review</code>: revisor sem a conversa, em segundo plano</li>
+      <li>📄 Revisão contra a spec, ignorando estilo</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Evidência, não afirmação</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">"Todos os testes passam" → <em>mostre a saída</em>.</p>
+    <p><code>/code-review --fix</code> em segundo plano fica fora do <code>/rewind</code>: commit antes.</p>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 4?</h2>
+    <ul>
+      <li>✓ TaskFlow com <code>editar</code>, filtros, prazo e <code>atrasadas</code></li>
+      <li>✓ <code>specs/prazo.md</code> e testes commitados</li>
+      <li>✓ Você planeja, especifica, testa e revisa</li>
+    </ul>
+    <p><a href="../04-permissoes/01-modos.html">Ir para o Módulo 4: Permissões e segurança →</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

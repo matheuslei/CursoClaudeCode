@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hooks</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m5a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 5 · Aula 4</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~30 min</span>
+    <h1>Hooks</h1>
+    <p class="objetivo">Objetivo: fazer o Claude Code executar um comando seu automaticamente em momentos certos (após cada edição, antes de um comando), garantindo regras que não dependem de o Claude "lembrar".</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Você pode escrever no CLAUDE.md "sempre verifique a sintaxe depois de editar". Na maioria das vezes ele faz, mas não sempre. Um <strong>hook</strong> é executado <strong>pela ferramenta</strong>, toda vez, sem exceção. É a diferença entre pedir e garantir.</p>
+    <div class="grade">
+      <div class="mini"><h4>Exemplos clássicos</h4><p>Formatar/validar após editar · bloquear comando perigoso · notificar quando o Claude termina · injetar contexto ao iniciar a sessão.</p></div>
+      <div class="mini"><h4>Cuidado</h4><p>Hooks rodam comandos <strong>com as suas permissões</strong>, sem pedir aprovação. Leia todo hook de projeto ou plugin antes de confiar.</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: onde os hooks entram no ciclo</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Configuração</h2>
+    <p>Hooks ficam nos mesmos arquivos de settings da aula 5.1 (usuário, projeto, local ou gerenciado), na chave <code>hooks</code>. A estrutura tem 3 níveis: <strong>evento → grupo com matcher → lista de handlers</strong>.</p>
+    <div class="cod"><span class="rot">.claude/settings.json (TaskFlow)</span><code>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/checar.py"
+          }
+        ]
+      }
+    ]
+  }
+}</code></div>
+    <p>E o script que ele chama: compila os <code>.py</code> do projeto e, se houver erro de sintaxe, sai com código <strong>2</strong> para o Claude receber o erro e corrigir.</p>
+    <div class="cod"><span class="rot">.claude/hooks/checar.py</span><code>import py_compile
+import sys
+from pathlib import Path
+
+sys.stderr.reconfigure(encoding="utf-8")  # acentos legíveis no Windows
+raiz = Path(__file__).resolve().parents[2]  # pasta do projeto
+erros = []
+for arquivo in raiz.glob("*.py"):
+    try:
+        py_compile.compile(str(arquivo), doraise=True)
+    except py_compile.PyCompileError as e:
+        erros.append(str(e))
+
+if erros:
+    print("Erro de sintaxe após a edição:\n" + "\n".join(erros), file=sys.stderr)
+    sys.exit(2)  # 2 = o Claude vê a mensagem e pode corrigir
+sys.exit(0)</code></div>
+
+    <h3>Eventos mais usados</h3>
+    <table class="tab">
+      <tbody>
+        <tr><td><code>SessionStart</code></td><td>Sessão começa ou é retomada</td></tr>
+        <tr><td><code>UserPromptSubmit</code></td><td>Você envia um prompt, antes de o Claude processar</td></tr>
+        <tr><td><code>PreToolUse</code></td><td>Antes de uma ferramenta rodar. <strong>Pode bloquear</strong></td></tr>
+        <tr><td><code>PostToolUse</code></td><td>Depois que uma ferramenta rodou com sucesso</td></tr>
+        <tr><td><code>Notification</code></td><td>O Claude Code envia uma notificação</td></tr>
+        <tr><td><code>Stop</code></td><td>O Claude termina de responder</td></tr>
+      </tbody>
+    </table>
+    <p class="ilustrativo">Há muitos outros (PreCompact, SubagentStop, SessionEnd…). Veja a lista completa na documentação.</p>
+
+    <h3>Matcher</h3>
+    <ul>
+      <li><code>"Edit|Write"</code>: nomes exatos de ferramentas, separados por <code>|</code></li>
+      <li><code>"*"</code>, <code>""</code> ou omitido: todas</li>
+      <li>Com outros caracteres vira expressão regular, ex.: <code>"mcp__memory__.*"</code></li>
+      <li>Campo opcional <code>"if"</code> filtra com a sintaxe de permissões, ex.: <code>"if": "Bash(git *)"</code> (só em eventos de ferramenta)</li>
+    </ul>
+
+    <h3>Códigos de saída: o que o seu script devolve</h3>
+    <table class="tab">
+      <thead><tr><th>Código</th><th>Efeito</th></tr></thead>
+      <tbody>
+        <tr><td><code>0</code></td><td>Sucesso, segue normalmente</td></tr>
+        <tr><td><code>2</code></td><td>Erro bloqueante: no <code>PreToolUse</code> <strong>impede</strong> a ação; o texto do stderr vira o motivo. No <code>PostToolUse</code> a ação já aconteceu, mas o stderr é mostrado ao Claude</td></tr>
+        <tr><td>Outro (ex.: <code>1</code>)</td><td>Erro <strong>não bloqueante</strong>: a ação segue e aparece um aviso de erro do hook. Atenção: <code>exit 1</code> não bloqueia!</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa alerta"><strong>Windows</strong>Hooks de comando rodam pelo Git Bash (se instalado) ou pelo PowerShell; o campo <code>"shell"</code> aceita <code>"bash"</code> ou <code>"powershell"</code>. Por isso o exemplo usa um script <strong>Python</strong>: o mesmo comando funciona nos dois. Use barras normais nos caminhos e abra o Claude na raiz do projeto.</div>
+    <p><code>/hooks</code> abre um navegador <strong>somente leitura</strong> dos hooks configurados, com a origem de cada um (usuário, projeto, local, plugin).</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o hook pegando um erro</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: simulador de hooks</h2>
+    <p>Este Claude simulado tem dois hooks: <code>PostToolUse</code> (checar sintaxe) e <code>PreToolUse</code> (bloqueia <code>Remove-Item</code>). Dispare eventos e veja o que acontece.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, crie <code>.claude/hooks/checar.py</code> e adicione o hook ao <code>.claude/settings.json</code> (junte com as permissões da aula 5.1, num único JSON)</li>
+      <li>Valide: <code>python -m json.tool .claude\settings.json</code></li>
+      <li>Abra <code>claude</code> na raiz do projeto e rode <code>/hooks</code>: o hook aparece em PostToolUse?</li>
+      <li>Peça: <code>adicione um comando "limpar" que remove todas as tarefas concluídas</code>. Observe se o hook roda após cada edição</li>
+      <li>Teste o bloqueio: peça <code>introduza propositalmente um erro de sintaxe em tarefas.py para testarmos o hook</code>. O Claude deve receber a mensagem do hook e corrigir</li>
+      <li>Commit do <code>.claude/</code></li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito (settings completo)</summary>
+      <div class="cod"><code>{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": ["Bash(python -m unittest *)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "python .claude/hooks/checar.py" }
+        ]
+      }
+    ]
+  }
+}</code></div>
+      <p>No passo 5, depois da edição com erro, aparece o texto "Erro de sintaxe após a edição…" e o Claude corrige em seguida, sem você pedir. A versão pronta está em <code>projeto-taskflow/etapa-05/</code>.</p>
+      <p>Se o hook não rodar: confira o <code>/hooks</code>, se o Claude foi aberto na raiz do projeto e se <code>python</code> funciona no terminal. Mensagens de "hook error" com código 1 indicam erro no próprio script.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>exit 1 para bloquear</h4><p>Não bloqueia! Para impedir a ação no PreToolUse, use <code>exit 2</code>.</p></div>
+      <div class="mini"><h4>Matcher com nome errado</h4><p>As ferramentas se chamam <code>Edit</code>, <code>Write</code>, <code>Bash</code>… com maiúscula.</p></div>
+      <div class="mini"><h4>Hook lento</h4><p>Ele roda a cada edição. Rodar a suíte inteira de testes toda vez pode deixar tudo lento.</p></div>
+      <div class="mini"><h4>Confiar em hook alheio</h4><p>Hook de projeto ou plugin roda comandos na sua máquina. Leia antes.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/hooks-guide">Guia de hooks</a> (receitas práticas)</li>
+      <li><a href="https://code.claude.com/docs/en/hooks">Hooks reference</a>: todos os eventos, entrada JSON e saída</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Hooks reference). Detalhe a confirmar na sua máquina: a pasta onde o hook roda. Por isso o script localiza o projeto pelo próprio caminho.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Hooks em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai aprender a diferença entre pedir e garantir: os hooks.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 5 · AULA 4</span><p class="v-titulo" data-t="0.3">Hooks</p><p class="v-sub" data-t="0.9">Comandos que rodam toda vez, sem exceção</p>' },
+  { fala: "Escrever no CLAUDE.md para sempre verificar a sintaxe funciona na maioria das vezes, mas não sempre. Um hook é executado pela ferramenta, toda vez, sem exceção.",
+    html: '<div class="v-linha"><div class="v-caixa" data-t="0.3"><span class="v-ic">📘</span><b>CLAUDE.md</b>pede: na maioria das vezes</div><span class="v-seta" data-t="3">→</span><div class="v-caixa acc" data-t="3.6" style="--fx:v-zoom"><span class="v-ic">🪝</span><b>Hook</b>garante: toda vez</div></div>' },
+  { fala: "Os hooks se prendem a eventos. Os mais usados: quando a sessão começa, quando você envia um prompt, antes de uma ferramenta rodar, que pode bloquear a ação, depois que ela rodou, e quando o Claude termina de responder.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.6"><b>SessionStart</b>sessão começa</div><div class="v-caixa" data-t="1.8"><b>UserPromptSubmit</b>você envia</div><div class="v-caixa warn" data-t="3.2"><b>PreToolUse</b>antes: pode bloquear</div><div class="v-caixa acc" data-t="4.8"><b>PostToolUse</b>depois da ferramenta</div><div class="v-caixa" data-t="6.2"><b>Stop</b>Claude termina</div></div>' },
+  { fala: "A configuração fica no settings, na chave hooks: evento, matcher e comando. Aqui, depois de cada Edit ou Write, o TaskFlow roda um script Python que verifica a sintaxe.",
+    html: '<p class="v-txt" data-t="0">.claude/settings.json</p><div class="v-code" data-t="0.3"><div><span class="a">"PostToolUse"</span>: [{</div><div data-t="2.6">  <span class="a">"matcher"</span>: <span class="o">"Edit|Write"</span>,</div><div data-t="3.6">  <span class="a">"hooks"</span>: [{ <span class="a">"type"</span>: <span class="o">"command"</span>,</div><div data-t="4.8">    <span class="a">"command"</span>: <span class="o">"python .claude/hooks/checar.py"</span> }]</div><div>}]</div></div>' },
+  { fala: "O código de saída do seu script decide o que acontece. Zero segue normalmente. Dois é bloqueante: no Pre Tool Use impede a ação, e a mensagem vai para o Claude. Qualquer outro, como um, não bloqueia.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa ok" data-t="0.6"><span class="v-ic">0</span><b>sucesso</b>segue normalmente</div><div class="v-caixa err" data-t="2.4"><span class="v-ic">2</span><b>bloqueia</b>o stderr vai para o Claude</div><div class="v-caixa warn" data-t="5.4"><span class="v-ic">1</span><b>não bloqueia!</b>só um aviso de erro</div></div>' },
+  { fala: "Cuidado: hooks rodam comandos com as suas permissões, sem pedir aprovação. Leia todo hook de projeto ou plugin antes de confiar. Barra hooks mostra os configurados e de onde vêm.",
+    html: '<div class="v-grade"><div class="v-caixa err" data-t="0.3"><span class="v-ic">⚠</span><b>Sem aprovação</b>rodam com as suas permissões: leia antes</div><div class="v-caixa" data-t="4.2"><span class="v-ic">🔎</span><b>/hooks</b>lista os hooks e a origem de cada um</div></div>' },
+  { fala: "Guarde assim: pedir é CLAUDE.md. Garantir é hook.",
+    html: '<p class="v-sub" data-t="0">A regra prática</p><p class="v-titulo" data-t="0.4">Pedir é CLAUDE.md. Garantir é hook.</p>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "▶", rt: "SessionStart" }, { ic: "✍", rt: "UserPromptSubmit" }, { ic: "🛑", rt: "PreToolUse" }, { ic: "🛠", rt: "Ferramenta" }, { ic: "🔍", rt: "PostToolUse" }, { ic: "🏁", rt: "Stop" }],
+  passos: [
+    { ativos: [0], titulo: "SessionStart", texto: "Roda quando a sessão começa ou é retomada. Útil para injetar contexto (ex.: a branch atual)." },
+    { ativos: [1], setas: [0], titulo: "UserPromptSubmit", texto: "Roda quando você envia uma mensagem, antes de o Claude processar." },
+    { ativos: [2], setas: [1], titulo: "PreToolUse: o porteiro", texto: "Antes da ferramenta rodar. Se o hook sair com <code>exit 2</code>, a ação é <strong>bloqueada</strong> e o stderr explica o motivo ao Claude." },
+    { ativos: [3], setas: [2], titulo: "A ferramenta executa", texto: "Edit, Write, Bash… com as permissões de sempre." },
+    { ativos: [4], setas: [3], titulo: "PostToolUse: o verificador", texto: "Depois da ferramenta. Perfeito para validar, formatar ou testar o que acabou de mudar. O matcher <code>Edit|Write</code> limita a edições." },
+    { ativos: [5], setas: [4], titulo: "Stop", texto: "Quando o Claude termina de responder. Exemplo: tocar um som ou mandar notificação." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code + hook PostToolUse (demonstração)", altura: 320,
+  passos: [
+    { t: "user", x: "adicione o comando limpar que remove as tarefas concluídas" },
+    { t: "tool", x: "Update(tarefas.py)", leg: "O Claude edita…" },
+    { t: "out", x: "Updated tarefas.py with 9 additions" },
+    { t: "html", x: '<span class="t-warn">  ⎿ PostToolUse:Edit hook returned blocking error:\n    Erro de sintaxe após a edição:\n    File "tarefas.py", line 71: def limpar(\n                                         ^ SyntaxError</span>', leg: "…o hook pega o erro na hora (exit 2)" },
+    { t: "claude", x: "O hook apontou um parêntese não fechado na linha 71. Corrigindo.", ms: 1300 },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "Updated tarefas.py with 1 addition and 1 removal" },
+    { t: "html", x: '<span class="t-ok">  ⎿ PostToolUse:Edit hook: ok</span>', leg: "Agora passou: exit 0" },
+    { t: "claude", x: "Comando limpar adicionado e validado." }
+  ]
+});
+(function () {
+  var sintaxeOk = true;
+  function post() { return sintaxeOk ? '<span class="t-ok">  ⎿ PostToolUse hook: checar.py → exit 0 (ok)</span>' : '<span class="t-warn">  ⎿ PostToolUse hook: checar.py → exit 2\n    Erro de sintaxe após a edição (stderr mostrado ao Claude)</span>\n<span class="t-acc">●</span> O hook encontrou um erro. Vou corrigir.'; }
+  Curso.terminal("term", {
+    titulo: "Simulador de hooks", prompt: ">",
+    intro: '<span class="t-dim">Comandos: editar ok · editar com erro · rodar Remove-Item · rodar git status · ler arquivo · /hooks</span>',
+    metas: ["/hooks", "editar ok", "editar com erro", "rodar Remove-Item", "ler arquivo"],
+    comandos: {
+      "/hooks": '<span class="t-caixa">Hooks (somente leitura)\n  PreToolUse   matcher: Bash      <span class="t-dim">project · bloquear-rm.py</span>\n  PostToolUse  matcher: Edit|Write <span class="t-dim">project · checar.py</span></span>',
+      "editar ok": function () { sintaxeOk = true; return '<span class="t-ok">●</span> <span class="t-b">Update(tarefas.py)</span>\n' + post(); },
+      "editar com erro": function () { sintaxeOk = false; var r = '<span class="t-ok">●</span> <span class="t-b">Update(tarefas.py)</span>\n' + post(); sintaxeOk = true; return r; },
+      "rodar remove-item": '<span class="t-ok">●</span> <span class="t-b">Bash(Remove-Item -Recurse dados)</span>\n<span class="t-warn">  ⎿ PreToolUse hook: bloquear-rm.py → exit 2\n    Bloqueado: remoção recursiva não é permitida neste projeto.</span>\n<span class="t-dim">A ferramenta NÃO rodou: o PreToolUse bloqueou antes.</span>',
+      "rodar git status": '<span class="t-ok">●</span> <span class="t-b">Bash(git status)</span>\n<span class="t-dim">  ⎿ PreToolUse hook: bloquear-rm.py → exit 0</span>\n  On branch main, nothing to commit',
+      "ler arquivo": '<span class="t-ok">●</span> <span class="t-b">Read(tarefas.py)</span>\n<span class="t-dim">  ⎿ (nenhum hook: o matcher Edit|Write não inclui Read)</span>'
+    },
+    desconhecido: '<span class="t-dim">Use: editar ok · editar com erro · rodar Remove-Item · rodar git status · ler arquivo · /hooks</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Você quer IMPEDIR que o Claude rode um comando perigoso. Qual evento?", op: ["<code>PostToolUse</code>", "<code>PreToolUse</code>", "<code>Stop</code>"], c: 1, ex: "Só o PreToolUse acontece antes da ferramenta e pode bloqueá-la." },
+  { p: "Seu hook de bloqueio termina com <code>exit 1</code> e o comando rodou mesmo assim. Por quê?", op: ["Bug do Claude Code", "Só <code>exit 2</code> é bloqueante; outros códigos são erro não bloqueante", "Hooks não funcionam no Windows"], c: 1, ex: "Para bloquear, <code>exit 2</code> com o motivo no stderr." },
+  { p: "O que o matcher <code>\"Edit|Write\"</code> faz num PostToolUse?", op: ["Roda o hook só depois de edições e escritas de arquivo", "Roda após qualquer ferramenta", "Bloqueia edições"], c: 0, ex: "O matcher filtra pelo nome da ferramenta; <code>|</code> separa alternativas." },
+  { p: "Por que usar hook em vez de escrever a regra no CLAUDE.md?", op: ["Hook é mais barato", "Hook é executado pela ferramenta toda vez; CLAUDE.md é orientação que o Claude pode não seguir", "CLAUDE.md não aceita regras"], c: 1, ex: "Regra que precisa ser garantida → hook. Conhecimento → CLAUDE.md." },
+  { p: "Você clonou um projeto com hooks em <code>.claude/settings.json</code>. O que fazer antes de usar?", op: ["Nada, é seguro", "Ler os hooks: eles rodam comandos com as suas permissões", "Apagar a pasta .claude"], c: 1, ex: "Hooks rodam na sua máquina sem pedir aprovação. Use <code>/hooks</code> para ver origem e comando." }
+]);
+Curso.checklist("check", [
+  "Explico evento, matcher e handler de um hook",
+  "Sei a diferença entre PreToolUse (pode bloquear) e PostToolUse (verifica)",
+  "Uso <code>exit 2</code> para bloquear ou devolver erro ao Claude",
+  "Configurei o hook de sintaxe no TaskFlow e vi pelo <code>/hooks</code>",
+  "Leio hooks de terceiros antes de confiar"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/init e o CLAUDE.md</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Aula 2</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~25 min</span>
+    <h1>/init e o CLAUDE.md</h1>
+    <p class="objetivo">Objetivo: criar e manter um <code>CLAUDE.md</code> enxuto que faça o Claude acertar o padrão do seu projeto em toda sessão, sem você repetir as mesmas instruções.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Toda sessão começa do zero. O <code>CLAUDE.md</code> é um arquivo Markdown que o Claude lê <strong>no início de toda sessão</strong>: é onde você escreve o que teria que explicar de novo todo dia. Comandos de teste, convenções, estrutura do projeto e regras do tipo "sempre faça X".</p>
+    <div class="caixa dica"><strong>Quando adicionar algo ao CLAUDE.md (segundo a doc oficial)</strong>Quando o Claude comete o mesmo erro pela segunda vez; quando você digita a mesma correção que digitou na sessão passada; quando um colega novo precisaria da mesma informação.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: onde o CLAUDE.md pode morar</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como escrever um bom CLAUDE.md</h2>
+    <h3>Os locais (do mais amplo para o mais específico)</h3>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Local</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td>Organização</td><td><code>C:\Program Files\ClaudeCode\CLAUDE.md</code> (Windows)</td><td>Regras da empresa, gerenciadas pela TI</td></tr>
+        <tr><td>Usuário</td><td><code>~/.claude/CLAUDE.md</code></td><td>Suas preferências em todos os projetos</td></tr>
+        <tr><td>Projeto</td><td><code>./CLAUDE.md</code> ou <code>./.claude/CLAUDE.md</code></td><td>Regras do projeto, compartilhadas no Git</td></tr>
+        <tr><td>Local</td><td><code>./CLAUDE.local.md</code></td><td>Preferências suas neste projeto. Coloque no <code>.gitignore</code></td></tr>
+      </tbody>
+    </table>
+    <p>Todos os encontrados são <strong>somados</strong> no contexto, não substituídos. Arquivos <code>CLAUDE.md</code> em subpastas carregam sob demanda, quando o Claude mexe em arquivos daquela pasta.</p>
+    <h3>Regras de ouro</h3>
+    <div class="grade">
+      <div class="mini"><h4>Concreto e verificável</h4><p>"Use 4 espaços de indentação" em vez de "formate bem o código".</p></div>
+      <div class="mini"><h4>Curto</h4><p>A doc recomenda <strong>menos de 200 linhas</strong> por arquivo. Mais longo = mais contexto e menos aderência.</p></div>
+      <div class="mini"><h4>Organizado</h4><p>Títulos Markdown e listas. Evite parágrafos densos.</p></div>
+      <div class="mini"><h4>Sem contradições</h4><p>Duas regras conflitantes e o Claude pode escolher qualquer uma.</p></div>
+    </div>
+    <h3>Imports com @</h3>
+    <p>Um CLAUDE.md pode puxar outros arquivos: <code>Veja @README.md para a visão geral</code>. Caminhos relativos partem do arquivo que importa, e imports aninhados vão até <strong>4 níveis</strong>. Dentro de crases (<code>`@README`</code>), o texto fica literal e não importa nada.</p>
+    <h3>AGENTS.md</h3>
+    <p>Se o repositório já tem um <code>AGENTS.md</code> (usado por outras ferramentas de IA) e <strong>nenhum</strong> CLAUDE.md, o Claude Code lê o AGENTS.md. Se existir CLAUDE.md, ele lê só o CLAUDE.md, a não ser que você importe o outro com <code>@AGENTS.md</code>.</p>
+    <div class="caixa"><strong>/init</strong>O comando <code>/init</code> analisa o código e gera um CLAUDE.md inicial com comandos de build e teste e as convenções que encontrar. Se já existir um, ele <strong>sugere melhorias</strong> em vez de sobrescrever. Revise sempre o que ele gerou: é um rascunho.</div>
+    <div class="caixa alerta"><strong>CLAUDE.md é contexto, não trava</strong>O Claude segue as instruções, mas elas não são uma regra forçada. Para bloquear uma ação de verdade, use permissões (Módulo 4) ou hooks (Módulo 5). E nunca coloque senhas ou tokens no CLAUDE.md: ele vai para o Git.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: /init no TaskFlow</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: bom ou ruim para o CLAUDE.md?</h2>
+    <p>Comece com <code>iniciar</code>. Para cada linha candidata, responda <code>s</code> (entra no CLAUDE.md) ou <code>n</code> (não entra).</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, faça commit de tudo e rode <code>claude</code>.</li>
+      <li>Rode <code>/init</code> e aprove a criação do <code>CLAUDE.md</code>.</li>
+      <li>Abra o arquivo (pelo editor ou com <code>/memory</code>) e <strong>edite</strong>: remova o que for óbvio e garanta 3 regras concretas (veja o modelo no gabarito).</li>
+      <li>Rode <code>/clear</code> e peça <code>adicione o comando editar &lt;numero&gt; &lt;novo titulo&gt;</code>. O Claude seguiu as regras sem você repetir?</li>
+      <li>Rode <code>/context all</code> e confirme que o CLAUDE.md aparece em <em>Memory files</em>. Faça commit.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver um CLAUDE.md modelo para o TaskFlow</summary>
+      <div class="cod"><code># TaskFlow
+
+CLI de tarefas em Python 3.10+, só biblioteca padrão.
+
+## Comandos
+- Rodar: `python tarefas.py &lt;comando&gt;`
+- Testes: `python -m unittest` (a partir do Módulo 3)
+
+## Convenções
+- Nomes de funções e mensagens em português
+- Todo comando que recebe número usa `_indice_valido()` para validar
+- Não adicione dependências externas
+- Dados ficam em `tarefas.json`; nunca mude o formato sem pedir
+
+## Antes de terminar uma tarefa
+- Rode o comando alterado pelo menos uma vez e mostre a saída</code></div>
+      <p>Repare: são ~15 linhas, todas concretas. Nada de "escreva código limpo".</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>CLAUDE.md enciclopédia</h4><p>500 linhas de tudo. Ocupa contexto e dilui o que importa. Procedimentos longos viram skills (Módulo 5).</p></div>
+      <div class="mini"><h4>Aceitar o /init sem revisar</h4><p>É um rascunho. Corte o óbvio e acrescente o que só você sabe.</p></div>
+      <div class="mini"><h4>Regras vagas</h4><p>"Siga boas práticas" não é verificável. Seja específico.</p></div>
+      <div class="mini"><h4>Segredos no arquivo</h4><p>O CLAUDE.md do projeto vai para o Git. Nada de senha, token ou dado pessoal.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/memory">How Claude remembers your project</a>: CLAUDE.md, regras em <code>.claude/rules/</code>, AGENTS.md</li>
+      <li><code>/doctor prompt-audit</code>: o Claude revisa seus arquivos de instrução em busca de regras desatualizadas ou conflitantes</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (How Claude remembers your project).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "O CLAUDE.md em 1 minuto", cenas: [
+  { fala: "Toda sessão começa do zero. O CLAUDE.md é o jeito de não repetir as mesmas instruções todo dia.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 2 · AULA 2</span><p class=\"v-titulo\" data-t=\"0.3\">/init e o CLAUDE.md</p><p class=\"v-sub\" data-t=\"0.9\">As instruções que valem em toda sessão</p>" },
+  { fala: "É um arquivo Markdown que o Claude lê no início de toda sessão. Nele vão os comandos de teste, as convenções do projeto e as regras do tipo: sempre faça isso.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\"># TaskFlow</span></div><div data-t=\"1.5\"><span class=\"d\">## Comandos</span></div><div data-t=\"2.4\">- Testes: <span class=\"u\">python -m unittest</span></div><div data-t=\"3.8\"><span class=\"d\">## Regras</span></div><div data-t=\"4.8\">- Só biblioteca padrão do Python</div></div>" },
+  { fala: "O comando /init analisa o projeto e gera um CLAUDE.md inicial. Se já existir um, ele sugere melhorias. Trate o resultado como rascunho e revise sempre.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:5\">/init</span></div><div class=\"v-code\"><div data-t=\"1.8\"><span class=\"o\">●</span> analisa o código</div><div data-t=\"3.2\"><span class=\"o\">●</span> gera um CLAUDE.md inicial</div><div data-t=\"5.6\"><span class=\"w\">●</span> você revisa: é um rascunho</div></div>" },
+  { fala: "Ele pode morar em quatro lugares: o da organização, o do usuário, o do projeto, que vai para o Git, e o local, só seu. Todos os que existirem são somados.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">🏢</span><b>Organização</b>regras da TI</div><div class=\"v-caixa \" data-t=\"1.8\"><span class=\"v-ic\">👤</span><b>Usuário</b>~/.claude/CLAUDE.md</div><div class=\"v-caixa acc\" data-t=\"3.2\"><span class=\"v-ic\">📁</span><b>Projeto</b>./CLAUDE.md, no Git</div><div class=\"v-caixa \" data-t=\"4.8\"><span class=\"v-ic\">🔒</span><b>Local</b>CLAUDE.local.md</div></div><p class=\"v-txt\" data-t=\"6.5\" style=\"text-align:center;color:#e0875f\">➕ todos são somados</p>" },
+  { fala: "Escreva regras concretas e verificáveis, curtas, com menos de duzentas linhas, organizadas em títulos e listas, e sem contradições.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">🎯</span><b>Concreto</b>4 espaços, não “formate bem”</div><div class=\"v-caixa \" data-t=\"2.2\"><span class=\"v-ic\">✂</span><b>Curto</b>menos de 200 linhas</div><div class=\"v-caixa \" data-t=\"3.6\"><span class=\"v-ic\">🗂</span><b>Organizado</b>títulos e listas</div><div class=\"v-caixa \" data-t=\"5.2\"><span class=\"v-ic\">⚖</span><b>Coerente</b>sem contradições</div></div>" },
+  { fala: "Lembre: o CLAUDE.md é contexto, não trava. Para bloquear uma ação de verdade, use permissões ou hooks. E nunca coloque senhas nele, porque ele vai para o Git.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A mensagem-chave</p><p class=\"v-titulo\" data-t=\"0.4\">Contexto, não trava</p><div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa ok\" data-t=\"2.6\"><span class=\"v-ic\">🔐</span><b>Para bloquear</b>permissões e hooks</div><div class=\"v-caixa err\" data-t=\"5.2\"><span class=\"v-ic\">🚫</span><b>Nunca</b>senhas ou tokens no CLAUDE.md</div></div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🏢", rt: "Organização" }, { ic: "👤", rt: "Usuário" }, { ic: "📁", rt: "Projeto" }, { ic: "🔒", rt: "Local" }],
+  passos: [
+    { ativos: [0], titulo: "Organização (managed policy)", texto: "Instalado pela TI. No Windows: <code>C:\\Program Files\\ClaudeCode\\CLAUDE.md</code>. Vale para todos na máquina. Você normalmente não edita." },
+    { ativos: [1], setas: [0], titulo: "Usuário: ~/.claude/CLAUDE.md", texto: "Suas preferências pessoais em <strong>todos</strong> os projetos. Ex.: \"responda em português\", \"prefiro explicações curtas\"." },
+    { ativos: [2], setas: [1], titulo: "Projeto: ./CLAUDE.md", texto: "Regras do projeto, <strong>versionadas no Git</strong> e compartilhadas com quem usar o repositório. É o que o <code>/init</code> cria." },
+    { ativos: [3], setas: [2], titulo: "Local: ./CLAUDE.local.md", texto: "Suas preferências <strong>só neste projeto</strong>, fora do Git (adicione ao <code>.gitignore</code>). Ex.: dados de teste que você prefere." },
+    { ativos: [0, 1, 2, 3], setas: [0, 1, 2], titulo: "Tudo somado", texto: "Os arquivos são <strong>concatenados</strong>, do mais amplo ao mais específico. Por isso evite contradições entre eles." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: /init (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "/init", leg: "Gera o CLAUDE.md analisando o código" },
+    { t: "tool", x: "Read(tarefas.py)" },
+    { t: "tool", x: "Read(README.md)" },
+    { t: "tool", x: "Write(CLAUDE.md)", leg: "Você aprova a criação" },
+    { t: "out", x: "Wrote 18 lines to CLAUDE.md" },
+    { t: "claude", x: "Criei o CLAUDE.md com comandos, estrutura e convenções que encontrei. Revise e ajuste.", ms: 1400 },
+    { t: "nota", x: "Você edita: remove o óbvio e adiciona 'use _indice_valido() em todo comando com número'", ms: 1600 },
+    { t: "user", x: "/clear", leg: "Sessão limpa…" },
+    { t: "user", x: "adicione o comando editar <numero> <titulo>" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "+ if not _indice_valido(tarefas, numero):", leg: "…e ele segue a regra sem você repetir" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Testes: `python -m unittest`", "s", "Comando que o Claude precisa saber e não adivinha. Entra."],
+    ["Escreva código limpo e bonito.", "n", "Vago e não verificável. Não ajuda."],
+    ["Não adicione dependências externas.", "s", "Regra concreta do projeto. Entra."],
+    ["Senha do banco de testes: Abc123!", "n", "NUNCA. Segredos não vão para o CLAUDE.md (vai para o Git!)."],
+    ["Procedimento de 40 passos para publicar uma versão", "n", "Longo e usado raramente: melhor como skill (Módulo 5)."],
+    ["Mensagens para o usuário em português.", "s", "Convenção concreta. Entra."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Linha ' + (i + 1) + "/" + itens.length + ':</span> "' + itens[i][0] + '"\n<span class="t-dim">Entra no CLAUDE.md? s/n</span>' : '<span class="t-ok">Fim: ' + pts + "/" + itens.length + " certas.</span> Digite iniciar para repetir."; }
+  function r(x) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === x; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ ') + itens[i][2] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Curadoria do CLAUDE.md (simulação)", prompt: ">",
+    intro: '<span class="t-dim">s = entra no CLAUDE.md · n = não entra</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "s": function () { return r("s"); }, "n": function () { return r("n"); } }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Quando o Claude lê o CLAUDE.md do projeto?", op: ["Só quando você pede", "No início de toda sessão", "Uma vez por semana"], c: 1, ex: "Ele carrega no início de cada sessão e é reinjetado após a compactação." },
+  { p: "Onde colocar uma preferência pessoal que vale para TODOS os seus projetos?", op: ["<code>./CLAUDE.md</code>", "<code>~/.claude/CLAUDE.md</code>", "<code>./CLAUDE.local.md</code>"], c: 1, ex: "O arquivo do usuário vale em todos os projetos e não vai para o Git de nenhum deles." },
+  { p: "Qual instrução é melhor para o CLAUDE.md?", op: ["\"Teste bem as mudanças\"", "\"Rode <code>python -m unittest</code> antes de dizer que terminou\""], c: 1, ex: "Concreta e verificável. A doc oficial dá exatamente esse tipo de exemplo." },
+  { p: "Seu repositório tem AGENTS.md e CLAUDE.md. O que o Claude lê por padrão?", op: ["Os dois", "Só o CLAUDE.md (a não ser que ele importe o AGENTS.md com @)", "Só o AGENTS.md"], c: 1, ex: "AGENTS.md é lido sozinho apenas quando não existe CLAUDE.md. Para usar os dois, importe: <code>@AGENTS.md</code>." },
+  { p: "Você quer impedir de verdade que o Claude apague uma pasta. CLAUDE.md resolve?", op: ["Sim, ele sempre obedece", "Não: CLAUDE.md é contexto. Para bloquear, use permissões ou hooks"], c: 1, ex: "A doc é clara: o CLAUDE.md é tratado como contexto, não como configuração forçada." }
+]);
+Curso.checklist("check", [
+  "Sei os 4 locais de CLAUDE.md e quando usar cada um",
+  "Rodei <code>/init</code> no TaskFlow e editei o resultado",
+  "Meu CLAUDE.md é curto, concreto e sem segredos",
+  "Conferi o carregamento com <code>/context all</code>",
+  "Fiz commit do CLAUDE.md"
+]);
+</script>
+</body>
+</html>

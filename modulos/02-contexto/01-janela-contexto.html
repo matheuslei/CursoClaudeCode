@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A janela de contexto</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Aula 1</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~15 min</span>
+    <h1>A janela de contexto</h1>
+    <p class="objetivo">Objetivo: entender o que ocupa o contexto do Claude, por que um contexto cheio piora as respostas e como medir isso com <code>/context</code>.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Cada sessão do Claude Code começa com uma <strong>janela de contexto</strong> nova: tudo o que o modelo "sabe" naquele momento. Ela tem limite, e cada arquivo lido, cada saída de comando e cada mensagem ocupa espaço. Quem entende o contexto gasta menos limite e recebe respostas melhores.</p>
+    <div class="caixa"><strong>Cenário</strong>Depois de 3 horas na mesma conversa, o Claude começa a "esquecer" o que você pediu no início e a repetir erros. Não é cansaço: é contexto lotado de coisas antigas competindo com o que importa agora.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como a janela enche</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>O que você precisa saber</h2>
+    <h3>Tokens</h3>
+    <p>O contexto é medido em <strong>tokens</strong>, pedaços de texto. Um arquivo de 50 linhas pode custar alguns milhares de tokens. A doc oficial mostra uma sessão de exemplo em que ler um arquivo de código custou cerca de 1.000 a 2.400 tokens e a saída de um <code>npm test</code>, cerca de 1.200.</p>
+    <h3>Tamanho da janela</h3>
+    <p>Os modelos atuais (Fable, Sonnet 5 e posteriores, Opus 4.7 e posteriores, Haiku 5.5) já vêm com janela de <strong>1 milhão de tokens</strong> por padrão. É muito, mas não é infinito, e encher a janela tem custo: o Claude Code reenvia a conversa inteira a cada pedido.</p>
+    <h3>O que carrega antes de você digitar</h3>
+    <table class="tab">
+      <thead><tr><th>Item</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td>System prompt e ferramentas</td><td>Sempre presente</td></tr>
+        <tr><td><code>CLAUDE.md</code> (usuário e projeto)</td><td>Aula 2.2</td></tr>
+        <tr><td>Memória automática (<code>MEMORY.md</code>)</td><td>Aula 2.3</td></tr>
+        <tr><td>Nomes das ferramentas MCP e descrições das skills</td><td>Módulos 5 e 6</td></tr>
+      </tbody>
+    </table>
+    <h3>Quando enche: compactação automática</h3>
+    <p>Perto do limite, o Claude Code <strong>compacta automaticamente</strong>: resume a conversa para liberar espaço. A sessão não acaba, mas detalhes antigos viram resumo. Você pode agir antes (Aula 2.4): <code>/clear</code> entre tarefas, <code>/compact</code> com foco, ou <code>/autocompact</code> para definir quando a compactação automática acontece.</p>
+    <div class="caixa dica"><strong>Medir é o primeiro passo</strong><code>/context</code> mostra o uso atual por categoria, com sugestões de otimização. <code>/context all</code> lista também quais arquivos de memória (CLAUDE.md etc.) foram carregados.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o contexto crescendo</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: encha e esvazie a janela</h2>
+    <p>Neste simulador, cada ação ocupa tokens. Execute as ações do desafio e acompanhe com <code>/context</code>. Os números são ilustrativos, inspirados no exemplo da documentação.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Use o TaskFlow (o seu, ou a cópia de <code>projeto-taskflow\etapa-02</code>):</p>
+    <ol>
+      <li>Abra <code>claude</code> na pasta e rode <code>/context</code> antes de qualquer pergunta. Anote o uso inicial.</li>
+      <li>Peça <code>leia tarefas.py e explique cada função</code>. Rode <code>/context</code> de novo.</li>
+      <li>Rode <code>! python tarefas.py listar</code> e confira o <code>/context</code> mais uma vez.</li>
+      <li>Rode <code>/context all</code> e veja a lista de arquivos de memória carregados.</li>
+      <li>Anote no <code>diario.md</code>: qual ação mais aumentou o contexto?</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Normalmente, <strong>ler o arquivo e explicar</strong> pesa mais: o conteúdo do arquivo e a resposta longa entram no contexto. A saída de um <code>listar</code> é pequena. O uso inicial não é zero porque system prompt, ferramentas e memória já carregaram antes da sua primeira mensagem.</p>
+      <p>Se o <code>/context all</code> não listar nenhum CLAUDE.md, é porque o projeto ainda não tem um. Vamos criar na próxima aula.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"1 milhão é infinito"</h4><p>Não é, e cada mensagem reenvia o histórico. Contexto grande custa limite mesmo com cache.</p></div>
+      <div class="mini"><h4>Colar logs gigantes</h4><p>Um log de 10 mil linhas ocupa muito. Filtre antes (só as linhas de erro).</p></div>
+      <div class="mini"><h4>Uma conversa para o dia todo</h4><p>Tarefas misturadas poluem o contexto. Tarefa nova, <code>/clear</code>.</p></div>
+      <div class="mini"><h4>Ignorar o /context</h4><p>Respostas piorando? Meça antes de culpar o modelo.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/context-window">Explore the context window</a>: simulação interativa oficial</li>
+      <li><a href="https://code.claude.com/docs/en/costs#reduce-token-usage">Reduce token usage</a></li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Explore the context window, Model configuration).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "A janela de contexto em 1 minuto", cenas: [
+  { fala: "Este é o conceito que mais influencia a qualidade das respostas do Claude: a janela de contexto.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 2 · AULA 1</span><p class="v-titulo" data-t="0.3">A janela de contexto</p><p class="v-sub" data-t="0.9">Tudo o que o modelo enxerga de uma vez</p>' },
+  { fala: "O contexto é tudo o que o modelo enxerga ao mesmo tempo: as instruções do sistema, o seu CLAUDE.md, a conversa, os arquivos que ele leu e a saída dos comandos que rodou.",
+    html: '<div class="v-grade" style="--cols:5"><div class="v-caixa" data-t="0.4"><span class="v-ic">⚙</span>Instruções</div><div class="v-caixa" data-t="1.6"><span class="v-ic">📘</span>CLAUDE.md</div><div class="v-caixa" data-t="2.8"><span class="v-ic">💬</span>Conversa</div><div class="v-caixa" data-t="4"><span class="v-ic">📄</span>Arquivos lidos</div><div class="v-caixa" data-t="5.2"><span class="v-ic">🖥</span>Saídas</div></div>' },
+  { fala: "E cada coisa ocupa espaço. Ler um arquivo grande ou um log enorme pode encher a janela muito mais rápido do que a própria conversa.",
+    html: '<div data-t="0.2"><p class="v-txt">Instruções + CLAUDE.md</p><div class="v-barra"><i style="--w:8%;--cor:#8fb8e8;animation-delay:.4s"></i></div></div><div data-t="1.5"><p class="v-txt">Conversa</p><div class="v-barra"><i style="--w:22%;animation-delay:1.7s"></i></div></div><div data-t="3"><p class="v-txt">Um log gigante colado</p><div class="v-barra"><i style="--w:88%;--cor:#ef8a8a;animation-delay:3.2s"></i></div></div>' },
+  { fala: "Quando a janela fica cheia de coisa velha, informações antigas competem com as novas, e as respostas pioram. Perto do limite, o Claude Code compacta a conversa automaticamente.",
+    html: '<div class="v-linha"><div class="v-caixa ok" data-t="0.3"><span class="v-ic">🎯</span><b>Contexto enxuto</b>respostas focadas</div><span class="v-seta" data-t="1.5">⟷</span><div class="v-caixa err" data-t="2.2"><span class="v-ic">🌫</span><b>Contexto lotado</b>ruído e confusão</div></div><p class="v-txt" data-t="6" style="text-align:center">Perto do limite: <b style="color:#e0875f">compactação automática</b></p>' },
+  { fala: "Você tem três ferramentas. Barra context mostra o uso. Barra compact resume a conversa e continua a mesma tarefa. Barra clear começa uma conversa nova.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.4"><span class="v-ic">📊</span><b>/context</b>quanto está em uso</div><div class="v-caixa" data-t="2.4"><span class="v-ic">🗜</span><b>/compact</b>resume e continua</div><div class="v-caixa acc" data-t="4.6"><span class="v-ic">✨</span><b>/clear</b>conversa nova</div></div>' },
+  { fala: "Guarde esta regra: uma tarefa, uma conversa. Mudou de assunto, use barra clear.",
+    html: '<p class="v-sub" data-t="0">A regra de ouro</p><p class="v-titulo" data-t="0.4">Uma tarefa, uma conversa</p><div class="v-code" data-t="1.6" style="align-self:flex-start"><span class="u">&gt; </span><span class="v-digita" style="--n:6">/clear</span></div>' }
+] });
+
+Curso.passos("diag", {
+  nos: [{ ic: "⚙", rt: "Antes de digitar" }, { ic: "💬", rt: "Sua mensagem" }, { ic: "📄", rt: "Leituras e saídas" }, { ic: "🗜", rt: "Compactação" }],
+  passos: [
+    { ativos: [0], titulo: "Já começa ocupado", texto: "Antes da primeira mensagem já carregaram o system prompt, as ferramentas, o <code>CLAUDE.md</code>, a memória automática e as descrições de skills e MCP. Por isso o <code>/context</code> nunca começa em zero." },
+    { ativos: [1], setas: [0], titulo: "Sua mensagem entra", texto: "O pedido em si costuma ser pequeno: dezenas de tokens." },
+    { ativos: [2], setas: [1], titulo: "O trabalho é o que pesa", texto: "Cada <strong>arquivo lido</strong>, <strong>busca</strong>, <strong>saída de comando</strong> e <strong>resposta</strong> do Claude se acumula. É aqui que a janela enche de verdade." },
+    { ativos: [3], setas: [2], titulo: "Perto do limite: resumo", texto: "O Claude Code <strong>compacta automaticamente</strong>, trocando a conversa por um resumo. CLAUDE.md e memória são reinjetados do disco, mas detalhes da conversa viram resumo." },
+    { ativos: [0, 1, 2, 3], setas: [0, 1, 2], titulo: "Por que contexto cheio piora", texto: "Informação antiga e irrelevante compete com a atual, e instruções do começo ficam diluídas. Contexto <strong>enxuto e focado</strong> = respostas melhores e menos limite gasto." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: medindo o contexto (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "/context", leg: "Uso inicial: só o que carrega antes de digitar" },
+    { t: "html", x: '<span class="t-caixa">Context usage  ~1% · System + tools · Memory files</span>' },
+    { t: "user", x: "leia tarefas.py e explique cada função" },
+    { t: "tool", x: "Read(tarefas.py)", leg: "O arquivo inteiro entra no contexto" },
+    { t: "out", x: "Read 92 lines" },
+    { t: "claude", x: "O arquivo tem 7 funções: carregar, salvar, _indice_valido, adicionar…", ms: 1200 },
+    { t: "user", x: "/context", leg: "Subiu: arquivo + explicação" },
+    { t: "html", x: '<span class="t-caixa">Context usage  ~2% · Messages cresceu</span>' },
+    { t: "nota", x: "Horas depois, com 40 arquivos lidos e logs colados…", ms: 1400 },
+    { t: "user", x: "/context" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-warn">Context usage  ~78% · Messages dominam a janela</span>\nSugestão: /clear entre tarefas · /compact com foco</span>', leg: "Hora de limpar ou compactar" }
+  ]
+});
+(function () {
+  var usado = 9000, LIM = 1000000;
+  function barra() { var p = usado / LIM * 100; var n = Math.min(30, Math.round(p / 100 * 30)); return "[" + "█".repeat(n) + "·".repeat(30 - n) + "] " + (Math.round(p * 10) / 10) + "% (" + usado.toLocaleString("pt-BR") + " tokens)"; }
+  function soma(t, msg) { usado = Math.min(LIM, usado + t); return msg + '\n<span class="t-dim">+' + t.toLocaleString("pt-BR") + " tokens</span>"; }
+  Curso.terminal("term", {
+    titulo: "Simulador de contexto (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Ações: ler arquivo · rodar testes · colar log · /context · /compact · /clear</span>',
+    metas: ["/context", "ler arquivo", "rodar testes", "colar log", "/compact", "/clear"],
+    comandos: {
+      "/context": function () { var c = usado > 600000 ? "t-warn" : "t-ok"; return '<span class="' + c + '">' + barra() + "</span>" + (usado > 600000 ? '\n<span class="t-warn">Contexto pesado: considere /clear (tarefa nova) ou /compact (mesma tarefa).</span>' : ""); },
+      "ler arquivo": function () { return soma(2400, '<span class="t-ok">●</span> Read(tarefas.py)'); },
+      "rodar testes": function () { return soma(1200, '<span class="t-ok">●</span> Bash(python -m unittest)'); },
+      "colar log": function () { return soma(650000, '<span class="t-warn">Você colou um log de 10 mil linhas.</span>'); },
+      "/compact": function () { usado = Math.max(9000, Math.round(usado * 0.15)); return '<span class="t-ok">Conversa resumida.</span> ' + barra(); },
+      "/clear": function () { usado = 9000; return '<span class="t-ok">Conversa nova.</span> ' + barra() + '\n<span class="t-dim">Só o que carrega antes de digitar continua.</span>'; }
+    }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Por que o <code>/context</code> não mostra 0% logo no início da sessão?", op: ["É um bug", "System prompt, ferramentas, CLAUDE.md e memória já carregaram antes da sua mensagem", "O Claude leu o projeto inteiro ao abrir"], c: 1, ex: "Esses itens sempre carregam. O Claude <strong>não</strong> lê o projeto inteiro de cara: ele lê sob demanda." },
+  { p: "O que mais costuma encher o contexto numa sessão de trabalho?", op: ["As suas mensagens", "Arquivos lidos, saídas de comandos e respostas longas", "O nome do modelo"], c: 1, ex: "O trabalho (leituras, buscas, saídas) é o que pesa. Suas mensagens costumam ser pequenas." },
+  { p: "O que acontece quando a janela de contexto chega perto do limite?", op: ["A sessão é encerrada", "O Claude Code compacta automaticamente, resumindo a conversa", "O Claude apaga arquivos do projeto"], c: 1, ex: "A compactação automática resume a conversa. CLAUDE.md e memória são reinjetados do disco." },
+  { p: "Com 1 milhão de tokens de janela, vale a pena manter uma conversa só para o dia inteiro?", op: ["Sim, cabe tudo", "Não: contexto irrelevante piora as respostas e cada mensagem reenvia o histórico", "Só se usar o Opus"], c: 1, ex: "Tamanho não é qualidade. Contexto focado responde melhor e gasta menos." }
+]);
+Curso.checklist("check", [
+  "Explico o que é token e o que ocupa a janela de contexto",
+  "Uso <code>/context</code> e <code>/context all</code> para medir",
+  "Sei o que é a compactação automática",
+  "Identifiquei qual ação mais pesou no meu TaskFlow"
+]);
+</script>
+</body>
+</html>

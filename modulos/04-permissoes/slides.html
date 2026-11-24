@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 4</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 4 · Revisão</p>
+    <h1>Permissões e segurança</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Os 6 modos</h2>
+    <ul>
+      <li><code>plan</code>: investiga e planeja; não edita sem aprovação</li>
+      <li><code>default</code> (Manual): pergunta tudo que muda algo</li>
+      <li><code>acceptEdits</code>: edições e comandos de arquivo livres na pasta</li>
+      <li><code>auto</code>: um classificador revisa cada ação</li>
+      <li><code>dontAsk</code>: nega o que perguntaria (CI)</li>
+      <li><code>bypassPermissions</code>: só em ambiente isolado</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Trocar de modo</h2>
+    <div class="cod" style="max-width:760px"><code>Shift+Tab                          # na sessão (Alt+M em alguns terminais Windows)
+claude --permission-mode plan      # ao abrir
+"permissions": { "defaultMode": "default" }   # como padrão</code></div>
+  </section>
+  <section class="slide">
+    <h2>Auto mode</h2>
+    <ul>
+      <li>Bloqueia: <code>curl | bash</code>, force push, <code>git reset --hard</code>, deploy em produção, envio de dados sensíveis</li>
+      <li>Pausa após 3 bloqueios seguidos ou 20 no total</li>
+      <li>"Não faça X" na conversa <strong>não é regra</strong></li>
+      <li>Reduz perguntas, <strong>não garante segurança</strong></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>A ordem das regras</h2>
+    <p style="font-size:clamp(1.4rem,3vw,2.2rem)">⛔ deny → ❓ ask → ✅ allow → 🎛 modo</p>
+    <p>Allow nunca abre exceção em deny. Deny vale em todos os modos.</p>
+  </section>
+  <section class="slide">
+    <h2>Regras do TaskFlow</h2>
+    <div class="cod" style="max-width:760px"><code>{
+  "permissions": {
+    "allow": ["Bash(python -m unittest *)"],
+    "ask":   ["Bash(git push *)"],
+    "deny":  ["Read(./.env)", "Read(./.env.*)"]
+  }
+}</code></div>
+    <p>Usuário <code>~/.claude/settings.json</code> · Projeto <code>.claude/settings.json</code> · Só você <code>.claude/settings.local.json</code></p>
+  </section>
+  <section class="slide">
+    <h2>Sandbox</h2>
+    <ul>
+      <li>Isola <strong>escrita</strong> (só a pasta) e <strong>rede</strong> (só domínios liberados)</li>
+      <li>Leitura continua ampla por padrão</li>
+      <li>Fora dele: Read/Edit/WebFetch, hooks, MCP, comandos com <code>!</code></li>
+      <li><strong>Windows nativo: não suportado</strong>; use WSL2</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Segredos e dados pessoais</h2>
+    <ul>
+      <li>O que não deve sair <strong>não entra no contexto</strong></li>
+      <li><code>.env</code> + <code>.gitignore</code> + <code>.env.example</code> + deny</li>
+      <li>Vazou? <strong>Revogue</strong> e avise a área responsável</li>
+      <li>Dados reais e LGPD: consulte segurança e privacidade antes</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 5?</h2>
+    <ul>
+      <li>✓ Você escolhe o modo certo para cada situação</li>
+      <li>✓ O TaskFlow tem <code>.claude/settings.json</code> com allow, ask e deny</li>
+      <li>✓ Segredos fora do contexto e do Git</li>
+    </ul>
+    <p><a href="../05-personalizacao/01-settings.html">Ir para o Módulo 5: Personalização →</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O que é MCP</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m6a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 6 · Aula 1</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~15 min</span>
+    <h1>O que é MCP</h1>
+    <p class="objetivo">Objetivo: entender o Model Context Protocol, o que um servidor MCP oferece ao Claude, como ele se conecta e quais são os riscos antes de instalar qualquer um.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Por padrão o Claude Code lê arquivos, edita e roda comandos. Mas muito do seu trabalho está em <strong>outros sistemas</strong>: o gerenciador de tarefas, a documentação, um banco de dados, o navegador. O <strong>MCP (Model Context Protocol)</strong> é um padrão aberto que liga o Claude a essas ferramentas sem você copiar e colar nada.</p>
+    <div class="caixa"><strong>Analogia</strong>MCP é como uma tomada padrão: qualquer aparelho com o plugue certo funciona em qualquer tomada. Um servidor MCP feito uma vez funciona no Claude Code, no app Desktop, no VS Code e em outros clientes compatíveis.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: cliente, servidor e ferramentas</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>O que um servidor MCP oferece</h2>
+    <div class="grade">
+      <div class="mini"><h4>🛠 Ferramentas (tools)</h4><p>Ações que o Claude pode chamar: "buscar issue", "consultar tabela", "abrir página". Aparecem com nomes como <code>mcp__servidor__ferramenta</code>.</p></div>
+      <div class="mini"><h4>📄 Recursos (resources)</h4><p>Dados que você menciona com <code>@</code>, no formato <code>@servidor:protocolo://caminho</code>.</p></div>
+      <div class="mini"><h4>💬 Prompts</h4><p>Modelos prontos que viram comandos: <code>/servidor:prompt</code> no menu <code>/</code> (ou <code>/mcp__servidor__prompt</code>).</p></div>
+    </div>
+    <h3>Dois jeitos de conectar (transportes)</h3>
+    <table class="tab">
+      <thead><tr><th>Transporte</th><th>Onde roda</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>stdio</code></td><td>Um programa na <strong>sua máquina</strong>, iniciado pelo Claude Code</td><td>Navegador controlado (Playwright), seu próprio script Python</td></tr>
+        <tr><td><code>http</code></td><td>Um serviço <strong>hospedado</strong>, acessado por URL</td><td>Servidor de documentação, Notion, Sentry</td></tr>
+      </tbody>
+    </table>
+    <p>Existe também o <code>sse</code>, que a documentação marca como <strong>depreciado</strong>. Prefira <code>http</code> quando o serviço oferecer.</p>
+    <h3>Custo de contexto</h3>
+    <p>Cada servidor conectado ocupa um pouco da janela de contexto, porque os nomes das ferramentas e as instruções do servidor carregam em toda sessão. O Claude Code reduz isso com o <strong>tool search</strong> (ligado por padrão): as definições completas das ferramentas só carregam quando o Claude precisa delas. Mesmo assim, <strong>remova servidores que você não usa</strong>.</p>
+    <p>Saídas muito grandes também são controladas: o padrão máximo é de 25.000 tokens por resultado (ajustável com a variável <code>MAX_MCP_OUTPUT_TOKENS</code>).</p>
+    <div class="caixa erro"><strong>Segurança: só servidores confiáveis</strong>Um servidor MCP pode ler dados, executar ações e trazer conteúdo externo. A documentação alerta: verifique se você confia em cada servidor antes de conectar, porque servidores que buscam conteúdo externo podem expor você a <em>prompt injection</em> (instruções maliciosas escondidas no conteúdo). Na empresa, conectar um MCP a sistemas ou dados corporativos é decisão da <strong>área de segurança da informação</strong>. Em estudo, use servidores públicos inofensivos e dados fictícios.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o Claude usando um servidor MCP</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: classifique</h2>
+    <p>Para cada item, diga se é <code>tool</code>, <code>resource</code> ou <code>prompt</code>. Também pode responder <code>stdio</code> ou <code>http</code> quando a pergunta for de transporte. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício de reflexão</h2>
+    <p>Escreva no seu <code>diario.md</code> (e faça commit):</p>
+    <ol>
+      <li>Dois sistemas que você usa no trabalho e que fariam sentido como servidor MCP.</li>
+      <li>Para cada um: seria <code>stdio</code> ou <code>http</code>? Quais 2 ferramentas ele teria?</li>
+      <li>Qual o maior risco de conectar cada um, e quem na organização deveria aprovar?</li>
+    </ol>
+    <details class="gabarito"><summary>Ver um exemplo de resposta</summary>
+      <p><strong>Sistema 1:</strong> gerenciador de chamados (hospedado) → <code>http</code>. Ferramentas: <code>buscar_chamado</code>, <code>comentar_chamado</code>. Risco: o Claude comentar em chamados reais por engano; dados pessoais de solicitantes. Aprovação: segurança da informação e privacidade (LGPD).</p>
+      <p><strong>Sistema 2:</strong> pasta local de relatórios fictícios → <code>stdio</code> (um script Python). Ferramentas: <code>listar_relatorios</code>, <code>ler_relatorio</code>. Risco: baixo se for só leitura de dados de teste. Mesmo assim, comece com permissões somente leitura.</p>
+      <p>Repare no padrão: <strong>comece só com leitura</strong> e libere escrita depois de confiar.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Instalar tudo que aparece</h4><p>Cada servidor é código de terceiros com acesso às suas coisas. Instale só o que precisa e confia.</p></div>
+      <div class="mini"><h4>Esquecer servidores ligados</h4><p>Servidores parados ocupam contexto. Revise com <code>/mcp</code> e remova os que não usa.</p></div>
+      <div class="mini"><h4>Confundir MCP com plugin</h4><p>Plugin é um <em>pacote</em> que pode conter servidores MCP, skills e hooks (Módulo 8).</p></div>
+      <div class="mini"><h4>Dar acesso de escrita logo de cara</h4><p>Para bancos e APIs, a doc recomenda credenciais somente leitura quando possível.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/mcp">Referência MCP do Claude Code</a> (em inglês)</li>
+      <li><a href="https://modelcontextprotocol.io/introduction">Introdução ao Model Context Protocol</a></li>
+      <li><a href="https://academy.claude.com/courses/introduction-to-model-context-protocol">Introduction to Model Context Protocol</a> (Anthropic Academy, gratuito, em inglês).</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (MCP reference e MCP quickstart oficiais).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "O que é MCP em 1 minuto", cenas: [
+  { fala: "Muito do seu trabalho está fora do código: tarefas, documentação, bancos de dados. O MCP liga o Claude a tudo isso.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 6 · AULA 1</span><p class=\"v-titulo\" data-t=\"0.3\">O que é MCP</p><p class=\"v-sub\" data-t=\"0.9\">Model Context Protocol</p>" },
+  { fala: "Pense numa tomada padrão. Um servidor MCP feito uma vez funciona no Claude Code, no app Desktop, no VS Code e em outros clientes compatíveis.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">🔌</span><b>Servidor MCP</b>feito uma vez</div><span class=\"v-seta\" data-t=\"2.4\">→</span><div class=\"v-caixa \" data-t=\"3\"><span class=\"v-ic\">⌨</span><b>Claude Code</b></div><div class=\"v-caixa \" data-t=\"3.8\"><span class=\"v-ic\">🖥</span><b>Desktop</b></div><div class=\"v-caixa \" data-t=\"4.6\"><span class=\"v-ic\">🧩</span><b>VS Code</b></div></div>" },
+  { fala: "Um servidor oferece ferramentas, que são ações que o Claude chama; recursos, que são dados que você menciona com @; e prompts, que viram comandos.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">🛠</span><b>Ferramentas</b>ações que o Claude chama</div><div class=\"v-caixa \" data-t=\"3\"><span class=\"v-ic\">📄</span><b>Recursos</b>dados que você menciona com @</div><div class=\"v-caixa \" data-t=\"5.4\"><span class=\"v-ic\">💬</span><b>Prompts</b>viram comandos /</div></div>" },
+  { fala: "Ele se conecta de dois jeitos: stdio, um programa que roda na sua máquina, ou http, um serviço hospedado acessado por uma URL.",
+    html: "<div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">💻</span><b>stdio</b>programa na sua máquina</div><div class=\"v-caixa acc\" data-t=\"3\"><span class=\"v-ic\">🌐</span><b>http</b>serviço numa URL</div></div>" },
+  { fala: "Cada servidor ocupa um pouco do contexto. O tool search, ligado por padrão, só carrega as definições completas quando o Claude precisa. Mesmo assim, remova os que você não usa.",
+    html: "<div data-t=\"0.3\"><p class=\"v-txt\">Cada servidor ocupa contexto</p><div class=\"v-barra\"><i style=\"--w:35%;--cor:#e6c06a;animation-delay:.5s\"></i></div></div><p class=\"v-txt\" data-t=\"3\" style=\"\">🔎 <b>tool search</b>: definições só quando precisa</p><p class=\"v-txt\" data-t=\"6\" style=\"\">🧹 remova servidores que você não usa</p>" },
+  { fala: "E o mais importante: só conecte servidores confiáveis. Conteúdo externo pode esconder instruções maliciosas. Na empresa, isso é decisão da segurança da informação.",
+    html: "<p class=\"v-titulo\" data-t=\"0\">Só servidores confiáveis</p><div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa err\" data-t=\"2.4\"><span class=\"v-ic\">🕵</span><b>Prompt injection</b>conteúdo externo com instruções maliciosas</div><div class=\"v-caixa warn\" data-t=\"5.4\"><span class=\"v-ic\">🏢</span><b>Na empresa</b>decisão da segurança da informação</div></div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você" }, { ic: "✻", rt: "Claude Code (cliente)" }, { ic: "🔌", rt: "Servidor MCP" }, { ic: "🗄", rt: "Sistema externo" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Você pede algo que está fora do projeto", texto: "<em>\"Quais issues de prioridade alta estão abertas?\"</em> O Claude Code (o <strong>cliente</strong>) não tem essa informação nos arquivos." },
+    { ativos: [1, 2], setas: [1], titulo: "O cliente conversa com um servidor MCP", texto: "Na inicialização, o Claude Code se conectou aos servidores configurados e sabe quais ferramentas existem. Ele escolhe a ferramenta certa, por exemplo <code>mcp__tracker__buscar_issues</code>." },
+    { ativos: [2, 3], setas: [2], titulo: "O servidor fala com o sistema", texto: "O servidor traduz o pedido para a API ou o banco do sistema e devolve o resultado em formato padrão. O Claude não precisa saber como a API funciona." },
+    { ativos: [1, 0], setas: [0, 1], titulo: "A resposta volta para a conversa", texto: "O resultado entra no contexto e o Claude responde, com a chamada <strong>identificada pelo nome do servidor</strong>, e você vê de onde veio a informação. Como qualquer ferramenta, o uso passa pelas permissões." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code + MCP (demonstração)", altura: 280,
+  passos: [
+    { t: "user", x: "use o servidor claude-code-docs para descobrir o que MCP_TIMEOUT faz", leg: "Pedido que exige o servidor MCP" },
+    { t: "tool", x: "claude-code-docs - search (MCP)(query: \"MCP_TIMEOUT\")", leg: "A chamada é rotulada com o nome do servidor" },
+    { t: "perm", x: '<span class="t-b">Tool use</span>  claude-code-docs - search (MCP)\nDo you want to proceed?\n<span class="t-user">❯ 1. Yes</span>\n  2. Yes, and don\'t ask again for claude-code-docs - search\n  3. No', ms: 1800, leg: "Primeiro uso: pede permissão como qualquer ferramenta" },
+    { t: "out", x: "Found 3 results in env-vars, mcp-quickstart…" },
+    { t: "claude", x: "MCP_TIMEOUT define, em milissegundos, quanto tempo o Claude Code espera um servidor MCP iniciar. O padrão é 30 segundos.", leg: "Resposta baseada no servidor, não na memória do modelo" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Uma ação 'criar_issue' que o Claude pode chamar", "tool", "Ações chamáveis são ferramentas (tools)."],
+    ["Algo que você menciona com @tracker:issue://123", "resource", "Menções com @servidor:protocolo://caminho são recursos."],
+    ["Um comando /tracker:revisar_pr que aparece no menu /", "prompt", "Prompts do servidor viram comandos no menu /."],
+    ["Um script Python na sua máquina iniciado pelo Claude Code", "stdio", "Processo local = transporte stdio."],
+    ["Um serviço em https://mcp.exemplo.com/mcp", "http", "Serviço hospedado por URL = transporte http."],
+    ["Uma ação 'consultar_tabela' num banco", "tool", "Também é uma ferramenta. Prefira credenciais somente leitura!"]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Item ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: tool · resource · prompt · stdio · http</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Era ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["tool", "resource", "prompt", "stdio", "http"].forEach(function (k) { cmds[k] = function () { return resp(k); }; });
+  Curso.terminal("term", { titulo: "Classificador MCP (simulação)", prompt: ">", intro: '<span class="t-dim">tool = ação · resource = dado com @ · prompt = comando / · stdio = local · http = hospedado</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: tool, resource, prompt, stdio ou http.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que é MCP?", op: ["Um modelo de IA da Anthropic", "Um padrão aberto para conectar o Claude a ferramentas e dados externos", "Um plugin do VS Code"], c: 1, ex: "Model Context Protocol: o mesmo servidor funciona em qualquer cliente compatível." },
+  { p: "Você quer que o Claude use um script Python que roda no seu computador. Qual transporte?", op: ["<code>http</code>", "<code>stdio</code>", "<code>sse</code>"], c: 1, ex: "Processos locais iniciados pelo Claude Code usam <code>stdio</code>, o transporte padrão." },
+  { p: "Por que remover servidores MCP que você não usa?", op: ["Porque eles param de funcionar sozinhos", "Porque nomes de ferramentas e instruções ocupam contexto em toda sessão, e cada servidor é um risco a mais", "Porque o Claude só aceita 2 servidores"], c: 1, ex: "Mesmo com o tool search reduzindo o custo, cada servidor ocupa espaço e amplia a superfície de risco." },
+  { p: "Qual o principal risco de um servidor que busca conteúdo da web?", op: ["Ficar lento", "Prompt injection: o conteúdo externo pode trazer instruções maliciosas", "Gastar muita memória RAM"], c: 1, ex: "A documentação alerta especificamente para isso. Conecte só servidores confiáveis." },
+  { p: "Na empresa, você quer conectar o Claude ao banco de dados de clientes. O que fazer primeiro?", op: ["Conectar com o usuário administrador para não ter erro", "Levar a decisão à segurança da informação e à privacidade (LGPD), e usar credenciais somente leitura", "Conectar e avisar depois"], c: 1, ex: "Dados de clientes envolvem LGPD e segurança. A decisão não é só técnica." }
+]);
+Curso.checklist("check", [
+  "Explico o que é MCP e para que serve",
+  "Diferencio tools, resources e prompts",
+  "Sei quando usar <code>stdio</code> e quando usar <code>http</code>",
+  "Entendo o custo de contexto e o papel do tool search",
+  "Sei os riscos e quem deve aprovar MCPs com dados corporativos"
+]);
+</script>
+</body>
+</html>

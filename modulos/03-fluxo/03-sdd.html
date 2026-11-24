@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec-Driven Development</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Aula 3</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~30 min</span>
+    <h1>Spec-Driven Development</h1>
+    <p class="objetivo">Objetivo: escrever uma especificação curta antes de pedir código, com o Claude te entrevistando, e usar essa spec como contrato para implementar e revisar.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O Claude não lê a sua mente. Quando falta informação, ele preenche a lacuna com a suposição mais provável, e a suposição mais provável nem sempre é a sua. Uma <strong>spec</strong> (especificação) põe no papel o que só você sabe: o objetivo, o que entra, o que fica de fora e como saber que ficou pronto.</p>
+    <p>Este curso nasceu assim: antes de qualquer aula existir, houve um SDD que você aprovou. É o mesmo método, em escala menor, para cada feature.</p>
+    <div class="grade">
+      <div class="mini"><h4>Sem spec</h4><p>"Adicione prazo às tarefas" → o Claude escolhe formato de data, o que é "atrasada", se a data é obrigatória… e você descobre no fim.</p></div>
+      <div class="mini"><h4>Com spec</h4><p>Decisões tomadas antes, por escrito. O Claude implementa, testa e revisa contra o mesmo documento.</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo da spec</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Anatomia de uma boa spec</h2>
+    <p>Cinco seções bastam. Uma página, não um tratado.</p>
+    <div class="cod" data-copiar="# Spec: <nome da feature>&#10;&#10;## Objetivo&#10;Uma ou duas frases: o problema e para quem.&#10;&#10;## Requisitos&#10;- R1 ...&#10;- R2 ...&#10;&#10;## Fora de escopo&#10;- ...&#10;&#10;## Critérios de aceite&#10;- [ ] Dado ..., quando ..., então ...&#10;&#10;## Casos de borda&#10;- ..."><span class="rot">specs/modelo.md</span><code># Spec: &lt;nome da feature&gt;
+
+## Objetivo
+Uma ou duas frases: o problema e para quem.
+
+## Requisitos
+- R1 ...
+- R2 ...
+
+## Fora de escopo
+- ...
+
+## Critérios de aceite
+- [ ] Dado ..., quando ..., então ...
+
+## Casos de borda
+- ...</code></div>
+    <table class="tab">
+      <tbody>
+        <tr><td><strong>Objetivo</strong></td><td>O porquê. Ajuda o Claude a decidir os detalhes que você não previu.</td></tr>
+        <tr><td><strong>Requisitos</strong></td><td>O que precisa existir. Numerados, para citar depois ("R2 não foi implementado").</td></tr>
+        <tr><td><strong>Fora de escopo</strong></td><td>O que <em>não</em> fazer. Evita que o Claude "capriche" onde você não pediu.</td></tr>
+        <tr><td><strong>Critérios de aceite</strong></td><td>Verificáveis, no formato "dado / quando / então". Viram testes na próxima aula.</td></tr>
+        <tr><td><strong>Casos de borda</strong></td><td>Entradas estranhas: vazio, inválido, limite.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Deixe o Claude te entrevistar</h3>
+    <p>Você não precisa ter tudo resolvido antes. A documentação oficial recomenda pedir que o Claude te entreviste:</p>
+    <div class="cod"><code>quero que as tarefas tenham data de vencimento, mas ainda não pensei nos detalhes.
+me entreviste até conseguir escrever a spec, e então escreva em specs/prazo.md</code></div>
+    <p>O Claude volta com perguntas (geralmente de múltipla escolha) sobre o que ainda está indefinido, até as respostas formarem uma spec.</p>
+    <div class="caixa dica"><strong>Comece a implementação numa sessão nova</strong>Com a spec escrita, faça <code>/clear</code> (ou abra outra sessão) e peça: <code>implemente specs/prazo.md</code>. A implementação começa com contexto limpo e uma definição de pronto por escrito. A spec também é o que você vai usar na revisão.</div>
+    <h3>Revisar contra a spec</h3>
+    <p>No fim, peça uma revisão focada na spec, não em estilo:</p>
+    <div class="cod"><code>use um subagente para revisar o diff contra specs/prazo.md: confira se cada requisito foi
+implementado e se os casos de borda têm testes. reporte lacunas de correção e ignore estilo</code></div>
+    <p>O "ignore estilo" importa: um revisor que precisa encontrar problemas sempre encontra <em>algum</em>. Sem foco, você acaba cheio de abstrações desnecessárias. Subagentes são o tema do Módulo 7; aqui basta pedir.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: a entrevista</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: seja entrevistado</h2>
+    <p>O Claude simulado vai te fazer 4 perguntas sobre a feature de prazo. Responda <code>a</code> ou <code>b</code>. No final, ele monta a spec com as <strong>suas</strong> decisões. Comece com <code>entrevista</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow (etapa-03 ou o seu):</p>
+    <ol>
+      <li>Peça a entrevista: <code>quero data de vencimento nas tarefas e um comando atrasadas. me entreviste até conseguir escrever a spec, depois escreva em specs/prazo.md</code></li>
+      <li>Responda às perguntas. Não sabe? Diga "sugira a opção mais simples"</li>
+      <li>Leia <code>specs/prazo.md</code>. Edite à mão o que não gostou. A spec é sua, não do Claude</li>
+      <li>Faça commit <strong>só da spec</strong>: <code>! git add specs/prazo.md</code> e <code>! git commit -m "Spec do prazo"</code></li>
+      <li><strong>Pare aqui.</strong> A implementação será na próxima aula, com TDD</li>
+    </ol>
+    <details class="gabarito"><summary>Ver uma spec de exemplo</summary>
+      <div class="cod"><code># Spec: prazo das tarefas
+
+## Objetivo
+Saber quais tarefas estão vencidas, para priorizar o que fazer primeiro.
+
+## Requisitos
+- R1 adicionar aceita --prazo AAAA-MM-DD (opcional)
+- R2 listar mostra o prazo ao lado do título, quando existir
+- R3 novo comando atrasadas lista tarefas não feitas com prazo anterior a hoje
+- R4 tarefas antigas, sem campo prazo, continuam funcionando
+
+## Fora de escopo
+- Horário, fuso, lembretes, recorrência
+- Editar o prazo de uma tarefa existente
+
+## Critérios de aceite
+- [ ] Dado prazo 2026-01-10 e hoje 2026-01-11, quando rodo atrasadas, então a tarefa aparece
+- [ ] Dado prazo igual a hoje, então NÃO está atrasada
+- [ ] Dada tarefa feita com prazo vencido, então NÃO aparece em atrasadas
+- [ ] Dado --prazo 2026-02-31, então erro "Data inválida" e nada é salvo
+
+## Casos de borda
+- Lista vazia: atrasadas mostra "Nenhuma tarefa atrasada."
+- Arquivo antigo sem "prazo": tratar como sem prazo</code></div>
+      <p>Repare em R4 e no último caso de borda: sem eles, a feature quebraria o <code>tarefas.json</code> que você já tem. É o tipo de detalhe que a entrevista ajuda a lembrar.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Spec gigante</h4><p>Se passa de uma página, divida em features menores.</p></div>
+      <div class="mini"><h4>Critério não verificável</h4><p>"Deve ser fácil de usar" não vira teste. "Dado X, quando Y, então Z" vira.</p></div>
+      <div class="mini"><h4>Aceitar a spec do Claude sem ler</h4><p>Ele propõe; você decide. Edite o que não for o que você quer.</p></div>
+      <div class="mini"><h4>Esquecer o fora de escopo</h4><p>Sem ele, o Claude pode implementar lembretes, fusos… que ninguém pediu.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a>: "Brainstorm with Claude first" e "Review against your spec"</li>
+      <li>O <a href="../../SDD.md">SDD.md</a> que planejou este curso é um exemplo real de spec em escala de projeto. Peça ao tutor: <code>me mostre como o SDD do curso foi estruturado</code></li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Spec-Driven Development em 1 minuto", cenas: [
+  { fala: "Spec-Driven Development: escrever o que você quer antes de pedir o código. É o método que deu origem a este curso.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 3 · AULA 3</span><p class=\"v-titulo\" data-t=\"0.3\">Spec-Driven Development</p><p class=\"v-sub\" data-t=\"0.9\">Especificar antes de codar</p>" },
+  { fala: "O Claude não lê a sua mente. Quando falta informação, ele preenche a lacuna com a suposição mais provável. E ela nem sempre é a sua.",
+    html: "<div class=\"v-code\" data-t=\"0.2\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:25\">adicione prazo às tarefas</span></div><div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa warn\" data-t=\"2.4\"><span class=\"v-ic\">📅</span>formato da data?</div><div class=\"v-caixa warn\" data-t=\"3.4\"><span class=\"v-ic\">⏰</span>o que é \"atrasada\"?</div><div class=\"v-caixa warn\" data-t=\"4.4\"><span class=\"v-ic\">❓</span>data obrigatória?</div></div>" },
+  { fala: "Uma boa spec tem cinco seções curtas: objetivo, requisitos numerados, o que fica fora de escopo, critérios de aceite e casos de borda. Uma página, não um tratado.",
+    html: "<div class=\"v-grade\" style=\"--cols:5\"><div class=\"v-caixa\" data-t=\"0.4\"><span class=\"v-ic\">🎯</span>Objetivo</div><div class=\"v-caixa\" data-t=\"1.6\"><span class=\"v-ic\">📋</span>Requisitos</div><div class=\"v-caixa\" data-t=\"2.8\"><span class=\"v-ic\">🚫</span>Fora de escopo</div><div class=\"v-caixa ok\" data-t=\"4\"><span class=\"v-ic\">✅</span>Critérios de aceite</div><div class=\"v-caixa\" data-t=\"5.6\"><span class=\"v-ic\">🧩</span>Casos de borda</div></div>" },
+  { fala: "Os critérios de aceite são verificáveis, no formato dado, quando, então. Na próxima aula, cada um deles vira um teste.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"d\">## Critérios de aceite</span></div><div data-t=\"1.2\"><span class=\"o\">- [ ]</span> <span class=\"a\">Dado</span> …,</div><div data-t=\"1.9\">      <span class=\"a\">quando</span> …,</div><div data-t=\"2.6\">      <span class=\"a\">então</span> …</div></div><p class=\"v-txt\" data-t=\"4.5\" style=\"text-align:center\">cada critério → <b style=\"color:#7cc48a\">um teste</b></p>" },
+  { fala: "Você não precisa ter tudo resolvido. Peça para o Claude te entrevistar: ele faz perguntas, geralmente de múltipla escolha, até conseguir escrever a spec.",
+    html: "<div class=\"v-code\"><div data-t=\"0.2\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:43\">me entreviste até conseguir escrever a spec</span></div><div data-t=\"4\"><span class=\"a\">●</span> A data de vencimento é obrigatória?</div><div data-t=\"4.8\">   <span class=\"u\">a)</span> sim   <span class=\"u\">b)</span> não, opcional</div></div>" },
+  { fala: "Com a spec escrita, comece numa sessão limpa e peça: implemente a spec. No fim, revise contra o mesmo documento, focando em correção e ignorando estilo.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa\" data-t=\"0.3\"><span class=\"v-ic\">📝</span><b>Spec</b></div><span class=\"v-seta\" data-t=\"1\">→</span><div class=\"v-caixa\" data-t=\"1.4\"><span class=\"v-ic\">✨</span><b>/clear</b></div><span class=\"v-seta\" data-t=\"2.4\">→</span><div class=\"v-caixa\" data-t=\"2.8\"><span class=\"v-ic\">🛠</span><b>Implementar</b></div><span class=\"v-seta\" data-t=\"4.6\">→</span><div class=\"v-caixa ok\" data-t=\"5\"><span class=\"v-ic\">🔍</span><b>Revisar contra a spec</b></div></div>" },
+  { fala: "A spec é o contrato: o Claude implementa, testa e é revisado contra o mesmo documento.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A ideia central</p><p class=\"v-titulo\" data-t=\"0.4\">A spec é o contrato</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "💬", rt: "Entrevista" }, { ic: "📄", rt: "spec.md" }, { ic: "🧹", rt: "Sessão limpa" }, { ic: "🛠", rt: "Implementar" }, { ic: "🔍", rt: "Revisar contra a spec" }],
+  passos: [
+    { ativos: [0], titulo: "O Claude te entrevista", texto: "Você descreve a ideia em uma frase e pede: <em>me entreviste até conseguir escrever a spec</em>. Ele pergunta sobre o que está indefinido." },
+    { ativos: [1], setas: [0], titulo: "A spec vira arquivo", texto: "<code>specs/prazo.md</code> com objetivo, requisitos, fora de escopo, critérios de aceite e casos de borda. <strong>Você revisa e edita.</strong> Commit da spec." },
+    { ativos: [2], setas: [1], titulo: "Contexto limpo", texto: "<code>/clear</code> ou sessão nova. A conversa da entrevista não polui a implementação; tudo o que importa está no arquivo." },
+    { ativos: [3], setas: [2], titulo: "Implementar a partir da spec", texto: "<code>implemente specs/prazo.md</code>. Na próxima aula: testes primeiro, a partir dos critérios de aceite." },
+    { ativos: [4], setas: [3], titulo: "Revisar contra a spec", texto: "Cada requisito foi implementado? Cada caso de borda tem teste? A spec é o gabarito da revisão." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: entrevista de spec (demonstração)", altura: 340,
+  passos: [
+    { t: "user", x: "quero prazo nas tarefas. me entreviste até conseguir escrever a spec, depois escreva em specs/prazo.md", leg: "Você só tem a ideia" },
+    { t: "claude", x: "Algumas perguntas para fechar a spec:", ms: 700 },
+    { t: "html", x: '<span class="t-caixa">1. O prazo é obrigatório ao adicionar?\n   <span class="t-user">❯ a) Opcional</span>   b) Obrigatório</span>', leg: "Perguntas de múltipla escolha", ms: 1500 },
+    { t: "html", x: '<span class="t-caixa">2. Tarefa com prazo HOJE está atrasada?\n   a) Sim   <span class="t-user">❯ b) Não, só a partir de amanhã</span></span>', ms: 1500 },
+    { t: "html", x: '<span class="t-caixa">3. Tarefas antigas, sem prazo no JSON?\n   <span class="t-user">❯ a) Continuam funcionando, sem prazo</span>   b) Migrar todas</span>', leg: "Detalhe que você talvez esquecesse", ms: 1500 },
+    { t: "html", x: '<span class="t-caixa">4. Lembretes e horário entram agora?\n   a) Sim   <span class="t-user">❯ b) Não, fora de escopo</span></span>', ms: 1300 },
+    { t: "tool", x: "Write(specs/prazo.md)" },
+    { t: "out", x: "Wrote 31 lines to specs/prazo.md" },
+    { t: "claude", x: "Spec escrita com 4 requisitos, 4 critérios de aceite e 2 casos de borda. Revise antes de implementarmos." },
+    { t: "user", x: "! git add specs/prazo.md && git commit -m \"Spec do prazo\"", leg: "Commit só da spec" },
+    { t: "user", x: "/clear", leg: "Implementação começa com contexto limpo" }
+  ]
+});
+(function () {
+  var qs = [
+    ["O prazo é obrigatório ao adicionar uma tarefa?", "Opcional (--prazo)", "Obrigatório", ["- R1 adicionar aceita --prazo AAAA-MM-DD (opcional)", "- R1 adicionar exige --prazo AAAA-MM-DD"]],
+    ["Tarefa com prazo igual a HOJE está atrasada?", "Não, só a partir de amanhã", "Sim", ["- [ ] Dado prazo igual a hoje, então NÃO está atrasada", "- [ ] Dado prazo igual a hoje, então está atrasada"]],
+    ["E as tarefas antigas, sem campo prazo no JSON?", "Continuam funcionando, sem prazo", "Exigir migração manual", ["- R4 tarefas sem prazo continuam funcionando", "- R4 o usuário migra o tarefas.json antes de usar"]],
+    ["Lembretes e horário entram nesta versão?", "Não, fora de escopo", "Sim", ["## Fora de escopo\n- Horário, fuso, lembretes", "- R5 lembretes com horário (atenção: amplia muito o escopo)"]]
+  ], i = -1, esc = [];
+  function pergunta() { var q = qs[i]; return '<span class="t-caixa"><span class="t-b">' + (i + 1) + "/" + qs.length + ". " + q[0] + "</span>\n  a) " + q[1] + "\n  b) " + q[2] + "</span>"; }
+  function resp(l) {
+    if (i < 0) return '<span class="t-dim">Digite entrevista para começar.</span>';
+    if (i >= qs.length) return '<span class="t-dim">Entrevista concluída. Digite spec ou entrevista.</span>';
+    esc.push(qs[i][3][l === "a" ? 0 : 1]); i++;
+    if (i < qs.length) return pergunta();
+    return '<span class="t-ok">Entrevista concluída.</span> Digite <span class="t-b">spec</span> para ver o resultado.';
+  }
+  Curso.terminal("term", {
+    titulo: "Entrevista de spec (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Simula o Claude te entrevistando sobre a feature de prazo.</span>',
+    metas: ["entrevista", "spec"],
+    comandos: {
+      "entrevista": function () { i = 0; esc = []; return '<span class="t-acc">●</span> Vou te fazer algumas perguntas para fechar a spec.\n' + pergunta(); },
+      "a": function () { return resp("a"); }, "b": function () { return resp("b"); },
+      "spec": function () {
+        if (esc.length < qs.length) return '<span class="t-dim">Termine a entrevista antes.</span>';
+        var req = esc.filter(function (x) { return x.indexOf("- R") === 0; }), crit = esc.filter(function (x) { return x.indexOf("- [ ]") === 0; }), fora = esc.filter(function (x) { return x.indexOf("## Fora") === 0; });
+        return '<span class="t-ok">● Write(specs/prazo.md)</span>\n<span class="t-caixa"># Spec: prazo das tarefas\n\n## Objetivo\nSaber quais tarefas estão vencidas.\n\n## Requisitos\n' + req.join("\n") + "\n- R3 comando atrasadas lista tarefas não feitas vencidas\n\n" + (fora.length ? fora[0] : "## Fora de escopo\n- (nada definido)") + "\n\n## Critérios de aceite\n" + crit.join("\n") + "\n- [ ] Dada data inválida, então erro e nada é salvo</span>\n" + '<span class="t-dim">Cada resposta sua virou uma linha da spec. Mudaria alguma? Digite entrevista para refazer.</span>';
+      }
+    },
+    desconhecido: '<span class="t-dim">Comandos: entrevista · a · b · spec</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Para que serve a seção \"Fora de escopo\"?", op: ["Para listar bugs conhecidos", "Para dizer o que NÃO fazer, evitando que o Claude amplie a feature por conta própria", "Para listar as bibliotecas proibidas"], c: 1, ex: "Sem limites escritos, o Claude tende a preencher lacunas, às vezes com coisas que você não pediu." },
+  { p: "Qual critério de aceite é verificável?", op: ["\"O comando deve ser intuitivo\"", "\"Dado prazo igual a hoje, quando rodo atrasadas, então a tarefa NÃO aparece\"", "\"Deve funcionar bem\""], c: 1, ex: "O formato dado/quando/então vira teste diretamente (próxima aula)." },
+  { p: "Você não sabe todos os detalhes da feature. O que fazer?", op: ["Esperar até ter tudo definido", "Pedir para o Claude te entrevistar até conseguir escrever a spec", "Deixar o Claude decidir tudo sozinho"], c: 1, ex: "A entrevista transforma o que está na sua cabeça em decisões explícitas, uma pergunta de cada vez." },
+  { p: "Por que começar a implementação numa sessão nova (ou após <code>/clear</code>)?", op: ["Porque a spec só funciona em sessões novas", "Para começar com contexto limpo: tudo o que importa já está no arquivo da spec", "Porque é mais barato abrir sessões"], c: 1, ex: "A conversa da entrevista vira ruído. A spec concentra as decisões." },
+  { p: "Ao pedir revisão contra a spec, por que acrescentar \"ignore estilo\"?", op: ["Porque estilo não importa nunca", "Porque um revisor sempre encontra algo; sem foco, você acumula mudanças desnecessárias", "Porque o Claude não sabe revisar estilo"], c: 1, ex: "Foque a revisão em correção e cobertura dos requisitos." }
+]);
+Curso.checklist("check", [
+  "Escrevo uma spec com objetivo, requisitos, fora de escopo, critérios e casos de borda",
+  "Peço ao Claude para me entrevistar quando os detalhes não estão claros",
+  "Escrevo critérios de aceite no formato dado/quando/então",
+  "Começo a implementação com contexto limpo, a partir do arquivo",
+  "Tenho <code>specs/prazo.md</code> commitado no TaskFlow"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Segundo plano e fork</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Aula 2</span><span class="selo cinza">Avançado</span><span class="selo cinza">~20 min</span>
+    <h1>Segundo plano e fork</h1>
+    <p class="objetivo">Objetivo: manter o Claude trabalhando sem travar a conversa, acompanhar e parar o que está rodando, e ramificar a conversa para testar outro caminho sem perder o atual.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Até aqui, cada pedido ocupava a sessão: você esperava o Claude terminar para mandar o próximo. Isso é ruim quando a tarefa é longa, como rodar uma bateria de testes ou uma revisão grande.</p>
+    <div class="grade">
+      <div class="mini"><h4>⏳ Segundo plano</h4><p>O trabalho continua rodando, e você continua conversando. O resultado chega quando terminar.</p></div>
+      <div class="mini"><h4>🌿 Fork</h4><p>Você copia a conversa no ponto atual e testa outra ideia na cópia. O original fica intacto.</p></div>
+    </div>
+    <div class="caixa"><strong>Analogia</strong>Segundo plano é colocar a roupa na máquina e ir fazer outra coisa. Fork é tirar uma cópia do documento antes de reescrever um capítulo inteiro.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o que roda onde</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os comandos</h2>
+    <h3>Mandar para segundo plano e acompanhar</h3>
+    <table class="tab">
+      <thead><tr><th>Comando ou atalho</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>Ctrl+B</kbd></td><td>Manda para segundo plano o comando Bash ou o subagente que está rodando. Quem usa tmux aperta duas vezes.</td></tr>
+        <tr><td>Pedir em texto</td><td><em>"rode os testes em segundo plano"</em> também funciona.</td></tr>
+        <tr><td><code>/tasks</code> (ou <code>/bashes</code>)</td><td>Mostra e gerencia o trabalho em segundo plano da sessão, inclusive subagentes que já terminaram.</td></tr>
+        <tr><td><kbd>Ctrl+X</kbd> <kbd>Ctrl+K</kbd></td><td>Para <strong>todos</strong> os subagentes em segundo plano da sessão. Aperte duas vezes em até 3 segundos para confirmar.</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Subagentes que a conversa principal inicia já <strong>começam em segundo plano</strong> por padrão.</li>
+      <li>Se um subagente em segundo plano precisar de permissão, o pedido aparece <strong>na sua sessão</strong>, com o nome dele. <kbd>Esc</kbd> recusa só aquela ação.</li>
+      <li>Comandos em segundo plano <strong>terminam quando você sai</strong> do Claude Code.</li>
+      <li><kbd>Ctrl+T</kbd> <strong>não</strong> é a lista de segundo plano: ele mostra ou esconde a lista de afazeres do Claude.</li>
+    </ul>
+
+    <h3>Ramificar a conversa (fork)</h3>
+    <table class="tab">
+      <thead><tr><th>Comando</th><th>O que acontece</th><th>Onde você fica</th></tr></thead>
+      <tbody>
+        <tr><td><code>/branch [nome]</code></td><td>Cria uma ramificação da conversa neste ponto.</td><td>Na ramificação. O original fica salvo; volte com <code>/resume</code>.</td></tr>
+        <tr><td><code>/fork [pedido]</code></td><td>Copia a conversa para uma <strong>nova sessão em segundo plano</strong>. Com um pedido, a cópia já começa a trabalhar.</td><td>Na conversa atual. A cópia aparece no agent view (aula 4).</td></tr>
+        <tr><td><code>/subtask &lt;tarefa&gt;</code></td><td>Inicia um subagente <strong>com todo o histórico</strong> (subagente fork). O resultado volta para esta conversa.</td><td>Na conversa atual.</td></tr>
+        <tr><td><code>claude --continue --fork-session</code></td><td>Pela linha de comando: retoma a última conversa como uma sessão nova.</td><td>Numa sessão nova; a original não muda.</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Subtask ou subagente comum?</strong>O subagente da aula 1 começa <strong>sem</strong> o seu histórico. O <code>/subtask</code> começa <strong>com</strong> ele: bom quando a tarefa depende do que vocês já discutiram.</div>
+    <div class="caixa alerta"><strong>Fork e arquivos</strong>Copiar a conversa não copia a pasta. Duas sessões editando os mesmos arquivos podem se atrapalhar. Por isso, o Claude Code orienta a cópia do <code>/fork</code> a criar um worktree próprio antes de editar código; worktrees são o assunto da próxima aula.</div>
+
+    <h3>E o custo?</h3>
+    <p>Cada subagente e cada sessão paralela gasta <strong>os próprios tokens</strong>. Paralelize o que é independente; para uma tarefa curta, esperar é mais barato. Confira o gasto com <code>/usage</code> (também <code>/cost</code> e <code>/stats</code>) e o contexto com <code>/context</code>.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: testes em segundo plano</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual comando?</h2>
+    <p>Para cada situação, digite o comando que resolve: <code>ctrl+b</code>, <code>/tasks</code>, <code>/branch</code>, <code>/fork</code> ou <code>/subtask</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: revisor em segundo plano</h2>
+    <p>Use a pasta de treino da aula 1 (<a href="../../projeto-taskflow/etapa-07/README.md">README da etapa 07</a>), com o subagente <code>revisor-taskflow</code> já criado.</p>
+    <ol>
+      <li>Abra <code>claude</code> na pasta de treino e peça: <em>"use o subagente revisor-taskflow para revisar o tarefas.py"</em>.</li>
+      <li>Enquanto ele trabalha (se ele aparecer em primeiro plano, aperte <kbd>Ctrl+B</kbd>), faça outra pergunta: <em>"explique em duas linhas o que a função _indice_valido faz"</em>.</li>
+      <li>Rode <code>/tasks</code> e veja o revisor na lista. Espere o relatório chegar na conversa.</li>
+      <li>Agora rode <code>/branch teste-docstrings</code> e peça: <em>"adicione docstrings curtas a todas as funções do tarefas.py"</em>. Rode <code>python -m unittest</code>.</li>
+      <li>Rode <code>/resume</code> e volte para a conversa original. Ela não sabe de nada do que aconteceu na ramificação. (Os <strong>arquivos</strong>, porém, mudaram: a ramificação é da conversa, não da pasta.)</li>
+      <li>Rode <code>/usage</code> e veja quanto a sessão gastou.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o que observar</summary>
+      <ul>
+        <li><strong>Passo 2:</strong> a sua pergunta é respondida enquanto o revisor ainda roda. Se ele pedir permissão para <code>python -m unittest</code>, o pedido aparece na sua tela com o nome dele.</li>
+        <li><strong>Passo 3:</strong> <code>/tasks</code> lista o subagente, rodando ou concluído.</li>
+        <li><strong>Passo 5:</strong> esta é a lição mais importante. <code>/branch</code> separa a <strong>conversa</strong>; os arquivos são os mesmos. Para separar arquivos, use worktrees (aula 3). Se quiser desfazer as docstrings, use <code>git checkout -- tarefas.py</code> na pasta de treino ou o rewind (<kbd>Esc</kbd> <kbd>Esc</kbd>, Módulo 3).</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Achar que fork copia arquivos</h4><p><code>/branch</code> e <code>/fork</code> copiam a conversa. A pasta é a mesma, a menos que a sessão use um worktree.</p></div>
+      <div class="mini"><h4>Sair com trabalho rodando</h4><p>Comandos em segundo plano terminam quando você sai do Claude Code. Confira <code>/tasks</code> antes de sair.</p></div>
+      <div class="mini"><h4>Confundir Ctrl+T e /tasks</h4><p><kbd>Ctrl+T</kbd> mostra a lista de afazeres do Claude. O trabalho em segundo plano está em <code>/tasks</code>.</p></div>
+      <div class="mini"><h4>Paralelizar tudo</h4><p>Cada trabalho paralelo gasta tokens próprios. Tarefa curta e dependente fica em primeiro plano.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/interactive-mode">Modo interativo</a> (em inglês): atalhos e comandos em segundo plano.</li>
+      <li><a href="https://code.claude.com/docs/en/commands">Lista de comandos</a> (em inglês): <code>/fork</code>, <code>/branch</code>, <code>/subtask</code> e <code>/tasks</code>.</li>
+      <li><strong>Sessões na nuvem:</strong> o Claude Code também roda tarefas em máquinas da Anthropic (<code>claude --cloud</code>), fora deste módulo, que trabalha só na sua máquina. Veja <a href="https://code.claude.com/docs/en/claude-code-on-the-web">Claude Code on the web</a> (em inglês). Antes de usar com código da empresa, confirme com a área de segurança da informação.</li>
+      <li>Próxima aula: <strong>worktrees</strong>, para separar também os arquivos.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Interactive mode" e "Commands").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Segundo plano e fork em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai deixar o Claude trabalhando enquanto continua conversando: segundo plano e fork.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 7 · AULA 2</span><p class="v-titulo" data-t="0.3">Segundo plano e fork</p><p class="v-sub" data-t="1.2">o Claude trabalha, você continua</p>' },
+  { fala: "Um comando demorado ou um subagente ocupando a tela? Aperte control B. O trabalho vai para o segundo plano e você volta a digitar.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="o">● Bash(python -m unittest) rodando…</span></div><div data-t="3.2"><span class="w">Ctrl+B</span> <span class="d">→ movido para segundo plano</span></div><div data-t="5.5"><span class="u">&gt; </span><span class="v-digita" style="--n:28">enquanto isso, explique isto</span></div></div><div class="v-linha" data-t="6.5"><div class="v-caixa acc"><span class="v-ic">⏳</span><b>Segundo plano</b>continua rodando</div><span class="v-seta">+</span><div class="v-caixa ok"><span class="v-ic">💬</span><b>Você</b>continua conversando</div></div>' },
+  { fala: "O comando barra tasks mostra o que está rodando e o que terminou. Para parar todos os subagentes em segundo plano, control X e depois control K, duas vezes.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="0.3"><span class="v-ic">📋</span><b>/tasks</b>o que roda e o que terminou</div><div class="v-caixa err" data-t="4.8"><span class="v-ic">⏹</span><b>Ctrl+X Ctrl+K</b>para todos (2×)</div></div>' },
+  { fala: "Fork é copiar a conversa. Barra fork cria uma sessão paralela, barra branch troca para uma ramificação, e barra subtask manda um subagente com todo o histórico.",
+    html: '<p class="v-titulo" data-t="0">Fork = copiar a conversa</p><div class="v-grade" style="--cols:3"><div class="v-caixa acc" data-t="2.2"><span class="v-ic">🍴</span><b>/fork</b>sessão paralela</div><div class="v-caixa" data-t="4.3"><span class="v-ic">🌿</span><b>/branch</b>você troca para ela</div><div class="v-caixa ok" data-t="6.6"><span class="v-ic">🤖</span><b>/subtask</b>subagente com histórico</div></div>' },
+  { fala: "Lembre: cada trabalho paralelo gasta os próprios tokens. Paralelize o que é independente, e confira o custo com barra usage.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="0.3"><p class="v-txt">1 sessão</p><div class="v-barra"><i style="--w:30%;--cor:#6ac08a;animation-delay:.6s"></i></div></div><div data-t="1.6"><p class="v-txt">3 trabalhos paralelos</p><div class="v-barra"><i style="--w:85%;--cor:#e07a6a;animation-delay:1.9s"></i></div></div></div><div class="v-caixa warn" data-t="5.2"><span class="v-ic">🪙</span><b>/usage</b>confira o gasto</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você" }, { ic: "✻", rt: "Conversa principal" }, { ic: "⏳", rt: "Segundo plano (/tasks)" }, { ic: "🌿", rt: "Cópia da conversa" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Você pede algo demorado", texto: "<em>\"Rode todos os testes.\"</em> Normalmente a conversa fica ocupada até terminar." },
+    { ativos: [1, 2], setas: [1], titulo: "Ctrl+B: vai para segundo plano", texto: "O comando ou subagente continua rodando, listado em <code>/tasks</code>. A conversa fica livre para o próximo pedido." },
+    { ativos: [0, 1], setas: [0], titulo: "Você continua", texto: "Faça outras perguntas. Pedidos de permissão do trabalho em segundo plano aparecem aqui, com o nome de quem pediu." },
+    { ativos: [1, 3], setas: [2], titulo: "Fork: copiar a conversa", texto: "<code>/branch</code> ou <code>/fork</code> copiam o <strong>histórico</strong> neste ponto. A pasta de arquivos continua a mesma." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Testes em segundo plano (ilustrativo)", altura: 300,
+  passos: [
+    { t: "user", x: "use o subagente revisor-taskflow para revisar o tarefas.py", leg: "Pedido normal" },
+    { t: "tool", x: "revisor-taskflow(Revisar tarefas.py)  ⏳ em segundo plano", leg: "Subagentes iniciados pela conversa começam em segundo plano" },
+    { t: "user", x: "enquanto isso: o que a função _indice_valido faz?", leg: "A conversa está livre" },
+    { t: "claude", x: "Ela confere se o número da tarefa (começando em 1) existe na lista e avisa quando não existe.", leg: "Resposta imediata" },
+    { t: "user", x: "/tasks", leg: "Acompanhar o trabalho em segundo plano" },
+    { t: "out", x: "revisor-taskflow · concluído · 3 tool uses", leg: "Terminou" },
+    { t: "claude", x: "O revisor terminou. Testes: passaram (6). Veredito: ajustar antes (faltam docstrings).", leg: "O resultado chega na conversa" }
+  ]
+});
+(function () {
+  var itens = [
+    ["O python -m unittest está demorando e você quer fazer outra pergunta agora", "ctrl+b", "Ctrl+B manda o comando em execução para segundo plano."],
+    ["Você quer ver o que está rodando em segundo plano e o que já terminou", "/tasks", "/tasks (ou /bashes) lista e gerencia o trabalho em segundo plano."],
+    ["Testar outra abordagem nesta conversa, podendo voltar à original depois", "/branch", "/branch cria a ramificação e troca para ela; /resume volta ao original."],
+    ["Uma cópia da conversa deve trabalhar sozinha numa sessão paralela enquanto você segue aqui", "/fork", "/fork copia a conversa para uma nova sessão em segundo plano."],
+    ["Um ajudante deve pesquisar algo que depende de tudo que vocês já discutiram e trazer o resultado para cá", "/subtask", "/subtask inicia um subagente com o histórico completo; o resultado volta para esta conversa."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: ctrl+b · /tasks · /branch · /fork · /subtask</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["ctrl+b", "/tasks", "/branch", "/fork", "/subtask"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  Curso.terminal("term", { titulo: "Qual comando? (simulação)", prompt: ">", intro: '<span class="t-dim">Responda com o comando que resolve cada situação.</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: ctrl+b, /tasks, /branch, /fork ou /subtask.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que <kbd>Ctrl+B</kbd> faz enquanto um comando Bash está rodando?", op: ["Cancela o comando", "Manda o comando para segundo plano e libera a conversa", "Abre a lista de afazeres"], c: 1, ex: "O comando continua rodando em segundo plano, e você volta a digitar." },
+  { p: "Onde você acompanha o trabalho em segundo plano?", op: ["<code>/tasks</code>", "<kbd>Ctrl+T</kbd>", "<code>/context</code>"], c: 0, ex: "<code>/tasks</code> (ou <code>/bashes</code>). <kbd>Ctrl+T</kbd> mostra a lista de afazeres do Claude." },
+  { p: "Você rodou <code>/branch</code> e pediu mudanças no código. O que acontece com os arquivos da conversa original?", op: ["Nada: cada ramificação tem a sua cópia dos arquivos", "Eles também mudam: a ramificação é da conversa, não da pasta", "O Claude bloqueia a edição"], c: 1, ex: "Fork e branch copiam o histórico. Para separar arquivos, use worktrees." },
+  { p: "Qual a diferença entre <code>/subtask</code> e um subagente comum?", op: ["<code>/subtask</code> herda todo o histórico da conversa", "<code>/subtask</code> não gasta tokens", "Nenhuma"], c: 0, ex: "O subagente comum começa sem histórico; o subagente fork do <code>/subtask</code> começa com ele." },
+  { p: "Como parar de uma vez todos os subagentes em segundo plano?", op: ["<kbd>Ctrl+C</kbd> uma vez", "<kbd>Ctrl+X</kbd> <kbd>Ctrl+K</kbd>, duas vezes em até 3 segundos", "Fechar o terminal é o único jeito"], c: 1, ex: "O atalho pede confirmação: aperte de novo em até 3 segundos." }
+]);
+Curso.checklist("check", [
+  "Mando um comando ou subagente para segundo plano com <kbd>Ctrl+B</kbd>",
+  "Acompanho o trabalho com <code>/tasks</code> e sei parar tudo com <kbd>Ctrl+X</kbd> <kbd>Ctrl+K</kbd>",
+  "Explico a diferença entre <code>/branch</code>, <code>/fork</code> e <code>/subtask</code>",
+  "Sei que fork copia a conversa, não os arquivos",
+  "Confiro o custo com <code>/usage</code>"
+]);
+</script>
+</body>
+</html>

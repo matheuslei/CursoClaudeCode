@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>settings.json e precedência</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m5a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 5 · Aula 1</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>settings.json e precedência</h1>
+    <p class="objetivo">Objetivo: saber em qual arquivo cada configuração deve ficar, prever qual valor vale quando há conflito e conferir o que foi carregado.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O <code>CLAUDE.md</code> é <em>orientação</em>: o Claude lê e tenta seguir. Já o <code>settings.json</code> é <strong>aplicado pela ferramenta</strong>, siga o Claude ou não: permissões, hooks, modelo padrão, variáveis de ambiente. Saber onde colocar cada chave evita o clássico "configurei e não funcionou".</p>
+    <div class="caixa"><strong>Cenário</strong>Você liberou <code>python</code> para rodar sem perguntar, mas só no seu computador. Seu colega clonou o projeto e o Claude pergunta tudo para ele. Por quê? A regra foi salva no <code>settings.local.json</code>, que é só seu e fica fora do Git.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: a pilha de precedência</h2>
+    <p>Quando a mesma chave aparece em mais de um lugar, <strong>vale a de nível mais alto</strong>. Navegue de baixo para cima:</p>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os arquivos e para que servem</h2>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Arquivo</th><th>Afeta quem</th><th>Use para</th></tr></thead>
+      <tbody>
+        <tr><td>Usuário</td><td><code>~/.claude/settings.json</code></td><td>Você, em todos os projetos desta máquina</td><td>Preferências pessoais: tema, modelo padrão, suas regras</td></tr>
+        <tr><td>Projeto compartilhado</td><td><code>.claude/settings.json</code></td><td>Todos no projeto (se commitado)</td><td>Permissões, hooks e plugins do time</td></tr>
+        <tr><td>Projeto local</td><td><code>.claude/settings.local.json</code></td><td>Só você, só neste projeto</td><td>Exceções pessoais; testar antes de compartilhar</td></tr>
+        <tr><td>Gerenciado</td><td><code>managed-settings.json</code> e outras fontes da organização</td><td>Todos onde a organização implantar</td><td>Política de segurança e conformidade</td></tr>
+      </tbody>
+    </table>
+    <p>No Windows, <code>~/.claude</code> é <code>%USERPROFILE%\.claude</code> (ex.: <code>C:\Users\ana\.claude</code>). Instalar o Claude Code <strong>não cria</strong> nenhum desses arquivos: eles surgem quando você muda algo no <code>/config</code>, quando escolhe "Yes, and don't ask again" (vai para o <code>settings.local.json</code>) ou quando você os cria.</p>
+
+    <h3>Exemplo de arquivo (formato da documentação)</h3>
+    <div class="cod"><span class="rot">.claude/settings.json</span><code>{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python -m unittest *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}</code></div>
+    <div class="caixa alerta"><strong>JSON estrito</strong>Nada de comentários <code>//</code> nem vírgula sobrando no final. Um erro de sintaxe vira "Settings Error" na próxima sessão. A linha <code>$schema</code> dá autocompletar e validação no VS Code.</div>
+
+    <h3>Três detalhes que confundem</h3>
+    <ul>
+      <li><strong>Listas se somam:</strong> <code>permissions.allow</code> de vários arquivos é <em>combinado</em>, não substituído.</li>
+      <li><strong>Linha de comando:</strong> <code>claude --settings '{"model": "..."}'</code> vale só para aquela sessão, acima dos seus arquivos e abaixo do gerenciado.</li>
+      <li><strong>Gerenciado vence tudo:</strong> se a organização define uma chave, nada nos seus arquivos muda isso. <code>/status</code> mostra se há fonte gerenciada.</li>
+    </ul>
+
+    <h3>Mudar e conferir</h3>
+    <ul>
+      <li><code>/config</code> abre o menu de opções pessoais (tema, editor, etc.).</li>
+      <li><code>/config chave=valor</code> muda uma opção direto, ex.: <code>/config verbose=true</code>.</li>
+      <li><code>/status</code> mostra a linha <strong>Setting sources</strong>: quais arquivos foram carregados.</li>
+      <li>A maioria das edições vale <strong>sem reiniciar</strong>: o Claude Code observa os arquivos. Exceções: <code>model</code> e <code>effortLevel</code> (use <code>/model</code> e <code>/effort</code>).</li>
+    </ul>
+
+    <h3>O mapa da pasta <code>.claude</code></h3>
+    <table class="tab">
+      <tbody>
+        <tr><td><code>CLAUDE.md</code> (raiz do projeto)</td><td>Instruções carregadas em toda sessão</td></tr>
+        <tr><td><code>.claude/settings.json</code></td><td>Permissões, hooks, env, modelo (aplicado)</td></tr>
+        <tr><td><code>.claude/settings.local.json</code></td><td>Suas exceções, fora do Git</td></tr>
+        <tr><td><code>.claude/rules/</code></td><td>Instruções por tema (opcionalmente por caminho)</td></tr>
+        <tr><td><code>.claude/skills/</code></td><td>Skills (aula 5.2)</td></tr>
+        <tr><td><code>.claude/commands/</code></td><td>Comandos de arquivo único (formato antigo; prefira skills)</td></tr>
+        <tr><td><code>.claude/output-styles/</code></td><td>Estilos de resposta (aula 5.3)</td></tr>
+        <tr><td><code>.claude/agents/</code></td><td>Subagentes (Módulo 7)</td></tr>
+        <tr><td><code>.mcp.json</code> (raiz)</td><td>Servidores MCP do time (Módulo 6)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: quem vence?</h2>
+    <p>O simulador mostra um conflito de configuração. Responda com o nome do arquivo vencedor: <code>usuario</code>, <code>projeto</code>, <code>local</code>, <code>cli</code> ou <code>gerenciado</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow (ou na cópia em <code>projeto-taskflow/etapa-05</code>):</p>
+    <ol>
+      <li>Crie <code>.claude/settings.json</code> que libera <code>Bash(python -m unittest *)</code> e bloqueia leitura de <code>./.env</code></li>
+      <li>Valide o JSON: <code>python -m json.tool .claude\settings.json</code></li>
+      <li>Abra <code>claude</code> e rode <code>/status</code>: confira a linha <strong>Setting sources</strong></li>
+      <li>Rode <code>/config</code> e mude o tema. Descubra em qual arquivo a mudança foi salva</li>
+      <li>Faça commit do <code>.claude/settings.json</code> (e confirme que o <code>settings.local.json</code>, se existir, <strong>não</strong> entrou)</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": ["Bash(python -m unittest *)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)"]
+  }
+}</code></div>
+      <ul>
+        <li><code>python -m json.tool</code> imprime o JSON formatado se estiver válido, ou aponta a linha do erro.</li>
+        <li><code>/status</code> deve listar <em>Project settings</em> (e <em>User settings</em>, se você já tiver um).</li>
+        <li>A troca de tema vai para <code>~/.claude/settings.json</code> (usuário).</li>
+        <li>Se o <code>settings.local.json</code> foi criado pelo Claude Code, ele já o colocou nas exclusões globais do Git. Se criou à mão, adicione ao <code>.gitignore</code>.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Comentário no JSON</h4><p><code>// isso quebra</code>. Settings são JSON estrito.</p></div>
+      <div class="mini"><h4>Arquivo certo, pasta errada</h4><p>O <code>.claude/settings.json</code> é lido da pasta onde você abriu o Claude. Abra na raiz do projeto.</p></div>
+      <div class="mini"><h4>Commitar o settings.local.json</h4><p>É pessoal. Se for para o Git, suas exceções viram regra do time.</p></div>
+      <div class="mini"><h4>"Não pega" por causa do gerenciado</h4><p>Se a organização fixou a chave, seus arquivos não mudam nada. Veja <code>/status</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/settings">Settings files and precedence</a></li>
+      <li><a href="https://code.claude.com/docs/en/settings-reference">All settings</a>: todas as chaves</li>
+      <li><a href="https://code.claude.com/docs/en/claude-directory">Explore the .claude directory</a></li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Settings e .claude directory).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "settings.json e precedência em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai descobrir onde cada configuração do Claude Code deve ficar e qual valor vale quando há conflito.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 5 · AULA 1</span><p class="v-titulo" data-t="0.3">settings.json e precedência</p><p class="v-sub" data-t="0.9">Onde cada configuração mora</p>' },
+  { fala: "O CLAUDE.md é orientação: o Claude lê e tenta seguir. Já o settings.json é aplicado pela própria ferramenta: permissões, hooks, modelo padrão e variáveis de ambiente.",
+    html: '<div class="v-grade"><div class="v-caixa" data-t="0.3"><span class="v-ic">📘</span><b>CLAUDE.md</b>orientação: o Claude tenta seguir</div><div class="v-caixa acc" data-t="3.5" style="--fx:v-zoom"><span class="v-ic">⚙</span><b>settings.json</b>aplicado pela ferramenta: permissões, hooks, modelo, env</div></div>' },
+  { fala: "São três arquivos principais. O de usuário vale para todos os seus projetos. O de projeto é do time e vai para o Git. E o local é só seu, naquele projeto, e fica fora do Git.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.4"><span class="v-ic">👤</span><b>Usuário</b>~/.claude/settings.json<br>você, todos os projetos</div><div class="v-caixa" data-t="2.4"><span class="v-ic">👥</span><b>Projeto</b>.claude/settings.json<br>o time, via Git</div><div class="v-caixa warn" data-t="4.6"><span class="v-ic">🔒</span><b>Local</b>.claude/settings.local.json<br>só você, fora do Git</div></div>' },
+  { fala: "Quando a mesma chave aparece em mais de um lugar, vale a de nível mais alto. No topo, o gerenciado da organização. Depois, a linha de comando, o local, o projeto e, por último, o usuário.",
+    html: '<p class="v-txt" data-t="0">Quem vence um conflito</p><div class="v-code" data-t="0.4"><div data-t="1.6"><span class="a">1</span> gerenciado <span class="d">(organização: vence tudo)</span></div><div data-t="2.8"><span class="a">2</span> linha de comando <span class="d">(--settings, só a sessão)</span></div><div data-t="3.8"><span class="a">3</span> local</div><div data-t="4.4"><span class="a">4</span> projeto</div><div data-t="5"><span class="a">5</span> usuário</div></div>' },
+  { fala: "Três detalhes que confundem: listas como permissões se somam entre os arquivos. O JSON é estrito, sem comentários. E barra status mostra quais arquivos foram carregados.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.5"><span class="v-ic">➕</span><b>Listas somam</b>allow de vários arquivos se combina</div><div class="v-caixa err" data-t="2.4"><span class="v-ic">🚫</span><b>JSON estrito</b>sem // comentários nem vírgula sobrando</div><div class="v-caixa" data-t="4.2"><span class="v-ic">🔎</span><b>/status</b>linha Setting sources</div></div>' },
+  { fala: "Resumindo: exceção sua vai no settings local. Regra do time vai no settings do projeto, commitado.",
+    html: '<p class="v-sub" data-t="0">A regra prática</p><p class="v-titulo" data-t="0.4">Exceção sua: local. Regra do time: projeto.</p>' }
+] });
+Curso.passos("diag", {
+  seta: "↑",
+  nos: [{ ic: "👤", rt: "Usuário" }, { ic: "👥", rt: "Projeto" }, { ic: "🔒", rt: "Local" }, { ic: "⌨", rt: "--settings" }, { ic: "🏢", rt: "Gerenciado" }],
+  passos: [
+    { ativos: [0], titulo: "5º (mais baixo): usuário", texto: "<code>~/.claude/settings.json</code>: suas preferências para todos os projetos. Qualquer nível acima pode sobrescrever." },
+    { ativos: [1], setas: [0], titulo: "4º: projeto compartilhado", texto: "<code>.claude/settings.json</code>: o que o time commita. Vence o seu arquivo de usuário <em>naquele projeto</em>." },
+    { ativos: [2], setas: [1], titulo: "3º: projeto local", texto: "<code>.claude/settings.local.json</code>: suas exceções naquele projeto. Vence o arquivo do time, só para você." },
+    { ativos: [3], setas: [2], titulo: "2º: linha de comando", texto: "<code>claude --settings '...'</code>: vale só para aquela sessão e não grava nada." },
+    { ativos: [4], setas: [3], titulo: "1º (topo): gerenciado", texto: "Política da organização. <strong>Nada abaixo sobrescreve</strong>, com raras exceções em que um valor <em>mais restritivo</em> seu é respeitado." },
+    { ativos: [0, 1, 2, 3, 4], setas: [0, 1, 2, 3], titulo: "Exceção importante: listas somam", texto: "Para listas como <code>permissions.allow</code>, os arquivos se <strong>combinam</strong> em vez de um substituir o outro." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell + Claude Code (demonstração)", prompt: "PS C:\\estudos-claude\\taskflow>", altura: 280,
+  passos: [
+    { t: "cmd", x: "mkdir .claude", leg: "A pasta do projeto" },
+    { t: "cmd", x: "notepad .claude\\settings.json", leg: "Crie o arquivo com o conteúdo da aula" },
+    { t: "cmd", x: "python -m json.tool .claude\\settings.json", leg: "Valide antes de usar" },
+    { t: "html", x: '{\n    "permissions": {\n        "allow": [\n            "Bash(python -m unittest *)"\n        ],\n<span class="t-dim">    ...</span>' },
+    { t: "cmd", x: "claude" },
+    { t: "user", x: "/status", leg: "Confira o que foi carregado" },
+    { t: "html", x: '<span class="t-caixa">Version: 2.1.xxx\nSetting sources: <span class="t-ok">User settings, Project settings</span></span>' },
+    { t: "user", x: "/config verbose=true", leg: "Mudar uma opção sem abrir o menu" },
+    { t: "html", x: '<span class="t-ok">Set verbose to true</span>' }
+  ]
+});
+(function () {
+  var casos = [
+    ["Usuário: model = A · Projeto: model = B", "projeto", "O projeto compartilhado fica acima do usuário."],
+    ["Projeto: tema claro · Local: tema escuro", "local", "O local (pessoal, do projeto) fica acima do compartilhado."],
+    ["Local: model = A · claude --settings model = B", "cli", "--settings vale para a sessão e fica acima dos arquivos."],
+    ["Gerenciado: dicas ligadas · Local: dicas desligadas · --settings: desligadas", "gerenciado", "Gerenciado é o topo: nada abaixo sobrescreve."],
+    ["Usuário: model = A (só isso)", "usuario", "Se só um lugar define, é ele que vale."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < casos.length ? '<span class="t-b">Caso ' + (i + 1) + "/" + casos.length + ":</span> " + casos[i][0] + '\n<span class="t-dim">Quem vence? usuario · projeto · local · cli · gerenciado</span>' : '<span class="t-ok">Fim! ' + pts + " de " + casos.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= casos.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = casos[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo. </span>' : '<span class="t-warn">✗ Era ' + casos[i][1] + ". </span>") + casos[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["usuario", "projeto", "local", "cli", "gerenciado"].forEach(function (k) { cmds[k] = function () { return resp(k); }; });
+  cmds["usuário"] = cmds["usuario"];
+  Curso.terminal("term", { titulo: "Quem vence? (simulação)", prompt: ">", intro: '<span class="t-dim">Precedência: gerenciado > cli > local > projeto > usuário</span>', metas: ["iniciar"], comandos: cmds });
+})();
+Curso.quiz("quiz", [
+  { p: "Onde colocar um hook de lint que TODO o time deve usar?", op: ["<code>~/.claude/settings.json</code>", "<code>.claude/settings.json</code> (commitado)", "<code>.claude/settings.local.json</code>"], c: 1, ex: "O arquivo de projeto compartilhado é o que vai para o Git e chega a todos." },
+  { p: "O time definiu um modelo em <code>.claude/settings.json</code>, mas você quer outro só para você neste projeto. Onde?", op: ["<code>.claude/settings.local.json</code>", "<code>~/.claude/settings.json</code>", "Editar o arquivo do time"], c: 0, ex: "O local fica acima do compartilhado e é só seu. O de usuário perderia para o do time." },
+  { p: "Você colocou <code>permissions.allow</code> no usuário e no projeto. O que acontece?", op: ["Só a lista do projeto vale", "As listas se combinam", "Dá erro"], c: 1, ex: "Listas se somam entre os níveis." },
+  { p: "Como saber quais arquivos de configuração foram carregados?", op: ["<code>/status</code> (linha Setting sources)", "<code>/context</code>", "Reiniciar o computador"], c: 0, ex: "<code>/status</code> lista as fontes carregadas. Para erros de entradas rejeitadas, <code>claude doctor</code>." },
+  { p: "Qual a diferença entre CLAUDE.md e settings.json?", op: ["Nenhuma", "CLAUDE.md orienta (o Claude tenta seguir); settings.json é aplicado pela ferramenta", "settings.json é só para o tema"], c: 1, ex: "Regra que precisa ser garantida → settings (permissões, hooks). Conhecimento e convenções → CLAUDE.md." }
+]);
+Curso.checklist("check", [
+  "Sei os 4 arquivos de configuração e quem cada um afeta",
+  "Prevejo quem vence num conflito (gerenciado > cli > local > projeto > usuário)",
+  "Sei que listas se combinam",
+  "Uso <code>/config</code>, <code>/config chave=valor</code> e <code>/status</code>",
+  "Criei e commitei um <code>.claude/settings.json</code> válido"
+]);
+</script>
+</body>
+</html>

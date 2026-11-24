@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 5</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 5 · Revisão</p>
+    <h1>Personalização</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Orientar × garantir</h2>
+    <ul>
+      <li><strong>CLAUDE.md, skills, output styles</strong>: instruções que o Claude segue</li>
+      <li><strong>settings.json (permissões, hooks)</strong>: aplicado pela ferramenta, sempre</li>
+      <li>Precisa acontecer sem exceção? → <strong>hook</strong></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Precedência de settings</h2>
+    <p style="font-size:clamp(1.2rem,2.6vw,1.9rem)">🏢 Gerenciado › ⌨ --settings › 🔒 local › 👥 projeto › 👤 usuário</p>
+    <ul>
+      <li>Listas (<code>permissions.allow</code>) se <strong>somam</strong></li>
+      <li><code>/status</code> → Setting sources · <code>/config chave=valor</code></li>
+      <li>JSON estrito: sem comentários, sem vírgula sobrando</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Onde fica cada coisa</h2>
+    <ul>
+      <li><code>.claude/settings.json</code>: time · <code>.claude/settings.local.json</code>: só você</li>
+      <li><code>.claude/skills/&lt;nome&gt;/SKILL.md</code>: skills</li>
+      <li><code>.claude/output-styles/*.md</code>: estilos</li>
+      <li><code>~/.claude/…</code>: as mesmas coisas, para todos os seus projetos</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Skill em 30 segundos</h2>
+    <div class="cod" style="max-width:820px"><code>---
+description: Revisa o diff do TaskFlow. Use quando pedirem revisão.
+argument-hint: [foco]
+---
+!`git diff HEAD`
+Revise o diff acima. Foco: $ARGUMENTS</code></div>
+    <ul><li>Chame com <code>/revisar-taskflow erros</code> · <code>/skills</code> · <code>/skill-doctor</code></li></ul>
+  </section>
+  <section class="slide">
+    <h2>Quem chama a skill?</h2>
+    <ul>
+      <li>Padrão: você <strong>e</strong> o Claude (pela description)</li>
+      <li><code>disable-model-invocation: true</code>: só você</li>
+      <li><code>user-invocable: false</code>: só o Claude</li>
+      <li><code>.claude/commands/</code>: formato antigo; prefira skills</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Output styles e status line</h2>
+    <ul>
+      <li><strong>Concise</strong> direto · <strong>Explanatory</strong> com ★ Insight · <strong>Learning</strong> com <code>TODO(human)</code> · <strong>Proactive</strong> assume e segue</li>
+      <li><code>/output-style learning</code> · no settings: <code>"Learning"</code> (maiúscula!)</li>
+      <li><code>/statusline mostre modelo e contexto</code>; no Windows, caminhos com <code>/</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Hooks</h2>
+    <div class="cod" style="max-width:820px"><code>"hooks": { "PostToolUse": [ {
+  "matcher": "Edit|Write",
+  "hooks": [ { "type": "command",
+    "command": "python .claude/hooks/checar.py" } ] } ] }</code></div>
+    <ul><li><strong>PreToolUse</strong> pode bloquear · <strong>PostToolUse</strong> verifica · <code>exit 2</code> bloqueia, <code>exit 1</code> não!</li></ul>
+  </section>
+  <section class="slide">
+    <h2>Segurança</h2>
+    <ul>
+      <li>Hooks e skills rodam comandos <strong>com as suas permissões</strong></li>
+      <li>Leia hooks e skills de terceiros antes de usar (<code>/hooks</code> mostra a origem)</li>
+      <li>Nunca coloque segredos em settings commitados</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 6?</h2>
+    <ul>
+      <li>✓ <code>.claude/settings.json</code> com permissões e hook de sintaxe</li>
+      <li>✓ Skills <code>/revisar-taskflow</code> e <code>/nova-funcionalidade</code></li>
+      <li>✓ Um output style próprio e uma status line</li>
+    </ul>
+    <p><a href="../06-mcp/01-o-que-e-mcp.html">Ir para o Módulo 6: MCP e integrações →</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

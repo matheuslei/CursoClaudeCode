@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cola de comandos</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/curso.css">
+</head>
+<body data-raiz="../" data-titulo="Referência › Cola de comandos">
+<main>
+  <h1>Cola de comandos</h1>
+  <p class="objetivo">Tudo o que você usa no dia a dia, num só lugar. Digite para filtrar.</p>
+  <div class="busca"><input id="busca" type="search" placeholder="Ex.: contexto, /rewind, atalho, modelo" aria-label="Filtrar comandos"></div>
+
+  <section class="bloco grupo-cola">
+    <h2>No terminal (antes de abrir o Claude)</h2>
+    <table class="tab"><thead><tr><th>Comando</th><th>O que faz</th><th></th></tr></thead><tbody>
+      <tr data-busca class="linha-cola"><td><code>irm https://claude.ai/install.ps1 | iex</code></td><td>Instala o Claude Code no Windows (PowerShell). Atualiza sozinho.</td><td><button data-copia="irm https://claude.ai/install.ps1 | iex">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>winget install Anthropic.ClaudeCode</code></td><td>Instalação alternativa via WinGet. Não atualiza sozinho: use <code>winget upgrade Anthropic.ClaudeCode</code>.</td><td><button data-copia="winget install Anthropic.ClaudeCode">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude --version</code></td><td>Confere se a instalação funcionou.</td><td><button data-copia="claude --version">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude</code></td><td>Abre uma sessão interativa na pasta atual.</td><td><button data-copia="claude">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude "tarefa"</code></td><td>Abre a sessão já com um pedido inicial.</td><td><button data-copia='claude "explique este projeto"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -p "pergunta"</code></td><td>Modo não interativo: responde e sai. Bom para scripts.</td><td><button data-copia='claude -p "explique esta função"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -c</code></td><td>Continua a conversa mais recente desta pasta.</td><td><button data-copia="claude -c">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -r</code></td><td>Escolhe uma conversa anterior para retomar.</td><td><button data-copia="claude -r">Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -w nome</code></td><td>Abre uma sessão num worktree próprio (<code>.claude/worktrees/nome</code>, branch <code>worktree-nome</code>). Precisa de Git. Módulo 7.</td><td><button data-copia='claude -w nome'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude --bg "tarefa"</code></td><td>Cria uma sessão já em segundo plano. Módulo 7.</td><td><button data-copia='claude --bg "tarefa"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude agents</code></td><td>Abre o agent view com as sessões em segundo plano (research preview). Módulo 7.</td><td><button data-copia='claude agents'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>git worktree list</code></td><td>Lista os worktrees do repositório.</td><td><button data-copia='git worktree list'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude plugin list</code></td><td>Lista plugins instalados, escopo e status. Módulo 8.</td><td><button data-copia='claude plugin list'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude plugin validate .</code></td><td>Confere manifesto, frontmatter e catálogo de um plugin ou marketplace. Módulo 8.</td><td><button data-copia='claude plugin validate .'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude --plugin-dir .\meu-plugin</code></td><td>Carrega um plugin só nesta sessão, sem instalar. Módulo 8.</td><td><button data-copia='claude --plugin-dir .\meu-plugin'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude plugin eval .</code></td><td>Avalia o comportamento do plugin com e sem ele. Gasta uso do plano. Módulo 8.</td><td><button data-copia='claude plugin eval .'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude plugin marketplace add .\pasta</code></td><td>Registra um marketplace local. Módulo 8.</td><td><button data-copia='claude plugin marketplace add .\pasta'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -p "pedido"</code></td><td>Modo não interativo: responde e termina. Para scripts. Módulo 9.</td><td><button data-copia='claude -p "pedido"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -p "pedido" --output-format json</code></td><td>Saída em JSON com resultado, sessão e custo (total_cost_usd). Módulo 9.</td><td><button data-copia='claude -p "pedido" --output-format json'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude -p "pedido" --max-budget-usd 1</code></td><td>Para quando o gasto estimado chega ao valor (modo print). Módulo 9.</td><td><button data-copia='claude -p "pedido" --max-budget-usd 1'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>Get-Content arq | claude -p "resuma"</code></td><td>Envia conteúdo pelo pipe no PowerShell. Módulo 9.</td><td><button data-copia='Get-Content arq | claude -p "resuma"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>pip install claude-agent-sdk</code></td><td>Instala o Agent SDK para Python (3.10+), dentro de um ambiente virtual. Módulo 10.</td><td><button data-copia='pip install claude-agent-sdk'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>$env:ANTHROPIC_API_KEY = "sua-chave-aqui"</code></td><td>Define a chave só nesta sessão do terminal (nunca no código). Módulo 10.</td><td><button data-copia='$env:ANTHROPIC_API_KEY = "sua-chave-aqui"'>Copiar</button></td></tr>
+      <tr data-busca class="linha-cola"><td><code>claude --safe-mode</code></td><td>Abre sem nenhuma personalização. Útil para diagnosticar problemas.</td><td><button data-copia="claude --safe-mode">Copiar</button></td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="bloco grupo-cola">
+    <h2>Dentro da sessão: comandos com /</h2>
+    <table class="tab"><thead><tr><th>Comando</th><th>O que faz</th></tr></thead><tbody>
+      <tr data-busca><td><code>/help</code></td><td>Mostra ajuda e comandos disponíveis.</td></tr>
+      <tr data-busca><td><code>/init</code></td><td>Cria o <code>CLAUDE.md</code>, o guia do projeto que o Claude lê em toda sessão.</td></tr>
+      <tr data-busca><td><code>/clear</code></td><td>Começa uma conversa nova, com contexto vazio. A anterior pode ser retomada com <code>/resume</code>.</td></tr>
+      <tr data-busca><td><code>/compact [instruções]</code></td><td>Resume a conversa para liberar contexto e continuar a mesma tarefa.</td></tr>
+      <tr data-busca><td><code>/context</code></td><td>Mostra quanto da janela de contexto está em uso.</td></tr>
+      <tr data-busca><td><code>/rewind</code></td><td>Volta a conversa e/ou o código para um ponto anterior (checkpoint).</td></tr>
+      <tr data-busca><td><code>/resume</code></td><td>Abre a lista de conversas anteriores para retomar.</td></tr>
+      <tr data-busca><td><code>/model</code></td><td>Troca o modelo (e salva como padrão).</td></tr>
+      <tr data-busca><td><code>/effort</code></td><td>Ajusta o nível de esforço: de <code>low</code> a <code>xhigh</code>, <code>max</code> ou <code>auto</code>.</td></tr>
+      <tr data-busca><td><code>/plan [tarefa]</code></td><td>Entra no plan mode: o Claude analisa e planeja antes de editar.</td></tr>
+      <tr data-busca><td><code>/usage</code></td><td>Custo da sessão, limites do plano e estatísticas. Alias: <code>/cost</code>.</td></tr>
+      <tr data-busca><td><code>/status</code></td><td>Versão, modelo, conta e conectividade.</td></tr>
+      <tr data-busca><td><code>/doctor</code></td><td>Checkup da instalação e das configurações.</td></tr>
+      <tr data-busca><td><code>/permissions</code></td><td>Gerencia regras de permissão (allow, ask, deny).</td></tr>
+      <tr data-busca><td><code>/memory</code></td><td>Edita arquivos <code>CLAUDE.md</code> e a memória automática.</td></tr>
+      <tr data-busca><td><code>/diff</code></td><td>Revisa as mudanças feitas na pasta, inclusive as do Claude.</td></tr>
+      <tr data-busca><td><code>/copy</code></td><td>Copia a última resposta para a área de transferência.</td></tr>
+      <tr data-busca><td><code>/export</code></td><td>Exporta a conversa como texto.</td></tr>
+      <tr data-busca><td><code>/config</code></td><td>Abre as configurações.</td></tr>
+      <tr data-busca><td><code>/powerup</code></td><td>Lições interativas oficiais dentro da ferramenta.</td></tr>
+      <tr data-busca><td><code>/tasks</code></td><td>Mostra e gerencia o trabalho em segundo plano (também <code>/bashes</code>).</td></tr>
+      <tr data-busca><td><code>/branch</code> · <code>/fork</code> · <code>/subtask</code></td><td>Ramifica a conversa · copia para uma sessão paralela · subagente com o histórico.</td></tr>
+      <tr data-busca><td><code>/bg</code></td><td>Manda a sessão aberta para segundo plano (agent view).</td></tr>
+      <tr data-busca><td><code>/goal condição</code></td><td>Trabalha turno a turno até a condição ser cumprida. <code>/goal clear</code> cancela.</td></tr>
+      <tr data-busca><td><code>/list-agents</code></td><td>Lista com quem a sessão pode trocar mensagens (também <code>/peers</code>), quando disponível.</td></tr>
+      <tr data-busca><td><code>/plugin</code></td><td>Gerenciador de plugins: descobrir, instalar, ativar, remover, marketplaces e erros.</td></tr>
+      <tr data-busca><td><code>/reload-plugins</code></td><td>Recarrega plugins depois de editar ou instalar.</td></tr>
+      <tr data-busca><td><code>/code-review</code></td><td>Procura bugs nas mudanças (níveis low a max; <code>--fix</code> aplica). Alias <code>/review</code>.</td></tr>
+      <tr data-busca><td><code>/security-review</code></td><td>Revisão de segurança das mudanças.</td></tr>
+      <tr data-busca><td><code>/install-github-app</code></td><td>Configura o app do GitHub e os workflows do Claude Code.</td></tr>
+      <tr data-busca><td><code>/loop [intervalo] [pedido]</code></td><td>Repete um pedido enquanto a sessão está aberta.</td></tr>
+      <tr data-busca><td><code>/schedule</code></td><td>Tarefas agendadas na nuvem (research preview). Alias <code>/routines</code>.</td></tr>
+      <tr data-busca><td><code>/exit</code></td><td>Sai do Claude Code (ou <kbd>Ctrl</kbd>+<kbd>D</kbd> duas vezes).</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="bloco grupo-cola">
+    <h2>Atalhos de teclado</h2>
+    <table class="tab"><thead><tr><th>Atalho</th><th>O que faz</th></tr></thead><tbody>
+      <tr data-busca><td><kbd>Esc</kbd></td><td>Interrompe o Claude no meio da resposta (o trabalho feito até ali fica).</td></tr>
+      <tr data-busca><td><kbd>Esc</kbd> <kbd>Esc</kbd></td><td>Com texto: limpa o rascunho. Com campo vazio: abre o menu de rewind.</td></tr>
+      <tr data-busca><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Alterna o modo de permissão (Manual, acceptEdits, plan, e outros quando disponíveis). No Windows, <kbd>Alt</kbd>+<kbd>M</kbd> em alguns terminais.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Interrompe; com nada rodando, limpa o campo; duas vezes, sai.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Busca no histórico de comandos.</td></tr>
+      <tr data-busca><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Navega no histórico de mensagens.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>J</kbd> ou <kbd>\</kbd>+<kbd>Enter</kbd></td><td>Quebra de linha (prompt com várias linhas). No Windows Terminal recente, <kbd>Shift</kbd>+<kbd>Enter</kbd> também.</td></tr>
+      <tr data-busca><td><kbd>Alt</kbd>+<kbd>V</kbd></td><td>Cola imagem da área de transferência (Windows).</td></tr>
+      <tr data-busca><td><kbd>Alt</kbd>+<kbd>P</kbd></td><td>Troca de modelo sem apagar o que você está digitando.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>O</kbd></td><td>Abre o visualizador detalhado da conversa (ferramentas usadas).</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Manda comando ou agente em execução para segundo plano.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>X</kbd> <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Para todos os subagentes em segundo plano (aperte duas vezes em até 3 s).</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>T</kbd></td><td>Mostra ou esconde a lista de tarefas do Claude.</td></tr>
+      <tr data-busca><td><kbd>Ctrl</kbd>+<kbd>G</kbd></td><td>Edita o prompt no seu editor de texto padrão.</td></tr>
+      <tr data-busca><td><kbd>?</kbd> (campo vazio)</td><td>Mostra o painel de atalhos.</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="bloco grupo-cola">
+    <h2>Prefixos especiais</h2>
+    <table class="tab"><thead><tr><th>Prefixo</th><th>O que faz</th></tr></thead><tbody>
+      <tr data-busca><td><code>/</code></td><td>Comandos e skills.</td></tr>
+      <tr data-busca><td><code>!</code></td><td>Shell mode: roda o comando direto, adiciona a saída ao contexto e o Claude comenta o resultado. Ex.: <code>! git status</code>.</td></tr>
+      <tr data-busca><td><code>@</code></td><td>Menciona um arquivo com autocompletar. Ex.: <code>explique @tarefas.py</code>.</td></tr>
+    </tbody></table>
+  </section>
+  <p class="conferido">Conferido em 17/11/2026 com a documentação oficial (Commands e Interactive mode). Comandos mudam com frequência: confirme com <code>/help</code> na sua versão.</p>
+</main>
+<script src="../assets/curso.js"></script>
+<script>Curso.iniciarReferencia();</script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worktrees</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Aula 3</span><span class="selo cinza">Avançado</span><span class="selo cinza">~30 min</span>
+    <h1>Worktrees: sessões paralelas sem conflito</h1>
+    <p class="objetivo">Objetivo: rodar duas sessões do Claude Code no mesmo projeto ao mesmo tempo, cada uma num worktree próprio, e juntar as duas mudanças no fim com os testes passando.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Na aula 2 você viu que fork copia a <strong>conversa</strong>, mas não a <strong>pasta</strong>. Se duas sessões editam a mesma pasta ao mesmo tempo, uma pode salvar por cima da outra, e os testes de uma quebram por causa do código pela metade da outra.</p>
+    <p>Um <strong>worktree</strong> do Git resolve isso: é uma <strong>segunda pasta de trabalho</strong>, com a sua própria branch, ligada ao mesmo repositório. Cada sessão trabalha na sua pasta; no fim, você junta as branches.</p>
+    <div class="caixa"><strong>Analogia</strong>Duas pessoas escrevendo no mesmo documento, cada uma numa cópia própria. No fim, alguém junta os dois trechos. Sem as cópias, uma apagaria o parágrafo da outra.</div>
+    <div class="caixa alerta"><strong>Precisa de Git</strong>Worktree é um recurso do Git. Nesta aula você usa a <strong>pasta de treino</strong> (cópia fora do curso, com Git só local; veja o <a href="../../projeto-taskflow/etapa-07/README.md">README da etapa 07</a>). A pasta do curso continua sem Git. Sem Git na máquina, faça a simulação e o plano B no fim do exercício.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: uma pasta por sessão</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como usar</h2>
+    <h3>O jeito do Claude Code: <code>--worktree</code></h3>
+    <div class="cod"><span class="rot">PowerShell, na pasta de treino</span><code>claude --worktree exportar
+# ou, abreviado:
+claude -w exportar</code></div>
+    <table class="tab">
+      <thead><tr><th>O quê</th><th>Onde</th></tr></thead>
+      <tbody>
+        <tr><td>Pasta do worktree</td><td><code>.claude/worktrees/exportar/</code>, na raiz do repositório</td></tr>
+        <tr><td>Branch nova</td><td><code>worktree-exportar</code></td></tr>
+        <tr><td>Sem nome?</td><td>O Claude Code inventa um, como <code>bright-running-fox</code></td></tr>
+        <tr><td>Ponto de partida</td><td>A branch padrão do repositório remoto; <strong>sem remoto</strong> (o caso da pasta de treino), o seu <code>HEAD</code> local</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Para uma segunda sessão paralela, abra <strong>outro terminal</strong> e rode o comando com outro nome.</li>
+      <li>Coloque <code>.claude/worktrees/</code> no <code>.gitignore</code> (o da etapa 07 já tem), para as pastas não aparecerem como arquivos novos.</li>
+      <li>Se o Claude nunca rodou na pasta, rode <code>claude</code> uma vez antes para aceitar o aviso de confiança. Senão o <code>--worktree</code> para com erro.</li>
+      <li>Você também pode pedir no meio da sessão: <em>"trabalhe num worktree"</em>.</li>
+    </ul>
+
+    <h3>Ao sair da sessão</h3>
+    <table class="tab">
+      <thead><tr><th>Situação do worktree</th><th>O que o Claude Code faz</th></tr></thead>
+      <tbody>
+        <tr><td>Sem mudanças, sessão sem nome</td><td>Remove o worktree e a branch sozinho.</td></tr>
+        <tr><td>Sem mudanças, sessão com nome</td><td>Pergunta antes, para você poder manter.</td></tr>
+        <tr><td>Com mudanças ou commits novos</td><td>Pergunta se mantém ou remove. Manter preserva a pasta e a branch; para voltar, use o comando <code>claude --worktree &lt;nome&gt; --resume</code> que ele mostra ao sair.</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa erro"><strong>Remover apaga o trabalho</strong>Escolher remover um worktree com mudanças apaga a pasta e a branch, com tudo o que estava nelas. Faça commit antes de sair se quiser guardar.</div>
+
+    <h3>O jeito manual: <code>git worktree</code></h3>
+    <p>Útil para usar uma branch que já existe ou criar a pasta fora do repositório.</p>
+    <div class="cod"><span class="rot">PowerShell</span><code>git worktree add ../taskflow-exportar -b exportar   # cria pasta e branch
+cd ../taskflow-exportar
+claude                                               # sessão nessa pasta
+git worktree list                                    # lista os worktrees
+git worktree remove ../taskflow-exportar             # remove quando terminar</code></div>
+
+    <h3>Subagentes em worktree</h3>
+    <p>Um subagente também pode trabalhar no próprio worktree: peça <em>"use worktrees para os seus agentes"</em> ou ponha <code>isolation: worktree</code> no frontmatter do subagente (aula 1). Sem mudanças, o worktree dele é removido sozinho ao terminar.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: duas sessões, dois worktrees</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: quem escreve onde?</h2>
+    <p>Para cada plano de trabalho paralelo, responda <code>seguro</code> ou <code>conflito</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: duas funcionalidades em paralelo</h2>
+    <p>Pré-requisito: pasta de treino com Git e o primeiro commit (passos 1 e 2 do <a href="../../projeto-taskflow/etapa-07/README.md">README da etapa 07</a>). As duas mudanças vão em <strong>arquivos diferentes</strong>, como manda o <code>CLAUDE.md</code> do projeto.</p>
+    <ol>
+      <li><strong>Terminal 1</strong>, na pasta de treino: <code>claude -w exportar</code>. Peça: <em>"crie exportar.py, que exporta as tarefas para CSV (numero, titulo, feita), com teste em tests/test_exportar.py, sem alterar tarefas.py. Rode os testes e faça commit"</em>.</li>
+      <li><strong>Terminal 2</strong>, na mesma pasta de treino: <code>claude -w estatisticas</code>. Peça: <em>"crie estatisticas.py, que conta tarefas feitas e pendentes, com teste em tests/test_estatisticas.py, sem alterar tarefas.py. Rode os testes e faça commit"</em>.</li>
+      <li>Enquanto as duas trabalham, num <strong>terceiro terminal</strong>, rode <code>git worktree list</code>. Você deve ver três pastas: a principal e as duas em <code>.claude/worktrees/</code>.</li>
+      <li>Quando as duas terminarem, saia delas (<code>/exit</code>) e escolha <strong>manter</strong> os worktrees.</li>
+      <li>Na pasta principal, junte as branches e rode os testes:
+        <div class="cod"><span class="rot">PowerShell, pasta de treino</span><code>git merge worktree-exportar
+git merge worktree-estatisticas
+python -m unittest</code></div></li>
+      <li>Opcional: peça ao <code>revisor-taskflow</code> (aula 1) uma revisão antes do merge.</li>
+      <li>Limpe: <code>git worktree remove .claude/worktrees/exportar</code>, o mesmo para <code>estatisticas</code>, e <code>git branch -d worktree-exportar worktree-estatisticas</code>.</li>
+    </ol>
+    <div class="caixa dica"><strong>O merge abriu um editor?</strong>O Git pode pedir uma mensagem para o commit de merge. Salve e feche o editor, ou use <code>git merge worktree-estatisticas -m "Junta estatisticas"</code>.</div>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>Uma solução está em <code>projeto-taskflow/etapa-07/gabarito/</code>: <code>exportar.py</code>, <code>estatisticas.py</code> e os testes em <code>gabarito/tests/</code>. Elas usam <code>tarefas.carregar()</code> sem alterar o <code>tarefas.py</code>.</p>
+      <div class="cod"><span class="rot">gabarito/estatisticas.py (trecho)</span><code>def contar(lista):
+    """Conta as tarefas por status e devolve um dicionário com total, feitas e pendentes."""
+    feitas = sum(1 for t in lista if t.get("feita"))
+    return {"total": len(lista), "feitas": feitas, "pendentes": len(lista) - feitas}</code></div>
+      <p><strong>Resultado esperado</strong>: depois dos dois merges, <code>python -m unittest</code> roda os testes antigos e os novos (11 com o gabarito) e mostra <code>OK</code>. Sem conflito, porque cada sessão criou arquivos próprios.</p>
+      <p>Este fluxo foi testado com <code>git worktree add</code> numa cópia de rascunho em 19/11/2026: dois worktrees, commits, dois merges e 11 testes passando.</p>
+    </details>
+    <details class="gabarito"><summary>Plano B: sem Git na máquina</summary>
+      <p>Faça a simulação do bloco 5 e o exercício assim: copie a pasta de treino duas vezes (<code>treino-exportar</code> e <code>treino-estatisticas</code>), abra um <code>claude</code> em cada uma e, no fim, copie os arquivos novos de volta para a pasta original. É o mesmo raciocínio do worktree, só que feito à mão. Para instalar o Git numa máquina corporativa, peça à TI.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Duas sessões no mesmo arquivo</h4><p>Worktree evita que uma sobrescreva a outra durante o trabalho, mas, se as duas mudarem o <code>tarefas.py</code>, o merge pode dar conflito. Divida o trabalho por arquivo.</p></div>
+      <div class="mini"><h4>Fora de um repositório</h4><p>Fora do Git aparece <code>Can only use --worktree in a git repository</code>. Rode <code>git init</code>, faça um commit e tente de novo.</p></div>
+      <div class="mini"><h4>Remover sem commit</h4><p>Remover um worktree com mudanças apaga o trabalho. Faça commit antes de sair.</p></div>
+      <div class="mini"><h4>Esquecer o .gitignore</h4><p>Sem <code>.claude/worktrees/</code> no <code>.gitignore</code>, as pastas aparecem como arquivos novos no <code>git status</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/worktrees">Worktrees no Claude Code</a> (em inglês): <code>.worktreeinclude</code> para copiar arquivos ignorados, escolha da branch base e solução de problemas.</li>
+      <li><a href="https://git-scm.com/docs/git-worktree">Documentação do git worktree</a> (em inglês).</li>
+      <li>Próxima aula: acompanhar várias sessões no <strong>agent view</strong> e trabalhar até um objetivo com <code>/goal</code>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Run parallel sessions with worktrees").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Worktrees em 1 minuto", cenas: [
+  { fala: "Nesta aula, duas sessões do Claude vão mexer no mesmo projeto ao mesmo tempo, sem uma atropelar a outra.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 7 · AULA 3</span><p class="v-titulo" data-t="0.3">Worktrees</p><p class="v-sub" data-t="1.2">duas sessões, zero atropelo</p>' },
+  { fala: "O problema: duas sessões editando a mesma pasta. Uma salva por cima da outra, e os testes de uma quebram por causa da outra.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">✻</span><b>Sessão A</b></div><span class="v-seta">→</span><div class="v-caixa err"><span class="v-ic">📁</span><b>mesma pasta</b>tarefas.py</div><span class="v-seta">←</span><div class="v-caixa"><span class="v-ic">✻</span><b>Sessão B</b></div></div><div class="v-caixa err" data-t="4"><span class="v-ic">💥</span><b>Sobrescreve</b>e quebra os testes</div>' },
+  { fala: "A solução é o worktree do Git: uma segunda pasta de trabalho, com a sua própria branch, ligada ao mesmo repositório.",
+    html: '<div class="v-caixa acc" data-t="0.3"><span class="v-ic">🗄</span><b>Repositório (.git)</b>um histórico só</div><div class="v-grade" style="--cols:2"><div class="v-caixa ok" data-t="3"><span class="v-ic">📁</span><b>Pasta principal</b>branch main</div><div class="v-caixa ok" data-t="4.5"><span class="v-ic">📁</span><b>Worktree</b>branch própria</div></div>' },
+  { fala: "Com claude, hífen hífen worktree e um nome, o Claude Code cria a pasta em ponto claude barra worktrees e a branch worktree hífen nome.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span><span class="v-digita" style="--n:26">claude --worktree exportar</span></div><div data-t="5.2"><span class="a">pasta:</span> .claude/worktrees/exportar/</div><div data-t="7.6"><span class="a">branch:</span> worktree-exportar</div></div>' },
+  { fala: "Cada sessão faz a sua parte em arquivos diferentes. No fim, você junta as branches com git merge e roda os testes.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="0.3"><span class="v-ic">📄</span><b>worktree-exportar</b>exportar.py</div><div class="v-caixa" data-t="1.6"><span class="v-ic">📄</span><b>worktree-estatisticas</b>estatisticas.py</div></div><div class="v-code" data-t="4.2"><div><span class="u">&gt; </span>git merge worktree-exportar</div><div><span class="u">&gt; </span>git merge worktree-estatisticas</div><div data-t="6.3"><span class="o">OK</span> <span class="d">· testes passando</span></div></div>' },
+  { fala: "Ao sair, se o worktree não tem mudanças, ele pode ser removido sozinho. Se tem, o Claude pergunta se você quer manter.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa ok" data-t="0.3"><span class="v-ic">🧹</span><b>Sem mudanças</b>pode sair sozinho</div><div class="v-caixa warn" data-t="3.6"><span class="v-ic">❓</span><b>Com mudanças</b>manter ou remover?</div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🗄", rt: "Repositório (.git)" }, { ic: "📁", rt: "Pasta principal (main)" }, { ic: "📁", rt: "Worktree A" }, { ic: "📁", rt: "Worktree B" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Um repositório, uma pasta", texto: "Normalmente você tem uma pasta de trabalho ligada ao repositório, na branch <code>main</code>." },
+    { ativos: [0, 2], setas: [0, 1], titulo: "claude -w exportar", texto: "O Claude Code cria a pasta <code>.claude/worktrees/exportar/</code> na branch <code>worktree-exportar</code>. Mesmo histórico, arquivos separados." },
+    { ativos: [0, 2, 3], setas: [1, 2], titulo: "claude -w estatisticas", texto: "Em outro terminal, um segundo worktree. As duas sessões editam pastas diferentes: ninguém sobrescreve ninguém." },
+    { ativos: [1, 2, 3], setas: [0, 1, 2], titulo: "Juntar com git merge", texto: "Na pasta principal, <code>git merge</code> de cada branch traz as duas mudanças. Depois, <code>python -m unittest</code> confirma que tudo funciona junto." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Duas sessões em paralelo (ilustrativo)", altura: 320,
+  passos: [
+    { t: "user", x: "claude -w exportar", leg: "Terminal 1" },
+    { t: "out", x: "Worktree criado: .claude/worktrees/exportar (branch worktree-exportar)", leg: "Pasta e branch próprias" },
+    { t: "user", x: "claude -w estatisticas", leg: "Terminal 2, ao mesmo tempo" },
+    { t: "tool", x: "Write(estatisticas.py) · Write(tests/test_estatisticas.py) · Bash(python -m unittest)", leg: "Cada sessão escreve só na sua pasta" },
+    { t: "user", x: "git worktree list", leg: "Terminal 3" },
+    { t: "out", x: "...\\treino-taskflow                                 [main]\n...\\treino-taskflow\\.claude\\worktrees\\estatisticas  [worktree-estatisticas]\n...\\treino-taskflow\\.claude\\worktrees\\exportar      [worktree-exportar]", leg: "Três pastas, um repositório" },
+    { t: "user", x: "git merge worktree-exportar; git merge worktree-estatisticas; python -m unittest", leg: "Juntar e testar" },
+    { t: "out", x: "Ran 11 tests\n\nOK", leg: "As duas mudanças juntas, testes passando" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Duas sessões na mesma pasta, ao mesmo tempo, as duas editando tarefas.py", "conflito", "Mesma pasta e mesmo arquivo: uma sessão sobrescreve a outra."],
+    ["Sessão A em worktree criando exportar.py; sessão B em outro worktree criando estatisticas.py", "seguro", "Pastas separadas e arquivos diferentes: o merge junta sem conflito."],
+    ["Duas sessões, cada uma no seu worktree, mas as duas reescrevendo a função listar() do tarefas.py", "conflito", "O worktree protege durante o trabalho, mas o merge vai dar conflito na mesma função."],
+    ["Uma sessão editando código e um subagente revisor só lendo os arquivos na mesma pasta", "seguro", "Quem só lê não escreve por cima de ninguém."],
+    ["Duas sessões feitas com /fork, sem worktree, cada uma criando arquivos novos com o mesmo nome", "conflito", "Fork copia a conversa, não a pasta: os dois arquivos de mesmo nome se sobrescrevem."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Plano ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: seguro · conflito</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Na verdade: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "seguro": function () { return resp("seguro"); }, "conflito": function () { return resp("conflito"); } };
+  Curso.terminal("term", { titulo: "Quem escreve onde? (simulação)", prompt: ">", intro: '<span class="t-dim">seguro = as sessões não se atrapalham · conflito = uma vai atrapalhar a outra</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: seguro ou conflito.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que é um worktree?", op: ["Uma cópia do repositório na nuvem", "Uma pasta de trabalho extra, com branch própria, ligada ao mesmo repositório", "Um subagente que edita arquivos"], c: 1, ex: "Mesmo histórico, arquivos separados." },
+  { p: "Onde o <code>claude --worktree exportar</code> cria a pasta?", op: ["<code>.claude/worktrees/exportar/</code>", "<code>~/worktrees/exportar/</code>", "Na pasta pai do projeto"], c: 0, ex: "Na raiz do repositório, em <code>.claude/worktrees/</code>, na branch <code>worktree-exportar</code>." },
+  { p: "Você sai de uma sessão em worktree que tem mudanças. O que acontece?", op: ["Tudo é apagado", "O Claude Code pergunta se mantém ou remove", "As mudanças são juntadas na main sozinhas"], c: 1, ex: "Com mudanças, ele pergunta. Remover apaga a pasta e a branch." },
+  { p: "Duas sessões em worktrees diferentes mudaram a mesma função. O que esperar?", op: ["Nenhum problema", "Conflito no merge", "O Claude Code impede a segunda sessão de abrir"], c: 1, ex: "Worktree separa as pastas durante o trabalho; o merge ainda precisa conciliar as mudanças. Divida por arquivo." },
+  { p: "Apareceu <code>Can only use --worktree in a git repository</code>. O que fazer?", op: ["Reinstalar o Claude Code", "Rodar <code>git init</code>, fazer um commit e tentar de novo", "Usar <code>/fork</code>"], c: 1, ex: "Worktree é recurso do Git. Na pasta de treino, inicie o repositório local e faça o primeiro commit." }
+]);
+Curso.checklist("check", [
+  "Explico por que duas sessões na mesma pasta se atrapalham",
+  "Abro uma sessão em worktree com <code>claude -w &lt;nome&gt;</code>",
+  "Sei onde fica o worktree e qual o nome da branch",
+  "Junto as branches com <code>git merge</code> e rodo os testes",
+  "Sei o que acontece ao sair, com e sem mudanças, e como limpar com <code>git worktree remove</code>"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "taskflow",
+  "description": "Skills, revisor, hook de sintaxe e servidor MCP do projeto de treino TaskFlow",
+  "version": "1.0.0",
+  "author": {
+    "name": "Aluno do curso"
+  }
+}

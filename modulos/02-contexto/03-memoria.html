@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memória automática e /memory</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Aula 3</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~15 min</span>
+    <h1>Memória automática e /memory</h1>
+    <p class="objetivo">Objetivo: entender o que o Claude anota sozinho entre sessões, onde isso fica, e como revisar, editar ou desligar com <code>/memory</code>.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Além do CLAUDE.md (que <strong>você</strong> escreve), o Claude Code tem a <strong>memória automática</strong>: notas que o <strong>próprio Claude</strong> escreve quando aprende algo útil sobre você ou o projeto, como uma correção que você fez ou uma preferência que confirmou. Na próxima sessão, ele já sabe.</p>
+    <table class="tab">
+      <thead><tr><th></th><th>CLAUDE.md</th><th>Memória automática</th></tr></thead>
+      <tbody>
+        <tr><td>Quem escreve</td><td>Você</td><td>O Claude</td></tr>
+        <tr><td>Conteúdo</td><td>Instruções e regras</td><td>Aprendizados e padrões</td></tr>
+        <tr><td>Carregado</td><td>Toda sessão, por inteiro</td><td>Toda sessão (primeiras 200 linhas ou 25 KB do índice)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo da memória</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como funciona na prática</h2>
+    <h3>Os 4 tipos de nota</h3>
+    <div class="grade">
+      <div class="mini"><h4>user</h4><p>Seu papel, experiência e preferências de trabalho.</p></div>
+      <div class="mini"><h4>feedback</h4><p>Correções que você deu e abordagens que aprovou.</p></div>
+      <div class="mini"><h4>project</h4><p>Trabalho em andamento, prazos e decisões que não estão no código.</p></div>
+      <div class="mini"><h4>reference</h4><p>Onde achar informação fora do projeto (um painel, um sistema de chamados).</p></div>
+    </div>
+    <p>O Claude <strong>não</strong> anota o que dá para descobrir lendo o código (arquitetura, caminhos de arquivos) nem o que o CLAUDE.md já diz. E não salva algo em toda sessão: só quando acha útil para o futuro.</p>
+    <h3>Onde fica</h3>
+    <p>Cada projeto tem uma pasta própria: <code>~/.claude/projects/&lt;projeto&gt;/memory/</code>. Dentro dela, um índice <code>MEMORY.md</code> (uma linha por memória) e um arquivo por nota. A memória é <strong>local da sua máquina</strong>: não vai para o Git nem para outros computadores.</p>
+    <h3>Pedir para lembrar</h3>
+    <ul>
+      <li><em>"Lembre que os testes precisam de Python 3.10+"</em> → vai para a <strong>memória automática</strong>.</li>
+      <li><em>"Adicione isso ao CLAUDE.md"</em> → vai para o <strong>CLAUDE.md</strong> (compartilhado com quem usa o repositório).</li>
+    </ul>
+    <h3>O comando /memory</h3>
+    <p>Lista seus arquivos CLAUDE.md (usuário e projeto, mesmo os que ainda não existem), abre qualquer um no editor, mostra a pasta de memória automática e tem um <strong>interruptor para ligar ou desligar</strong> a memória automática. Ela vem <strong>ligada por padrão</strong> em sessões locais.</p>
+    <div class="caixa alerta"><strong>Revise de vez em quando</strong>As notas são Markdown comum: você pode ler, editar e apagar. Se alguma estiver errada ou desatualizada, corrija. Uma memória errada leva o Claude a repetir o erro.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: memória ou CLAUDE.md?</h2>
+    <p>Comece com <code>iniciar</code>. Para cada informação, responda <code>m</code> (memória automática, só sua), <code>c</code> (CLAUDE.md do projeto, compartilhado) ou <code>x</code> (nenhum dos dois).</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, abra <code>claude</code> e diga: <code>lembre que eu prefiro explicações curtas, em tópicos</code>.</li>
+      <li>Observe se aparece uma mensagem do tipo "Saved 1 memory".</li>
+      <li>Rode <code>/memory</code>: encontre a pasta de memória automática e abra o <code>MEMORY.md</code>.</li>
+      <li>Saia, abra uma sessão nova e pergunte <code>explique a função remover</code>. A resposta veio curta e em tópicos?</li>
+      <li>No PowerShell, liste a pasta: <code>ls ~\.claude\projects</code> e encontre a do TaskFlow.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Você deve encontrar algo como <code>~\.claude\projects\&lt;nome-derivado-do-projeto&gt;\memory\MEMORY.md</code>, com uma linha apontando para um arquivo de nota do tipo <code>user</code> ou <code>feedback</code>. O nome exato do arquivo pode variar.</p>
+      <p>Se nada foi salvo, o Claude pode ter achado a informação pouco útil, ou a memória automática pode estar desligada (confira o interruptor no <code>/memory</code>). Em máquinas gerenciadas pela empresa, ela pode estar desligada por configuração.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Achar que a memória vai para o time</h4><p>É local da sua máquina. Para o time, use o CLAUDE.md do projeto.</p></div>
+      <div class="mini"><h4>Nunca revisar</h4><p>Notas antigas ou erradas viram instruções erradas. Revise pelo <code>/memory</code>.</p></div>
+      <div class="mini"><h4>Ditar dados sensíveis</h4><p>Não peça para "lembrar" senhas, tokens ou dados pessoais de terceiros.</p></div>
+      <div class="mini"><h4>Confundir as duas</h4><p>Regra do projeto → CLAUDE.md. Preferência sua → memória ou <code>~/.claude/CLAUDE.md</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/memory#auto-memory">Auto memory</a>: armazenamento, limites, como desligar por projeto</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (How Claude remembers your project).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Memória automática em 1 minuto", cenas: [
+  { fala: "Além do CLAUDE.md que você escreve, o Claude Code tem uma memória que ele mesmo escreve.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 2 · AULA 3</span><p class=\"v-titulo\" data-t=\"0.3\">Memória automática</p><p class=\"v-sub\" data-t=\"0.9\">O que o Claude anota sozinho entre sessões</p>" },
+  { fala: "O CLAUDE.md é escrito por você, com instruções e regras. A memória automática é escrita pelo Claude, com aprendizados: uma correção sua ou uma preferência que você confirmou.",
+    html: "<div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">✍</span><b>CLAUDE.md</b>você escreve: instruções e regras</div><div class=\"v-caixa acc\" data-t=\"3.4\"><span class=\"v-ic\">🧠</span><b>Memória automática</b>o Claude escreve: aprendizados</div></div>" },
+  { fala: "As notas são de quatro tipos: sobre você, sobre correções e aprovações, sobre o trabalho em andamento no projeto e referências a sistemas externos.",
+    html: "<div class=\"v-grade\" style=\"--cols:4\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">👤</span><b>user</b>você e suas preferências</div><div class=\"v-caixa \" data-t=\"1.6\"><span class=\"v-ic\">💬</span><b>feedback</b>correções e aprovações</div><div class=\"v-caixa \" data-t=\"3.1\"><span class=\"v-ic\">📌</span><b>project</b>trabalho em andamento</div><div class=\"v-caixa \" data-t=\"4.6\"><span class=\"v-ic\">🔗</span><b>reference</b>onde achar informação</div></div>" },
+  { fala: "Cada projeto tem uma pasta de memória na sua máquina, com um índice chamado MEMORY.md e uma nota por arquivo. Ela não vai para o Git.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">~/.claude/projects/&lt;projeto&gt;/memory/</span></div><div data-t=\"2.4\">  <span class=\"a\">MEMORY.md</span>   <span class=\"d\">← índice</span></div><div data-t=\"3.6\">  <span class=\"d\">uma nota por arquivo</span></div></div><p class=\"v-txt\" data-t=\"5.4\" style=\"text-align:center\">💻 local da sua máquina: não vai para o Git</p>" },
+  { fala: "Você também pode pedir. Diga: lembre que. E vai para a memória. Diga: adicione ao CLAUDE.md. E vai para o arquivo compartilhado do projeto.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">\"Lembre que os testes precisam de Python 3.10+\"</span></div><div data-t=\"1.4\">   <span class=\"a\">→ memória automática</span></div><div data-t=\"3.4\"><span class=\"u\">\"Adicione isso ao CLAUDE.md\"</span></div><div data-t=\"4.4\">   <span class=\"a\">→ CLAUDE.md (compartilhado)</span></div></div>" },
+  { fala: "O comando /memory mostra seus arquivos, abre a pasta de memória e liga ou desliga o recurso. Revise de vez em quando: uma memória errada faz o Claude repetir o erro.",
+    html: "<div class=\"v-code\" data-t=\"0.2\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:7\">/memory</span></div><div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa \" data-t=\"1.6\"><span class=\"v-ic\">📄</span><b>Arquivos</b>abre os CLAUDE.md</div><div class=\"v-caixa \" data-t=\"2.6\"><span class=\"v-ic\">📂</span><b>Pasta</b>mostra a memória</div><div class=\"v-caixa \" data-t=\"3.6\"><span class=\"v-ic\">⏻</span><b>Interruptor</b>liga ou desliga</div></div><p class=\"v-txt\" data-t=\"6.4\" style=\"text-align:center;color:#e6c06a\">🔍 revise: memória errada repete erro</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "💬", rt: "Você corrige" }, { ic: "📝", rt: "Claude anota" }, { ic: "🗂", rt: "MEMORY.md" }, { ic: "🔁", rt: "Próxima sessão" }],
+  passos: [
+    { ativos: [0], titulo: "Algo útil acontece", texto: "Você corrige o Claude (\"não use bibliotecas externas aqui\") ou confirma uma preferência (\"isso, sempre assim\")." },
+    { ativos: [1], setas: [0], titulo: "O Claude decide anotar", texto: "Se for útil no futuro, ele grava uma nota com um tipo (<code>user</code>, <code>feedback</code>, <code>project</code> ou <code>reference</code>). Aparece algo como \"Saved 1 memory\"." },
+    { ativos: [2], setas: [1], titulo: "Índice + arquivos", texto: "A nota vira um arquivo em <code>~/.claude/projects/&lt;projeto&gt;/memory/</code> e ganha uma linha no índice <code>MEMORY.md</code>." },
+    { ativos: [3], setas: [2], titulo: "Carrega na próxima sessão", texto: "O início do <code>MEMORY.md</code> (até 200 linhas ou 25 KB) carrega em toda sessão. Os arquivos de nota são lidos sob demanda." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: memória (demonstração)", altura: 280,
+  passos: [
+    { t: "user", x: "lembre que eu prefiro explicações curtas, em tópicos", leg: "Pedido explícito para lembrar" },
+    { t: "html", x: '<span class="t-dim">✻ Saved 1 memory</span>' },
+    { t: "claude", x: "Anotado. Vou manter as explicações curtas e em tópicos.", ms: 1200 },
+    { t: "user", x: "/memory", leg: "Revisar o que está salvo" },
+    { t: "html", x: '<span class="t-caixa">Memory\n  User memory      ~/.claude/CLAUDE.md\n  Project memory   ./CLAUDE.md\n  Auto memory: <span class="t-ok">on</span>  ·  Open auto-memory folder</span>' },
+    { t: "nota", x: "Dia seguinte, sessão nova", ms: 1200 },
+    { t: "user", x: "explique a função remover" },
+    { t: "claude", x: "• Carrega as tarefas\n  • Valida o número com _indice_valido\n  • Remove com pop() e salva", leg: "Seguiu a preferência sem você repetir" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Você prefere respostas em tópicos.", "m", "Preferência sua: memória automática (ou ~/.claude/CLAUDE.md)."],
+    ["O projeto não usa bibliotecas externas.", "c", "Regra do projeto que vale para todos: CLAUDE.md."],
+    ["O token de acesso da API de testes.", "x", "Segredo nunca vai para nenhum dos dois."],
+    ["Você corrigiu: 'mensagens sempre em português'. Vale para o time.", "c", "Se é convenção do projeto, registre no CLAUDE.md para todos."],
+    ["Você está no meio de uma migração e prefere não mexer no formato do JSON até sexta.", "m", "Decisão temporária e pessoal: típica nota de memória do tipo project."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">m = memória · c = CLAUDE.md · x = nenhum</span>' : '<span class="t-ok">Fim: ' + pts + "/" + itens.length + ".</span> Digite iniciar para repetir."; }
+  function r(x) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === x; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ ') + itens[i][2] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Onde guardar? (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Classifique cada informação.</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "m": function () { return r("m"); }, "c": function () { return r("c"); }, "x": function () { return r("x"); } }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Quem escreve a memória automática?", op: ["Você", "O próprio Claude", "A TI da empresa"], c: 1, ex: "A memória automática é escrita pelo Claude. O CLAUDE.md é escrito por você." },
+  { p: "Onde a memória automática fica guardada?", op: ["No repositório Git do projeto", "Em <code>~/.claude/projects/&lt;projeto&gt;/memory/</code>, na sua máquina", "Na nuvem, compartilhada com o time"], c: 1, ex: "É local da máquina. Não é versionada nem compartilhada." },
+  { p: "Você diz \"adicione ao CLAUDE.md que os testes rodam com python -m unittest\". Onde a informação vai parar?", op: ["Na memória automática", "No CLAUDE.md"], c: 1, ex: "Pedido explícito de CLAUDE.md vai para o CLAUDE.md. \"Lembre que…\" vai para a memória automática." },
+  { p: "Como desligar a memória automática?", op: ["Apagando a pasta .git", "Pelo interruptor no <code>/memory</code> (ou <code>autoMemoryEnabled: false</code> nas configurações do projeto)", "Não é possível"], c: 1, ex: "O interruptor fica no <code>/memory</code>. Para um projeto só, use a configuração <code>autoMemoryEnabled</code>." }
+]);
+Curso.checklist("check", [
+  "Explico a diferença entre CLAUDE.md e memória automática",
+  "Sei onde as notas ficam e que são locais",
+  "Uso <code>/memory</code> para revisar e ligar ou desligar",
+  "Testei uma preferência sendo lembrada numa sessão nova"
+]);
+</script>
+</body>
+</html>

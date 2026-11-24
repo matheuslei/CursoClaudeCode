@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sandbox</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m4a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 4 · Aula 4</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~15 min</span>
+    <h1>Sandbox</h1>
+    <p class="objetivo">Objetivo: entender o que o sandbox isola (arquivos e rede), onde ele funciona, inclusive no Windows via WSL2, e o que fica de fora.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Regras olham o <strong>texto</strong> do comando. Mas um comando pode fazer coisas que o texto não revela: um script Python que apaga arquivos, um <code>npm install</code> que acessa a internet. O <strong>sandbox</strong> é uma barreira do <strong>sistema operacional</strong>: mesmo que o comando tente, ele não consegue escrever fora da pasta nem acessar sites não autorizados.</p>
+    <div class="caixa alerta"><strong>Windows nativo: sem sandbox</strong>Segundo a documentação, o sandbox <strong>não funciona no Windows nativo</strong>: os comandos rodam sem isolamento. Para usá-lo no Windows, rode o Claude Code dentro do <strong>WSL2</strong>. No WSL1 também não funciona. Mesmo assim, vale entender o conceito: ele aparece em todo material avançado.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: as paredes do sandbox</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como funciona</h2>
+    <table class="tab">
+      <thead><tr><th>Plataforma</th><th>Suporte</th></tr></thead>
+      <tbody>
+        <tr><td>macOS</td><td>Sim (Seatbelt)</td></tr>
+        <tr><td>Linux</td><td>Sim (bubblewrap e socat)</td></tr>
+        <tr><td>WSL2</td><td>Sim (bubblewrap)</td></tr>
+        <tr><td>WSL1</td><td>Não</td></tr>
+        <tr><td><strong>Windows nativo</strong></td><td><strong>Não</strong>: use WSL2</td></tr>
+      </tbody>
+    </table>
+    <h3>O que ele isola</h3>
+    <ul>
+      <li><strong>Escrita:</strong> só na pasta de trabalho, numa pasta temporária e em diretórios adicionados. Caminhos protegidos (configurações em <code>.claude</code>, <code>.git/hooks</code>, <code>.bashrc</code>…) continuam bloqueados.</li>
+      <li><strong>Rede:</strong> sem saída direta. Tudo passa por um proxy que só deixa passar domínios em <code>network.allowedDomains</code>, que <strong>começa vazio</strong>.</li>
+      <li><strong>Leitura:</strong> por padrão, <em>ainda pode ler</em> quase tudo da máquina, inclusive credenciais como <code>~/.ssh</code>. Para restringir, há configurações próprias (<code>filesystem.denyRead</code>, <code>credentials</code>…).</li>
+    </ul>
+    <h3>Como ligar (Linux, macOS ou WSL2)</h3>
+    <div class="cod"><code>/sandbox</code></div>
+    <p>Abre um painel com o modo (<strong>auto-allow</strong>: comandos sandboxed rodam sem perguntar; ou <strong>permissões normais</strong>), as exceções e a configuração. Ou, no <code>~/.claude/settings.json</code>:</p>
+    <div class="cod"><code>{
+  "sandbox": {
+    "enabled": true
+  }
+}</code></div>
+    <p>No Linux/WSL2, instale as dependências: <code>sudo apt-get install bubblewrap socat</code>.</p>
+    <h3>O que fica <strong>fora</strong> do sandbox</h3>
+    <ul>
+      <li>As ferramentas internas de arquivo e web: Read, Edit, Write, WebFetch, WebSearch. Para elas, valem as <strong>regras de permissão</strong> da aula anterior.</li>
+      <li>Hooks, servidores MCP locais, status line.</li>
+      <li>Comandos que <strong>você</strong> digita com <code>!</code> (na maioria das sessões).</li>
+      <li>Se um comando falha no sandbox, o Claude pode pedir para rodá-lo <strong>fora</strong>. Quem aprova depende do modo. Para proibir isso: <code>"allowUnsandboxedCommands": false</code>.</li>
+    </ul>
+    <div class="caixa dica"><strong>Sandbox + regras = defesa em camadas</strong>Regras controlam as ferramentas do Claude; o sandbox controla o que os comandos de shell conseguem fazer no sistema. Um cobre o ponto cego do outro.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração (WSL2/Linux)</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: dentro ou fora?</h2>
+    <p>Com o sandbox ligado, o que é contido por ele? Responda <code>sandbox</code> (contido) ou <code>fora</code> (não coberto, precisa de regras ou cuidado). Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício</h2>
+    <p><strong>Se você usa WSL2</strong> (ou Linux/macOS):</p>
+    <ol>
+      <li>Instale as dependências e rode <code>/sandbox</code> numa cópia do TaskFlow dentro do WSL</li>
+      <li>Peça ao Claude: <code>rode touch ~/sandbox-teste e depois curl --noproxy '*' https://example.com</code></li>
+      <li>Observe as falhas e anote as mensagens no diário</li>
+    </ol>
+    <p><strong>Se você está no Windows nativo</strong> (caso mais comum): faça o exercício de análise. Liste no <code>diario.md</code> três comandos que suas regras <em>não</em> pegariam, mas que o sandbox conteria, e decida se vale configurar o WSL2 (confirme com a TI se pode instalar).</p>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <ul>
+        <li>WSL2: o <code>touch ~/sandbox-teste</code> falha com algo como <code>Read-only file system</code> ou <code>Operation not permitted</code>, porque está fora da pasta. O <code>curl</code> falha com <code>Could not resolve host</code>, porque a rede não está liberada. Não rode esses testes você mesmo com <code>!</code>: isso costuma rodar fora do sandbox.</li>
+        <li>Windows nativo, exemplos: <code>python limpa.py</code> (o script pode apagar qualquer coisa, e a regra só vê "python limpa.py"); <code>npm install pacote</code> (scripts de instalação acessam a rede); <code>git clone https://…</code> de um repositório desconhecido seguido de execução.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"Ativei, então estou protegido" no Windows</h4><p>No Windows nativo, os comandos rodam sem sandbox. Confira a plataforma.</p></div>
+      <div class="mini"><h4>Achar que bloqueia leitura</h4><p>Por padrão, a leitura continua ampla. Proteja credenciais com configuração específica e regras Read deny.</p></div>
+      <div class="mini"><h4>Liberar domínios demais</h4><p><code>allowedDomains</code> começa vazio por um motivo. Libere só o necessário.</p></div>
+      <div class="mini"><h4>Excluir comandos à toa</h4><p><code>excludedCommands</code> roda aquele comando com acesso total, sempre.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/sandboxing">Sandboxing</a>: configuração completa</li>
+      <li><a href="https://code.claude.com/docs/en/sandbox-environments">Sandbox environments</a>: dev containers e outras opções de isolamento</li>
+      <li><a href="https://learn.microsoft.com/pt-br/windows/wsl/install">Instalar o WSL</a> (Microsoft, em português)</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Sandboxing).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Sandbox em 1 minuto", cenas: [
+  { fala: "Regras olham o texto do comando. Mas um comando pode fazer mais do que o texto revela.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 4 · AULA 4</span><p class="v-titulo" data-t="0.3">Sandbox</p><p class="v-sub" data-t="0.9">Uma barreira do sistema operacional</p>' },
+  { fala: "Um script Python pode apagar arquivos, e um npm install acessa a internet. O sandbox impede isso no nível do sistema operacional, mesmo que o comando tente.",
+    html: '<div class="v-code"><div data-t="0.3"><span class="u">python limpar.py</span>   <span class="w">→ apaga arquivos?</span></div><div data-t="2"><span class="u">npm install</span>        <span class="w">→ acessa a internet</span></div></div><p class="v-txt" data-t="4.2" style="text-align:center">O sandbox barra no <b style="color:#e0875f">sistema operacional</b></p>' },
+  { fala: "Ele isola a escrita, que só vale na pasta de trabalho, e a rede, que só alcança domínios autorizados. A lista começa vazia. Mas atenção: por padrão, a leitura continua ampla.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa ok" data-t="0.4"><span class="v-ic">✍</span><b>Escrita</b>só na pasta de trabalho</div><div class="v-caixa ok" data-t="2.6"><span class="v-ic">🌐</span><b>Rede</b>só domínios autorizados (lista começa vazia)</div><div class="v-caixa warn" data-t="5.6"><span class="v-ic">👁</span><b>Leitura</b>ainda ampla por padrão</div></div>' },
+  { fala: "Funciona no macOS, no Linux e no WSL2. No Windows nativo e no WSL1, não funciona. No Windows, rode o Claude Code dentro do WSL2.",
+    html: '<div class="v-grade" style="--cols:5"><div class="v-caixa ok" data-t="0.3"><b>macOS</b>sim</div><div class="v-caixa ok" data-t="0.9"><b>Linux</b>sim</div><div class="v-caixa ok" data-t="1.5"><b>WSL2</b>sim</div><div class="v-caixa err" data-t="2.6"><b>Windows nativo</b>não</div><div class="v-caixa err" data-t="3.2"><b>WSL1</b>não</div></div><p class="v-txt" data-t="4.6" style="text-align:center">No Windows: use o <b style="color:#e0875f">WSL2</b></p>' },
+  { fala: "Ficam fora do sandbox as ferramentas de arquivo e web do Claude, os hooks, os servidores MCP locais e os comandos que você digita com exclamação.",
+    html: '<p class="v-txt" data-t="0">Fora do sandbox</p><div class="v-code" data-t="0.3"><div data-t="0.6"><span class="a">●</span> Read, Edit, Write, WebFetch  <span class="d">→ valem as regras</span></div><div data-t="2.4"><span class="a">●</span> hooks e servidores MCP locais</div><div data-t="3.8"><span class="a">●</span> comandos digitados com <span class="u">!</span></div></div>' },
+  { fala: "Regras controlam as ferramentas do Claude. O sandbox controla o que os comandos conseguem fazer. Juntos, formam uma defesa em camadas.",
+    html: '<p class="v-sub" data-t="0">Um cobre o ponto cego do outro</p><p class="v-titulo" data-t="0.4">Regras + sandbox = defesa em camadas</p><div class="v-code" data-t="1.8" style="align-self:flex-start"><span class="u">&gt; </span><span class="v-digita" style="--n:8">/sandbox</span></div>' }
+] });
+
+Curso.passos("diag", {
+  nos: [{ ic: "🐚", rt: "Comando shell" }, { ic: "📁", rt: "Arquivos" }, { ic: "🌐", rt: "Rede" }, { ic: "🔑", rt: "Credenciais" }],
+  passos: [
+    { ativos: [0], titulo: "Um comando roda dentro do sandbox", texto: "O Claude roda <code>python script.py</code>. O sistema operacional coloca o processo numa \"caixa\". Tudo o que ele e seus filhos fizerem está sujeito às paredes." },
+    { ativos: [0, 1], setas: [0], titulo: "Parede de arquivos", texto: "Escrita só na pasta de trabalho, numa pasta temporária e em diretórios adicionados. Arquivos de configuração protegidos continuam bloqueados até dentro da pasta." },
+    { ativos: [0, 2], setas: [1], titulo: "Parede de rede", texto: "Sem saída direta: um proxy só deixa passar domínios autorizados (a lista começa vazia)." },
+    { ativos: [0, 3], setas: [2], titulo: "Atenção: leitura é ampla", texto: "Por padrão, o comando ainda <strong>lê</strong> quase tudo, inclusive credenciais. Restrinja com <code>filesystem.denyRead</code> ou <code>credentials</code>." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code no WSL2 com sandbox (demonstração)", prompt: "voce@wsl:~/taskflow$", altura: 280,
+  passos: [
+    { t: "user", x: "/sandbox", leg: "Painel do sandbox" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Sandbox</span>   [Mode]  Overrides  Config\n<span class="t-user">❯ Auto-allow</span>: comandos sandboxed rodam sem perguntar\n  Regular permissions</span>' },
+    { t: "user", x: "rode touch ~/sandbox-teste", leg: "Escrever fora da pasta" },
+    { t: "tool", x: "Bash(touch ~/sandbox-teste)" },
+    { t: "out", x: "touch: cannot touch '/home/voce/sandbox-teste': Read-only file system" },
+    { t: "user", x: "rode curl --noproxy '*' https://example.com", leg: "Acessar rede não liberada" },
+    { t: "tool", x: "Bash(curl --noproxy '*' https://example.com)" },
+    { t: "out", x: "curl: (6) Could not resolve host: example.com" },
+    { t: "claude", x: "As duas ações foram contidas pelo sandbox: escrita fora da pasta e rede não autorizada." }
+  ]
+});
+(function () {
+  var casos = [
+    ["Claude roda Bash(python limpa.py) e o script tenta apagar ~/Documents", "sandbox", "Escrita fora da pasta de trabalho: contida."],
+    ["Claude usa a ferramenta Read para ler ~/.ssh/id_rsa", "fora", "Read é ferramenta interna, fora do sandbox. Proteja com regra Read deny."],
+    ["Um npm install tenta baixar de um domínio não liberado", "sandbox", "Rede passa pelo proxy; domínio fora da lista falha."],
+    ["Você digita ! rm -rf build", "fora", "Comandos digitados com ! rodam fora do sandbox na maioria das sessões."],
+    ["Claude usa WebFetch numa página qualquer", "fora", "WebFetch não é limitado pelo allowedDomains do sandbox; use regras WebFetch(domain:...)."],
+    ["No Windows nativo, Claude roda PowerShell(Remove-Item ...)", "fora", "Windows nativo não tem sandbox; vale só a regra e a sua aprovação."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < casos.length ? '<span class="t-b">Caso ' + (i + 1) + "/" + casos.length + ":</span> " + casos[i][0] + '\n<span class="t-dim">sandbox ou fora?</span>' : '<span class="t-ok">Fim! ' + pts + " de " + casos.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= casos.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = casos[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ ') + casos[i][2] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Dentro ou fora do sandbox? (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Responda: sandbox · fora</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "sandbox": function () { return resp("sandbox"); }, "fora": function () { return resp("fora"); } },
+    desconhecido: '<span class="t-dim">Responda sandbox ou fora (ou iniciar).</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "No Windows nativo (sem WSL), o sandbox do Claude Code…", op: ["Funciona normalmente", "Não está disponível; os comandos rodam sem isolamento", "Só bloqueia a rede"], c: 1, ex: "A documentação indica: Windows nativo não suporta; use WSL2." },
+  { p: "Qual a diferença principal entre regras de permissão e sandbox?", op: ["Nenhuma", "Regras olham a ação/texto do comando; o sandbox impõe limites no sistema operacional ao que o processo consegue fazer", "Sandbox só serve para Python"], c: 1, ex: "São camadas complementares: uma cobre o ponto cego da outra." },
+  { p: "Com o sandbox ligado, a ferramenta Read do Claude pode ler <code>~/.aws/credentials</code>?", op: ["Não, o sandbox bloqueia", "Sim, Read fica fora do sandbox; use regra Read deny"], c: 1, ex: "Ferramentas internas (Read, Edit, WebFetch…) não passam pelo sandbox." },
+  { p: "A lista <code>network.allowedDomains</code> começa…", op: ["Com os sites mais comuns", "Vazia", "Com tudo liberado"], c: 1, ex: "Começa vazia: você libera só o necessário." }
+]);
+Curso.checklist("check", [
+  "Explico o que o sandbox isola (escrita e rede) e o que não isola (leitura ampla por padrão)",
+  "Sei que no Windows nativo não há sandbox e que o caminho é o WSL2",
+  "Conheço o que fica fora: ferramentas internas, hooks, MCP, comandos com <code>!</code>",
+  "Fiz o exercício (prático no WSL2 ou de análise no Windows)"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/clear, /compact e /rewind</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Aula 4</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~20 min</span>
+    <h1>/clear, /compact e /rewind</h1>
+    <p class="objetivo">Objetivo: escolher a ferramenta certa para cada situação: recomeçar, resumir ou voltar no tempo, inclusive desfazendo edições com checkpoints.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Você já viu esses comandos no Módulo 1. Agora, com o contexto entendido, dá para usá-los com estratégia. A regra prática: <strong>uma tarefa, uma conversa</strong>. E quando o Claude errar o caminho, volte ao ponto anterior em vez de tentar consertar em cima do erro.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: qual usar?</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os detalhes que fazem diferença</h2>
+    <h3>/clear</h3>
+    <p>Começa uma conversa nova com contexto vazio (CLAUDE.md e memória continuam). A anterior continua acessível pelo <code>/resume</code>. Dica da doc: use <code>/rename</code> antes de limpar, para achar a conversa depois. Os totais do <code>/usage</code> também zeram.</p>
+    <h3>/compact [instruções]</h3>
+    <p>Resume a conversa para liberar espaço e <strong>continuar a mesma tarefa</strong>. Dê foco ao resumo: <code>/compact foque nas mudanças do comando editar e nos testes que falharam</code>. Depois da compactação, o CLAUDE.md da raiz e a memória são reinjetados do disco, e o Claude relê até 5 arquivos recentes.</p>
+    <p>Você também pode deixar instruções permanentes de compactação no CLAUDE.md, numa seção como <code># Compact instructions</code>.</p>
+    <h3>/rewind e checkpoints</h3>
+    <p>Cada mensagem sua que inicia um turno cria um <strong>checkpoint</strong> do código. Abra o menu com <code>/rewind</code> (alias <code>/undo</code>) ou <kbd>Esc</kbd> <kbd>Esc</kbd> com o campo vazio, escolha a mensagem e uma ação:</p>
+    <table class="tab">
+      <tbody>
+        <tr><td><strong>Restore code and conversation</strong></td><td>Volta código e conversa àquele ponto</td></tr>
+        <tr><td><strong>Restore conversation</strong></td><td>Volta só a conversa e mantém o código atual</td></tr>
+        <tr><td><strong>Restore code</strong></td><td>Desfaz as edições e mantém a conversa</td></tr>
+        <tr><td><strong>Summarize from here / up to here</strong></td><td>Resume um trecho da conversa (um <code>/compact</code> direcionado)</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa alerta"><strong>Limites do rewind</strong>Arquivos alterados <strong>só por comandos</strong> (Bash ou PowerShell), e não pelas ferramentas de edição do Claude, não são rastreados. Mudanças feitas fora do Claude Code também não. Checkpoints servem para recuperação rápida na sessão e <strong>não substituem o Git</strong>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: voltando de um caminho errado</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: escolha a ferramenta</h2>
+    <p>Comece com <code>iniciar</code> e responda cada situação com o comando certo: <code>/clear</code>, <code>/compact</code> ou <code>/rewind</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow (tudo commitado), peça: <code>transforme o armazenamento em SQLite</code>. Deixe o Claude fazer pelo menos uma edição.</li>
+      <li>Arrependeu-se! Pressione <kbd>Esc</kbd> <kbd>Esc</kbd> (campo vazio), escolha a mensagem do pedido e <strong>Restore code and conversation</strong>.</li>
+      <li>Confira com <code>! git status</code> que o código voltou ao estado anterior.</li>
+      <li>Peça uma tarefa de verdade (<code>adicione o comando limpar-concluidas</code>) e, no meio, rode <code>/compact foque no comando limpar-concluidas</code>.</li>
+      <li>Terminou? <code>/rename limpar-concluidas</code>, depois <code>/clear</code>. Confirme que ela aparece no <code>/resume</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <ul>
+        <li>Passo 3: <code>git status</code> deve mostrar <em>working tree clean</em>, porque o rewind desfez as edições feitas pelas ferramentas do Claude. Se o Claude tiver criado arquivos <strong>via comando</strong> (ex.: um banco <code>.db</code> gerado por script), eles podem continuar lá. Use <code>git status</code> e <code>git clean</code>/<code>git restore</code> com cuidado.</li>
+        <li>Passo 4: após o <code>/compact</code>, o Claude continua a tarefa com o foco que você deu.</li>
+        <li>Passo 5: a conversa aparece com o nome <code>limpar-concluidas</code> na lista do <code>/resume</code>.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Consertar em cima do erro</h4><p>Três rodadas de "não, assim não" poluem o contexto. Volte com rewind e peça melhor.</p></div>
+      <div class="mini"><h4>/compact para mudar de assunto</h4><p>O resumo carrega o assunto velho. Tarefa nova pede <code>/clear</code>.</p></div>
+      <div class="mini"><h4>Confiar só no rewind</h4><p>Mudanças por comando não são rastreadas. Commit antes de mudanças grandes.</p></div>
+      <div class="mini"><h4>/compact sem foco</h4><p>Sem instrução, o resumo adivinha o que importa. Diga o que manter.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/checkpointing">Checkpointing</a>: todas as opções e limitações</li>
+      <li><a href="https://code.claude.com/docs/en/context-window#what-survives-compaction">What survives compaction</a></li>
+      <li><a href="https://academy.claude.com/courses/claude-code-in-action">Claude Code in Action</a> (Anthropic Academy, em inglês): lição sobre conduzir sessões longas (compactação dirigida, rewind, /goal).</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Checkpointing, Explore the context window, Manage costs).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "/clear, /compact e /rewind em 1 minuto", cenas: [
+  { fala: "Três comandos, três situações: recomeçar, resumir ou voltar no tempo.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 2 · AULA 4</span><p class=\"v-titulo\" data-t=\"0.3\">/clear, /compact e /rewind</p><p class=\"v-sub\" data-t=\"0.9\">Recomeçar, resumir ou voltar no tempo</p>" },
+  { fala: "Mudou de assunto? Use /clear. O contexto fica vazio, mas o CLAUDE.md e a memória continuam. E a conversa anterior pode ser retomada com /resume.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:6\">/clear</span></div><div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa acc\" data-t=\"2.2\"><span class=\"v-ic\">✨</span><b>Contexto vazio</b>conversa nova</div><div class=\"v-caixa \" data-t=\"3.8\"><span class=\"v-ic\">📘</span><b>Continuam</b>CLAUDE.md e memória</div></div><p class=\"v-txt\" data-t=\"6\" style=\"text-align:center\">↩ a anterior fica no /resume</p>" },
+  { fala: "Mesma tarefa, conversa longa? Use /compact. Você pode dar foco ao resumo. Por exemplo: foque nos testes que falharam.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:38\">/compact foque nos testes que falharam</span></div><p class=\"v-txt\" data-t=\"4.4\" style=\"text-align:center\">🗜 resume a conversa e continua a mesma tarefa</p>" },
+  { fala: "Cada mensagem sua cria um checkpoint. Com /rewind, ou Esc duas vezes com o campo vazio, você escolhe um ponto e volta o código, a conversa, ou os dois.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"d\">Rewind: escolha uma ação</span></div><div data-t=\"2.6\"><span class=\"u\">❯ Restore code and conversation</span></div><div data-t=\"3.6\">  Restore conversation</div><div data-t=\"4.4\">  Restore code</div><div data-t=\"5.2\">  Summarize from here</div></div>" },
+  { fala: "Atenção: arquivos alterados só por comandos de terminal, ou fora do Claude Code, não são rastreados. Checkpoint é recuperação rápida. Não substitui o Git.",
+    html: "<div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">⚠</span><b>Não rastreia</b>comandos de terminal e mudanças fora do Claude</div><div class=\"v-caixa ok\" data-t=\"4.6\"><span class=\"v-ic\">🛟</span><b>Git continua</b>checkpoint não substitui commit</div></div>" },
+  { fala: "Resumindo: assunto novo, /clear. Mesma tarefa, /compact. Caminho errado, /rewind.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">🆕</span><b>Assunto novo</b>/clear</div><div class=\"v-caixa \" data-t=\"1.6\"><span class=\"v-ic\">📚</span><b>Mesma tarefa</b>/compact</div><div class=\"v-caixa \" data-t=\"2.8\"><span class=\"v-ic\">↩</span><b>Caminho errado</b>/rewind</div></div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🆕", rt: "/clear" }, { ic: "🗜", rt: "/compact" }, { ic: "⏪", rt: "/rewind" }],
+  seta: "·",
+  passos: [
+    { ativos: [0], titulo: "/clear: assunto novo", texto: "Terminou uma tarefa e vai começar outra sem relação? Contexto limpo. É o mais barato: não processa nada." },
+    { ativos: [1], titulo: "/compact: mesma tarefa, conversa longa", texto: "Está no meio da tarefa, mas a conversa cresceu demais. Resume e continua. Dê foco: <code>/compact foque em…</code>" },
+    { ativos: [2], titulo: "/rewind: caminho errado", texto: "O Claude foi por uma direção que você não queria? Volte ao checkpoint anterior (código, conversa ou os dois) e peça de novo, melhor." },
+    { ativos: [0, 1, 2], titulo: "E o Git?", texto: "Checkpoints são para a sessão. O <strong>Git</strong> continua sendo a rede de segurança permanente: commit antes de mudanças grandes." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: rewind (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "transforme o armazenamento em SQLite", leg: "Pedido grande, sem pensar muito…" },
+    { t: "tool", x: "Write(banco.py)" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "Updated tarefas.py with 34 additions and 12 removals" },
+    { t: "nota", x: "Você percebe que não queria isso. Campo vazio, Esc Esc:", ms: 1300 },
+    { t: "html", x: '<span class="t-caixa">Rewind\n<span class="t-user">❯ "transforme o armazenamento em SQLite"</span>  · 2 files changed\n  "adicione o comando remover"\n\n  1. Restore code and conversation\n  2. Restore conversation\n  3. Restore code\n  4. Summarize from here\n  5. Never mind</span>', leg: "Escolha o ponto e a ação", ms: 2200 },
+    { t: "html", x: '<span class="t-user">  › 1. Restore code and conversation</span>' },
+    { t: "html", x: '<span class="t-ok">Restored code and conversation.</span>' },
+    { t: "user", x: "! git status", leg: "Conferindo com o Git" },
+    { t: "out", x: "nothing to commit, working tree clean" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Você terminou o comando editar e agora vai estudar outro assunto.", "/clear"],
+    ["Meio da implementação de limpar-concluidas; a conversa está enorme com logs de teste antigos.", "/compact"],
+    ["O Claude reescreveu 3 arquivos numa direção que você não queria.", "/rewind"],
+    ["Você quer manter o código atual, mas apagar da conversa uma discussão longa e inútil.", "/rewind"],
+    ["Amanhã você vai começar uma tarefa nova de manhã.", "/clear"]
+  ], i = -1, pts = 0;
+  var dicas = { "/clear": "Assunto novo, contexto limpo.", "/compact": "Mesma tarefa: resuma e continue.", "/rewind": "Volte ao checkpoint (código e/ou conversa, ou Summarize)." };
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] : '<span class="t-ok">Fim: ' + pts + "/" + itens.length + ".</span> Digite iniciar para repetir."; }
+  function r(c) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === c; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Isso. ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ". ") + dicas[itens[i][1]] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Escolha a ferramenta (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Responda com /clear, /compact ou /rewind</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "/clear": function () { return r("/clear"); }, "/compact": function () { return r("/compact"); }, "/rewind": function () { return r("/rewind"); }, "/undo": function () { return r("/rewind"); } },
+    padroes: [[/^\/compact\s+.+/i, function () { return r("/compact"); }]]
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "O que o <code>/clear</code> faz com a conversa anterior?", op: ["Apaga para sempre", "Começa uma nova; a anterior continua no <code>/resume</code>", "Resume e continua"], c: 1, ex: "Nada se perde: a conversa anterior pode ser retomada pelo <code>/resume</code>." },
+  { p: "Como abrir o menu de rewind pelo teclado?", op: ["<kbd>Ctrl</kbd>+<kbd>Z</kbd>", "<kbd>Esc</kbd> <kbd>Esc</kbd> com o campo de digitação vazio", "<kbd>Shift</kbd>+<kbd>Tab</kbd>"], c: 1, ex: "Com texto no campo, <kbd>Esc</kbd> <kbd>Esc</kbd> limpa o rascunho; com o campo vazio, abre o rewind." },
+  { p: "O Claude criou um arquivo rodando um script pelo terminal. O rewind desfaz isso?", op: ["Sim, sempre", "Não necessariamente: arquivos alterados só por comandos não são rastreados; use o Git", "Só no Windows"], c: 1, ex: "Os checkpoints rastreiam as edições feitas pelas ferramentas de edição do Claude. Para o resto, Git." },
+  { p: "Qual comando é melhor para resumir a conversa mantendo o foco no bug atual?", op: ["<code>/clear</code>", "<code>/compact foque no bug do comando editar</code>", "<code>/rewind</code>"], c: 1, ex: "<code>/compact</code> com instruções escolhe o que o resumo preserva." },
+  { p: "Qual a regra prática desta aula?", op: ["Uma conversa por dia", "Uma tarefa, uma conversa", "Nunca usar /clear"], c: 1, ex: "Conversas focadas mantêm o contexto limpo e as respostas melhores." }
+]);
+Curso.checklist("check", [
+  "Escolho entre <code>/clear</code>, <code>/compact</code> e <code>/rewind</code> sem hesitar",
+  "Usei <code>/compact</code> com instruções de foco",
+  "Desfiz edições com <kbd>Esc</kbd> <kbd>Esc</kbd> / <code>/rewind</code>",
+  "Sei que checkpoints não substituem o Git"
+]);
+</script>
+</body>
+</html>

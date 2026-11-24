@@ -1,0 +1,29 @@
+# Cache do Python (ferramentas/ e projeto-taskflow/)
+__pycache__/
+*.pyc
+.venv/
+
+# Lixo do sistema e do Office
+Thumbs.db
+desktop.ini
+.DS_Store
+~$*
+
+# Configurações locais de editor e do Claude Code nesta raiz
+# (as pastas .claude/ dentro de projeto-taskflow/ são material do curso e sobem)
+/.vscode/
+/.claude/
+*.local.json
+*.local.md
+
+# Amostras de voz usadas só para escolher a narração (o site não usa)
+audio/amostras/
+
+# Bastidores do curso. Tire o # da frente se não quiser publicá-los.
+# CLAUDE.md
+# SDD.md
+# podcast/PROMPTS.md
+
+# ATENÇÃO: o .gitignore de projeto-taskflow/etapa-09/ ignora revisao-*.md,
+# o que tira do repositório o gabarito revisao-esperada.md. Adicione-o à força:
+#   git add -f projeto-taskflow/etapa-09/gabarito/revisao-esperada.md

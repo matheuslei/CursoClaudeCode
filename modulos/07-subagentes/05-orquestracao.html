@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orquestração em escala</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7a5">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Aula 5</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>Orquestração em escala</h1>
+    <p class="objetivo">Objetivo: escolher o nível certo de paralelismo para cada tarefa (subagentes, sessões paralelas ou equipe de agentes) e manter o custo sob controle.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Você já conhece as peças: subagentes (aula 1), segundo plano e fork (aula 2), worktrees (aula 3) e agent view (aula 4). Falta decidir <strong>quando usar cada uma</strong>. Mais agentes não quer dizer trabalho melhor: quer dizer mais tokens e mais coordenação.</p>
+    <div class="caixa"><strong>Regra de ouro</strong>Use o nível mais simples que resolve. Suba de nível só quando o paralelismo realmente compensar.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: três níveis</h2>
+    <div id="diag"></div>
+    <table class="tab">
+      <thead><tr><th></th><th>1. Subagentes</th><th>2. Sessões paralelas</th><th>3. Equipe de agentes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>O que é</strong></td><td>Ajudantes dentro de uma sessão</td><td>Várias sessões suas, cada uma num worktree</td><td>Uma sessão líder e colegas que conversam entre si</td></tr>
+        <tr><td><strong>Comunicação</strong></td><td>Devolvem o resultado a quem chamou</td><td>Você coordena (e, se disponível, mensagens entre sessões)</td><td>Mensagens diretas e lista de tarefas compartilhada</td></tr>
+        <tr><td><strong>Melhor para</strong></td><td>Tarefa focada em que só o resultado importa</td><td>Mudanças independentes que você quer acompanhar</td><td>Trabalho que pede discussão: pesquisa, revisão, hipóteses concorrentes</td></tr>
+        <tr><td><strong>Custo</strong></td><td>Menor</td><td>Médio: uma sessão inteira por tarefa</td><td>Maior: cada colega é uma sessão inteira</td></tr>
+        <tr><td><strong>Como</strong></td><td>Aula 1</td><td>Aulas 2 a 4</td><td>Esta aula</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Equipes de agentes (agent teams)</h2>
+    <div class="caixa alerta"><strong>Experimental</strong>Equipes de agentes vêm <strong>desligadas</strong> e têm limitações conhecidas (retomar sessão, status de tarefas, encerramento). Use na pasta de treino, não em código importante.</div>
+    <h3>Ligar</h3>
+    <div class="cod"><span class="rot">.claude/settings.json (na pasta de treino)</span><code>{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}</code></div>
+    <p>Depois, peça em linguagem normal, dizendo quantos colegas e o papel de cada um:</p>
+    <div class="cod"><span class="rot">pedido</span><code>Crie uma equipe com três colegas para revisar o TaskFlow: um olhando os testes,
+um olhando mensagens e textos para o usuário, e um procurando casos de erro.
+Cada um só lê e relata. Depois junte os achados.</code></div>
+    <h3>Como funciona</h3>
+    <ul>
+      <li>A sessão principal é a <strong>líder</strong>: cria os colegas, monta a <strong>lista de tarefas compartilhada</strong> e junta os resultados.</li>
+      <li>Cada colega é uma sessão inteira, com janela de contexto própria. Ele carrega o <code>CLAUDE.md</code> do projeto, mas <strong>não</strong> o histórico da líder: o pedido precisa dizer o que ele deve saber.</li>
+      <li>Os colegas trocam mensagens diretamente e pegam tarefas da lista sozinhos.</li>
+      <li>Pedidos de permissão dos colegas aparecem na sessão da líder.</li>
+      <li>Você pode usar um subagente da aula 1 como papel de colega: <em>"crie um colega do tipo revisor-taskflow"</em>.</li>
+    </ul>
+    <h3>Como ver a equipe</h3>
+    <table class="tab">
+      <thead><tr><th>Modo</th><th>Como é</th><th>Onde funciona</th></tr></thead>
+      <tbody>
+        <tr><td><strong>In-process</strong> (padrão)</td><td>Todos no seu terminal. Painel abaixo do campo de texto: <kbd>↑</kbd> <kbd>↓</kbd> escolhem um colega, <kbd>Enter</kbd> abre a conversa dele, <kbd>x</kbd> para o colega escolhido.</td><td>Qualquer terminal, inclusive no Windows</td></tr>
+        <tr><td><strong>Split panes</strong></td><td>Cada colega num painel do terminal.</td><td>Precisa de tmux ou iTerm2. No Windows, use o modo in-process.</td></tr>
+      </tbody>
+    </table>
+    <p>Para encerrar um colega, peça à líder: <em>"peça ao colega de testes para encerrar"</em>. As pastas da equipe são limpas quando a sessão termina.</p>
+    <div class="caixa erro"><strong>Efeito colateral ao ligar</strong>Com equipes ligadas, um subagente a que o Claude dá um nome pode virar colega de equipe, mesmo sem você pedir uma equipe. Se não estiver usando, volte a variável para <code>"0"</code>.</div>
+
+    <h3>Mensagens entre as suas sessões</h3>
+    <p>Sem montar uma equipe, sessões suas (por exemplo, uma em cada worktree) podem trocar descobertas. <code>/list-agents</code> (ou <code>/peers</code>) lista com quem a sessão pode falar e o nome a usar. Esse recurso só aparece quando está disponível na sua sessão.</p>
+
+    <h3>Custos: como não exagerar</h3>
+    <ul>
+      <li><strong>Equipes pequenas:</strong> comece com 3 a 5 colegas. Três focados costumam render mais que cinco dispersos.</li>
+      <li><strong>Comece por pesquisa e revisão:</strong> tarefas que só leem não têm o problema de dois colegas editarem o mesmo arquivo.</li>
+      <li><strong>Modelos mais baratos:</strong> peça <em>"use Sonnet para cada colega"</em>, ou use <code>model: haiku</code> em subagentes simples.</li>
+      <li><strong>Meça:</strong> <code>/usage</code> mostra o gasto da sessão e <code>/context</code>, o uso da janela.</li>
+      <li><strong>Um arquivo, um dono:</strong> divida o trabalho por arquivo, como na aula 3.</li>
+    </ul>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o painel da equipe</h2>
+    <p>Simulação guiada para quem não pode ligar o recurso experimental.</p>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual nível de orquestração?</h2>
+    <p>Três cenários. Responda <code>subagente</code>, <code>sessoes</code> ou <code>equipe</code>. Acertar 2 de 3 mostra que você entendeu. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício (prática real opcional)</h2>
+    <p>A prática real usa um recurso <strong>experimental</strong> e gasta bem mais tokens. Se preferir não ligar, a simulação guiada do bloco 4 e o jogo do bloco 5 bastam para concluir a aula.</p>
+    <ol>
+      <li>Na pasta de treino, crie <code>.claude/settings.json</code> com a variável do bloco 3 e abra <code>claude</code>.</li>
+      <li>Rode <code>/usage</code> e anote o gasto inicial.</li>
+      <li>Faça o pedido da equipe de revisão (três colegas, só leitura).</li>
+      <li>Acompanhe no painel: escolha um colega com <kbd>↑</kbd> <kbd>↓</kbd> e abra com <kbd>Enter</kbd>.</li>
+      <li>Quando a líder juntar os achados, rode <code>/usage</code> de novo e compare com o passo 2.</li>
+      <li>Desligue: troque a variável para <code>"0"</code> ou apague o <code>.claude/settings.json</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o que observar</summary>
+      <ul>
+        <li>Os três colegas aparecem no painel, cada um com seu papel. A lista de tarefas compartilhada aparece com <kbd>Ctrl+T</kbd>.</li>
+        <li>Os achados se parecem com os do revisor da aula 1 (docstrings faltando), mas vindos de três ângulos.</li>
+        <li>O gasto do passo 5 deve ser bem maior que o de uma revisão com um só subagente. Esse é o ponto: equipe compensa quando a discussão entre os colegas agrega, não para uma revisão simples.</li>
+        <li>Se o Claude criar subagentes em vez de uma equipe, peça de novo dizendo explicitamente "crie uma equipe de agentes".</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Equipe para tarefa simples</h4><p>Uma revisão focada sai mais barata com um subagente. Equipe é para trabalho que pede discussão.</p></div>
+      <div class="mini"><h4>Colegas no mesmo arquivo</h4><p>Dois colegas editando o mesmo arquivo se sobrescrevem. Dê a cada um seus arquivos.</p></div>
+      <div class="mini"><h4>Pedido sem contexto</h4><p>Os colegas não herdam o histórico da líder. Diga no pedido o que cada um precisa saber.</p></div>
+      <div class="mini"><h4>Esquecer o recurso ligado</h4><p>Com equipes ligadas, subagentes com nome podem virar colegas. Desligue quando não estiver usando.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/agent-teams">Agent teams</a> (em inglês): exemplos de revisão em paralelo, hipóteses concorrentes e hooks de qualidade.</li>
+      <li><a href="https://code.claude.com/docs/en/costs">Custos</a> (em inglês): como reduzir o gasto com tokens.</li>
+      <li>Revise o módulo nos <a href="slides.html">slides do Módulo 7</a>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Orchestrate teams of Claude Code sessions").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Orquestração em 1 minuto", cenas: [
+  { fala: "Última aula do módulo: escolher o jeito certo de orquestrar vários agentes.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 7 · AULA 5</span><p class="v-titulo" data-t="0.3">Orquestração em escala</p><p class="v-sub" data-t="1.2">o nível certo para cada tarefa</p>' },
+  { fala: "São três níveis. Subagentes dentro de uma sessão. Várias sessões em paralelo, cada uma no seu worktree. E equipes de agentes, que conversam entre si.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="1.2"><span class="v-ic">🤖</span><b>1. Subagentes</b>dentro de uma sessão</div><div class="v-caixa acc" data-t="3.4"><span class="v-ic">📁</span><b>2. Sessões</b>uma por worktree</div><div class="v-caixa ok" data-t="6.8"><span class="v-ic">👥</span><b>3. Equipe</b>conversam entre si</div></div>' },
+  { fala: "As equipes de agentes são experimentais. Uma sessão líder cria colegas, divide uma lista de tarefas, e eles trocam mensagens diretamente.",
+    html: '<div class="v-caixa warn" data-t="0.3"><span class="v-ic">🧪</span><b>Experimental</b>desligado por padrão</div><div class="v-linha" data-t="3"><div class="v-caixa acc"><span class="v-ic">⭐</span><b>Líder</b></div><span class="v-seta">→</span><div class="v-caixa"><span class="v-ic">📋</span><b>Tarefas</b>compartilhadas</div><span class="v-seta">⇄</span><div class="v-caixa ok"><span class="v-ic">👥</span><b>Colegas</b>mensagens diretas</div></div>' },
+  { fala: "Mas cada colega é uma sessão inteira, com contexto e tokens próprios. Comece com três a cinco, e prefira tarefas de pesquisa e revisão.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="0.3"><p class="v-txt">1 subagente</p><div class="v-barra"><i style="--w:25%;--cor:#6ac08a;animation-delay:.6s"></i></div></div><div data-t="1.5"><p class="v-txt">equipe de 4</p><div class="v-barra"><i style="--w:90%;--cor:#e07a6a;animation-delay:1.8s"></i></div></div></div><div class="v-caixa ok" data-t="5"><span class="v-ic">🔎</span><b>3 a 5 colegas</b>pesquisa e revisão</div>' },
+  { fala: "A regra de ouro: use o nível mais simples que resolve. Só suba quando o paralelismo realmente compensar.",
+    html: '<p class="v-titulo" data-t="0">Regra de ouro</p><p class="v-sub" data-t="1">o nível mais simples que resolve</p>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você" }, { ic: "🤖", rt: "1. Subagentes" }, { ic: "📁", rt: "2. Sessões paralelas" }, { ic: "👥", rt: "3. Equipe de agentes" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Nível 1: subagentes", texto: "Uma sessão, ajudantes que voltam com o resultado. Ideal para revisar, pesquisar, testar. É o mais barato." },
+    { ativos: [0, 2], setas: [0, 1], titulo: "Nível 2: sessões paralelas", texto: "Você abre várias sessões, cada uma num worktree, e acompanha pelo agent view. Bom para mudanças independentes." },
+    { ativos: [0, 3], setas: [0, 1, 2], titulo: "Nível 3: equipe", texto: "Uma líder coordena colegas que conversam entre si e dividem uma lista de tarefas. Para trabalho que pede discussão." },
+    { ativos: [0, 1], setas: [0], titulo: "Na dúvida, desça", texto: "Cada nível acima custa mais tokens e mais coordenação. Comece pelo mais simples." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Equipe de revisão no TaskFlow (simulação guiada)", altura: 320,
+  passos: [
+    { t: "user", x: "Crie uma equipe com três colegas para revisar o TaskFlow: testes, textos para o usuário e casos de erro. Só leitura.", leg: "Pedido à líder" },
+    { t: "tool", x: "Equipe criada · tarefas: 3 pendentes\n  ● testes        trabalhando\n  ● textos       trabalhando\n  ● erros        trabalhando", leg: "Painel abaixo do campo de texto" },
+    { t: "out", x: "[↓] escolher · [Enter] abrir colega · [x] parar · [Ctrl+T] tarefas", leg: "Navegando pelo painel" },
+    { t: "tool", x: "erros → testes: \"remover 0 imprime aviso; existe teste para isso?\"", leg: "Colegas trocam mensagens direto" },
+    { t: "out", x: "  ✓ testes  concluído · ✓ textos  concluído · ✓ erros  concluído", leg: "Cada um avisa a líder ao terminar" },
+    { t: "claude", x: "Achados juntos: 🟡 5 funções sem docstring; 🟢 falta teste para número 0 em concluir; 🟢 mensagens em português ok.", leg: "A líder sintetiza" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Revisar o tarefas.py e devolver só uma lista de problemas", "subagente", "Tarefa focada em que só o resultado importa: um subagente basta e é o mais barato."],
+    ["Criar exportar.py e estatisticas.py ao mesmo tempo, em arquivos diferentes, e você quer acompanhar cada um", "sessoes", "Mudanças independentes que editam arquivos: uma sessão por worktree, acompanhadas no agent view."],
+    ["Investigar por que um teste falha às vezes, com três hipóteses diferentes que devem ser confrontadas entre si", "equipe", "Hipóteses concorrentes que precisam se contestar: é o caso clássico de equipe."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Cenário ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: subagente · sessoes · equipe</span>' : (pts >= 2 ? '<span class="t-ok">Fim! ' + pts + " de 3. Você sabe escolher o nível.</span>" : '<span class="t-warn">Fim! ' + pts + " de 3. Releia o bloco 2 e tente de novo.</span>") + " Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["subagente", "sessoes", "equipe"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  cmds["sessões"] = cmds["sessoes"];
+  Curso.terminal("term", { titulo: "Qual nível de orquestração? (simulação)", prompt: ">", intro: '<span class="t-dim">subagente · sessoes (paralelas, em worktrees) · equipe (agent teams)</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: subagente, sessoes ou equipe.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual nível tem o menor custo?", op: ["Subagentes", "Sessões paralelas", "Equipe de agentes"], c: 0, ex: "Subagentes devolvem só o resumo à sessão; equipes são várias sessões inteiras." },
+  { p: "Como ligar as equipes de agentes?", op: ["<code>/agents</code>", "Variável <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>", "Já vêm ligadas"], c: 1, ex: "No ambiente ou no bloco <code>env</code> do <code>settings.json</code>. É experimental." },
+  { p: "No Windows, sem tmux, como você vê a equipe?", op: ["Não dá para usar", "No modo in-process, pelo painel abaixo do campo de texto", "Só pelo navegador"], c: 1, ex: "Split panes exige tmux ou iTerm2; o in-process funciona em qualquer terminal." },
+  { p: "Os colegas da equipe recebem o histórico da conversa da líder?", op: ["Sim, completo", "Não: carregam o CLAUDE.md e o pedido de criação", "Só as últimas 10 mensagens"], c: 1, ex: "Por isso o pedido deve dizer o que cada colega precisa saber." },
+  { p: "Qual a boa prática de tamanho de equipe para começar?", op: ["1 colega", "3 a 5 colegas", "Quanto mais, melhor"], c: 1, ex: "Custo cresce com cada colega; três focados costumam render mais que cinco dispersos." }
+]);
+Curso.checklist("check", [
+  "Comparo subagentes, sessões paralelas e equipes de agentes",
+  "Sei ligar e desligar as equipes de agentes (experimental)",
+  "Navego pelo painel da equipe no modo in-process",
+  "Conheço <code>/list-agents</code> para mensagens entre sessões",
+  "Controlo o custo: equipes pequenas, modelos mais baratos, <code>/usage</code>"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Primeira sessão com o TaskFlow</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m1a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 1 · Aula 2</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~25 min</span>
+    <h1>Primeira sessão com o TaskFlow</h1>
+    <p class="objetivo">Objetivo: abrir o Claude Code num projeto real, explorar o código com perguntas, fazer a primeira mudança aprovando permissões e salvar com Git.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Este é o fluxo que você vai repetir milhares de vezes: <strong>abrir → entender → pedir → aprovar → verificar → salvar</strong>. Fazer certo desde a primeira vez cria bons hábitos.</p>
+    <p>Durante o curso usaremos o <strong>TaskFlow</strong>, uma pequena lista de tarefas de linha de comando em Python, com dados fictícios. Ele cresce a cada módulo.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: anatomia de uma sessão</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Preparando o projeto</h2>
+    <p>O código inicial está na pasta do curso, em <code>projeto-taskflow\etapa-01</code>. Copie para a sua pasta de estudos e transforme em repositório Git (troque o caminho de origem pelo local onde está o curso):</p>
+    <div class="cod"><code>Copy-Item -Recurse "C:\caminho\do\curso-claude-code\projeto-taskflow\etapa-01" ~\estudos-claude\taskflow
+cd ~\estudos-claude\taskflow
+git init
+git add .
+git commit -m "TaskFlow: versão inicial"</code></div>
+    <p>Você precisa do <strong>Python 3.10+</strong>. Teste com <code>python --version</code>. Se não tiver, <code>winget install Python.Python.3.12</code> (confirme com a TI se necessário). Teste o app:</p>
+    <div class="cod"><code>python tarefas.py adicionar "Estudar o Módulo 1"
+python tarefas.py listar</code></div>
+
+    <h3>Como responder a um pedido de permissão</h3>
+    <p>Quando o Claude quer editar um arquivo ou rodar um comando, aparece um quadro perguntando. As opções típicas:</p>
+    <table class="tab">
+      <tbody>
+        <tr><td><strong>Yes</strong></td><td>Permite só esta ação.</td></tr>
+        <tr><td><strong>Yes, and don't ask again…</strong></td><td>Permite esta e as próximas parecidas, nesta sessão ou no projeto (o texto diz qual).</td></tr>
+        <tr><td><strong>No</strong> (e diga o que fazer)</td><td>Recusa. Você pode explicar o que prefere, e o Claude ajusta.</td></tr>
+      </tbody>
+    </table>
+    <p><kbd>Shift</kbd>+<kbd>Tab</kbd> alterna o <strong>modo de permissão</strong> da sessão (Manual, aceitar edições, plan…). O indicador de modo aparece perto do campo de digitação.</p>
+    <div class="caixa alerta"><strong>Sua sessão pode começar em auto mode</strong>Em vários planos, novas sessões começam no <em>auto mode</em>: um classificador aprova sozinho as ações consideradas seguras e você vê menos pedidos de permissão. Para esta aula, aperte <kbd>Shift</kbd>+<kbd>Tab</kbd> até o modo <strong>Manual</strong> (default), em que o Claude pede aprovação para editar e rodar comandos. Aprovar cada ação é a melhor forma de aprender o que o Claude faz. O Módulo 4 explica todos os modos.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: uma sessão completa</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Responda aos pedidos do Claude simulado. Digite <code>1</code> (Yes), <code>2</code> (Yes, don't ask again) ou <code>3</code> (No). Comece com o pedido sugerido.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Na pasta <code>taskflow</code>, rode <code>claude</code> e faça, em ordem:</p>
+    <ol>
+      <li>Pergunte: <code>o que este projeto faz e como os dados são salvos?</code></li>
+      <li>Pergunte: <code>quais comandos o tarefas.py aceita hoje?</code></li>
+      <li>Peça: <code>adicione o comando "concluir &lt;numero&gt;" que marca a tarefa como feita e mostra [x] no listar</code></li>
+      <li>Aprove as edições lendo o que muda. Teste você mesmo: <code>! python tarefas.py concluir 1</code> e <code>! python tarefas.py listar</code></li>
+      <li>Peça: <code>faça commit das mudanças com uma mensagem descritiva</code></li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito (uma solução possível)</summary>
+      <p>O Claude deve criar algo equivalente a isto em <code>tarefas.py</code> (os detalhes podem variar):</p>
+      <div class="cod"><code>def concluir(numero):
+    tarefas = carregar()
+    if numero &lt; 1 or numero &gt; len(tarefas):
+        print(f"Tarefa {numero} não existe.")
+        return
+    tarefas[numero - 1]["feita"] = True
+    salvar(tarefas)
+    print(f"Tarefa {numero} concluída.")</code></div>
+      <p>…mais o registro do subcomando <code>concluir</code> no <code>argparse</code> e a marca <code>[x]</code>/<code>[ ]</code> no <code>listar</code>. Confira com <code>git log --oneline</code>: deve haver um commit novo, criado pelo Claude.</p>
+      <p><strong>Ponto de atenção:</strong> o Claude tratou número inválido (0, negativo, maior que a lista)? Se não, peça. Esse é o hábito de revisar.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Abrir na pasta errada</h4><p>O Claude só enxerga a pasta onde foi aberto. <code>cd</code> primeiro, <code>claude</code> depois.</p></div>
+      <div class="mini"><h4>Aprovar sem ler</h4><p>Leia o diff de cada edição. É sua chance de pegar erro cedo.</p></div>
+      <div class="mini"><h4>Pedir tudo de uma vez</h4><p>"Faça um sistema completo" gera bagunça. Peça em passos pequenos e verificáveis.</p></div>
+      <div class="mini"><h4>Não testar</h4><p>Rode o programa você mesmo, ou peça ao Claude para rodar e mostrar a saída.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/quickstart">Quickstart oficial</a>, passos 3 a 7</li>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">Modos de permissão</a></li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Primeira sessão em 1 minuto", cenas: [
+  { fala: "Hora da primeira sessão de verdade, com o TaskFlow: uma lista de tarefas em Python, com dados fictícios.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 1 · AULA 2</span><p class=\"v-titulo\" data-t=\"0.3\">Primeira sessão com o TaskFlow</p><p class=\"v-sub\" data-t=\"0.9\">Abrir, explorar, pedir, aprovar e salvar</p>" },
+  { fala: "O fluxo que você vai repetir sempre: abrir na pasta certa, explorar, pedir algo específico, aprovar com consciência e salvar com commit.",
+    html: "<div class=\"v-grade\" style=\"--cols:5\"><div class=\"v-caixa\" data-t=\"0.6\"><span class=\"v-ic\">📂</span><b>Abrir</b>cd + claude</div><div class=\"v-caixa\" data-t=\"2\"><span class=\"v-ic\">❓</span><b>Explorar</b></div><div class=\"v-caixa\" data-t=\"2.8\"><span class=\"v-ic\">✍</span><b>Pedir</b></div><div class=\"v-caixa\" data-t=\"4\"><span class=\"v-ic\">🔐</span><b>Aprovar</b></div><div class=\"v-caixa acc\" data-t=\"5.2\"><span class=\"v-ic\">💾</span><b>Commit</b></div></div>" },
+  { fala: "Comece perguntando. O Claude lê os arquivos que precisar; você não precisa colar código.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:23\">o que este projeto faz?</span></div><div data-t=\"2.6\"><span class=\"o\">●</span> Read(tarefas.py)</div><div data-t=\"3.6\"><span class=\"a\">●</span> É uma CLI de tarefas em Python que salva em tarefas.json.</div></div>" },
+  { fala: "Depois, peça algo específico. Em vez de melhore o código, diga exatamente o que quer: adicione o comando concluir, que marca a tarefa como feita.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa err\" data-t=\"0.4\"><span class=\"v-ic\">✗</span><b>Vago</b>\"melhore o código\"</div><div class=\"v-caixa ok\" data-t=\"3.4\"><span class=\"v-ic\">✓</span><b>Específico</b>\"adicione o comando concluir &lt;numero&gt; que marca a tarefa como feita\"</div></div>" },
+  { fala: "Para editar ou rodar comandos, o Claude pede permissão e mostra o que vai mudar. Leia o diff e aprove, ou recuse explicando o que prefere.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"w\">Edit file</span> tarefas.py</div><div data-t=\"1\"><span class=\"o\">+ def concluir(numero):</span></div><div data-t=\"2\"><span class=\"u\">❯ 1. Yes</span></div><div data-t=\"2.6\">  2. Yes, allow all edits during this session</div><div data-t=\"3.2\">  3. No, and tell Claude what to do differently</div></div>" },
+  { fala: "Em vários planos, a sessão começa em auto mode, que aprova sozinho o que é seguro. Para aprender, aperte Shift Tab até o modo Manual.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">🧠</span><b>Pode começar em auto mode</b>aprova sozinho o que é seguro</div><span class=\"v-seta\" data-t=\"3.4\">→</span><div class=\"v-caixa acc\" data-t=\"4\"><span class=\"v-ic\">⇧</span><b>Shift+Tab até Manual</b>para ver cada ação</div></div>" },
+  { fala: "No fim, teste o resultado e faça o commit. Ciclo completo e reversível.",
+    html: "<p class=\"v-sub\" data-t=\"0\">Fechando o ciclo</p><p class=\"v-titulo\" data-t=\"0.4\">Teste. Depois, commit.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📂", rt: "cd + claude" }, { ic: "❓", rt: "Explorar" }, { ic: "✍", rt: "Pedir" }, { ic: "🔐", rt: "Aprovar" }, { ic: "💾", rt: "Commit" }],
+  passos: [
+    { ativos: [0], titulo: "Abrir no lugar certo", texto: "<code>cd</code> para a pasta do projeto e <code>claude</code>. Acima do campo de digitação aparecem versão, modelo e pasta: confira!" },
+    { ativos: [1], setas: [0], titulo: "Explorar antes de mudar", texto: "Faça perguntas: <em>o que este projeto faz? onde fica X?</em> O Claude lê os arquivos que precisar. Você não precisa colar código." },
+    { ativos: [2], setas: [1], titulo: "Pedir algo específico", texto: "Ruim: <em>melhore o código</em>. Bom: <em>adicione o comando concluir &lt;numero&gt; que marca a tarefa como feita e mostra [x] no listar</em>." },
+    { ativos: [3], setas: [2], titulo: "Aprovar com consciência", texto: "Cada edição ou comando aparece num quadro de permissão com o diff ou o comando. Leia e aprove (<strong>Yes</strong>), ou recuse explicando (<strong>No</strong>)." },
+    { ativos: [4], setas: [3], titulo: "Verificar e salvar", texto: "Teste o resultado e faça commit (você mesmo, ou pedindo ao Claude). Pronto: ciclo completo e reversível." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: taskflow (demonstração)", altura: 340,
+  inicio: '<span class="t-dim">╭─────────────────────────────────────╮\n│ ✻ Claude Code                       │\n│   C:\\Users\\ana\\estudos-claude\\taskflow │\n╰─────────────────────────────────────╯</span>',
+  passos: [
+    { t: "user", x: "o que este projeto faz?", leg: "Explorar primeiro" },
+    { t: "tool", x: "Read(tarefas.py)" },
+    { t: "out", x: "Read 52 lines" },
+    { t: "claude", x: "É uma CLI de tarefas em Python. Salva em tarefas.json e tem os comandos adicionar e listar.", ms: 1500 },
+    { t: "user", x: "adicione o comando concluir <numero> que marca a tarefa como feita", leg: "Pedido específico" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "perm", x: '<span class="t-b">Edit file</span> tarefas.py\n<span class="t-ok">+ def concluir(numero):\n+     tarefas = carregar()\n+     ...</span>\nDo you want to make this edit to tarefas.py?\n<span class="t-user">❯ 1. Yes</span>\n  2. Yes, allow all edits during this session\n  3. No, and tell Claude what to do differently', leg: "Pedido de permissão: leia o diff!", ms: 2200 },
+    { t: "html", x: '<span class="t-user">  › 1. Yes</span>' },
+    { t: "out", x: "Updated tarefas.py with 14 additions" },
+    { t: "tool", x: "Bash(python tarefas.py concluir 1)", leg: "Ele verifica sozinho" },
+    { t: "perm", x: '<span class="t-b">Bash command</span>  python tarefas.py concluir 1\n<span class="t-user">❯ 1. Yes</span>\n  2. Yes, and don\'t ask again for python commands in this project\n  3. No', ms: 1800 },
+    { t: "out", x: "Tarefa 1 concluída." },
+    { t: "claude", x: "Comando concluir adicionado e testado. Quer que eu faça o commit?" },
+    { t: "user", x: "sim, faça o commit", leg: "Salvar a versão" },
+    { t: "tool", x: 'Bash(git commit -am "Adiciona comando concluir")' },
+    { t: "out", x: "[main 7c1d2e0] Adiciona comando concluir\n 1 file changed, 14 insertions(+)" }
+  ]
+});
+(function () {
+  var etapa = 0;
+  var pedidos = [
+    { txt: '<span class="t-tool t-ok">●</span> <span class="t-b">Read(tarefas.py)</span>\n<span class="t-perm">Ler arquivo do projeto. Responder: 1 Yes · 2 Yes, don\'t ask again · 3 No</span>', bom: [1, 2], fb: { 1: "Ler arquivos do projeto é seguro. Na prática, leitura dentro da pasta do projeto costuma nem pedir permissão.", 2: "Ok: leitura dentro do projeto é de baixo risco.", 3: "Recusar leitura impede o Claude de entender o código. Ele não conseguirá ajudar." } },
+    { txt: '<span class="t-ok">●</span> <span class="t-b">Update(tarefas.py)</span>  <span class="t-ok">+14 linhas: def concluir(numero)…</span>\n<span class="t-perm">Editar arquivo. 1 Yes · 2 Yes, allow all edits this session · 3 No</span>', bom: [1], fb: { 1: "Boa: enquanto aprende, aprove edição por edição lendo o diff.", 2: "Funciona, mas no começo é melhor ver cada edição para entender o que o Claude faz.", 3: "Recusou. Se fizer sentido, diga o que prefere ('use outro nome de função')." } },
+    { txt: '<span class="t-ok">●</span> <span class="t-b">Bash(python tarefas.py concluir 1)</span>\n<span class="t-perm">Rodar comando. 1 Yes · 2 Yes, don\'t ask again for python · 3 No</span>', bom: [1, 2], fb: { 1: "Correto: é o Claude verificando o próprio trabalho, um comando seguro e esperado.", 2: "Razoável para um projeto de estudo: rodar o próprio script é de baixo risco.", 3: "Recusar a verificação deixa você sem evidência de que funciona." } },
+    { txt: '<span class="t-ok">●</span> <span class="t-b">Bash(Remove-Item -Recurse C:\\Users\\voce\\Documents)</span>\n<span class="t-perm">Rodar comando. 1 Yes · 2 Yes, don\'t ask again · 3 No</span>', bom: [3], fb: { 1: "PERIGO! Isso apagaria sua pasta Documentos inteira, fora do projeto. Sempre leia o comando.", 2: "PERIGO DUPLO: apagaria Documentos e liberaria comandos parecidos no futuro.", 3: "Exato! Comando destrutivo e fora do projeto. Recuse e pergunte por que ele quis isso." } }
+  ];
+  function mostra() { if (etapa >= pedidos.length) return '<span class="t-ok">Treino concluído.</span> Você viu leitura, edição, verificação e um comando perigoso.\n<span class="t-dim">Digite reiniciar para repetir.</span>'; return pedidos[etapa].txt; }
+  function resp(n) {
+    if (etapa === 0 && !window._iniciou) return '<span class="t-dim">Primeiro envie o pedido sugerido no desafio.</span>';
+    if (etapa >= pedidos.length) return mostra();
+    var p = pedidos[etapa], ok = p.bom.indexOf(n) >= 0;
+    var r = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ ') + p.fb[n] + "</span>\n\n";
+    etapa++; return r + mostra();
+  }
+  Curso.terminal("term", {
+    titulo: "Claude Code: permissões (simulação)", prompt: ">",
+    intro: '<span class="t-dim">✻ Claude Code (simulação) · taskflow</span>',
+    metas: ["adicione o comando concluir"],
+    comandos: {
+      "adicione o comando concluir": function () { window._iniciou = true; etapa = 0; return '<span class="t-acc">●</span> Vou ler o código e implementar o comando.\n\n' + mostra(); },
+      "reiniciar": function () { window._iniciou = false; etapa = 0; return '<span class="t-dim">Reiniciado. Envie o pedido de novo.</span>'; },
+      "1": function () { return resp(1); }, "2": function () { return resp(2); }, "3": function () { return resp(3); }
+    },
+    desconhecido: '<span class="t-dim">Nesta simulação, envie: adicione o comando concluir · depois responda 1, 2 ou 3.</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual é a melhor primeira mensagem num projeto que você não conhece?", op: ["\"Refatore tudo\"", "\"O que este projeto faz e como está organizado?\"", "\"Escreva 50 testes\""], c: 1, ex: "Explorar primeiro dá contexto para você e para o Claude. Mudanças vêm depois." },
+  { p: "O Claude pede para editar um arquivo. O que você deve fazer antes de aprovar?", op: ["Aprovar rápido para não atrasar", "Ler o diff mostrado no pedido de permissão", "Fechar o terminal"], c: 1, ex: "O pedido mostra exatamente o que vai mudar. Ler o diff é sua revisão em tempo real." },
+  { p: "O que a tecla <kbd>Shift</kbd>+<kbd>Tab</kbd> faz no Claude Code?", op: ["Volta para a mensagem anterior", "Alterna o modo de permissão da sessão", "Sai do Claude Code"], c: 1, ex: "Ela alterna entre modos como Manual, aceitar edições e plan. Veremos todos no Módulo 4." },
+  { p: "Você não gostou da edição proposta. Qual a melhor resposta?", op: ["Aceitar e corrigir depois na mão", "Escolher \"No\" e dizer o que prefere", "Fechar e abrir de novo"], c: 1, ex: "Recusar com instrução (\"No, use um dicionário em vez de lista\") ensina o Claude o que você quer na hora." }
+]);
+Curso.checklist("check", [
+  "Copiei o TaskFlow, inicializei o Git e fiz o commit inicial",
+  "Fiz perguntas de exploração antes de pedir mudanças",
+  "Adicionei o comando <code>concluir</code> aprovando as edições conscientemente",
+  "Testei o resultado e o commit foi feito"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ferramentas próprias</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m10a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 10 · Aula 2</span><span class="selo cinza">Expert</span><span class="selo cinza">~30 min</span>
+    <h1>Ferramentas próprias</h1>
+    <p class="objetivo">Objetivo: transformar funções Python do TaskFlow em ferramentas que o agente chama sozinho, com <code>@tool</code> e <code>create_sdk_mcp_server</code>, e controlar quais delas ele enxerga e usa sem perguntar.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>As ferramentas embutidas (<code>Read</code>, <code>Edit</code>, <code>Bash</code>…) servem para qualquer projeto. Mas o seu sistema tem operações próprias: <em>adicionar uma tarefa</em>, <em>consultar um cadastro</em>, <em>abrir um chamado</em>. Dar uma <strong>ferramenta própria</strong> para cada operação deixa o agente mais seguro e previsível: ele chama a sua função, com os parâmetros certos, em vez de editar o <code>tarefas.json</code> na mão ou montar comandos no Bash.</p>
+    <div class="grade">
+      <div class="mini"><h4>🎯 Precisão</h4><p>A descrição e os parâmetros dizem ao Claude exatamente o que a ferramenta faz e o que ela espera.</p></div>
+      <div class="mini"><h4>🔒 Controle</h4><p>Você valida a entrada na função e decide o que fica disponível. Sem Bash, sem edição livre.</p></div>
+    </div>
+    <div class="caixa"><strong>Lembra do Módulo 6?</strong>Lá, o <code>servidor_mcp.py</code> rodava como um <strong>processo separado</strong>, ligado ao Claude Code por <code>claude mcp add</code>. No SDK, o servidor MCP roda <strong>dentro do seu programa</strong>: nada de outro processo, nada de registrar com comando.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o caminho de uma chamada</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Anatomia de uma ferramenta</h2>
+    <p>Uma ferramenta tem <strong>quatro partes</strong>: nome, descrição, esquema de entrada e a função (o <em>handler</em>). No Python, as três primeiras vão no decorador <code>@tool</code>:</p>
+    <div class="cod"><span class="rot">agente_ferramentas.py (trecho)</span><code>from typing import Any
+from claude_agent_sdk import tool, create_sdk_mcp_server
+from tarefas import carregar, salvar
+
+
+@tool("adicionar_tarefa", "Adiciona uma tarefa pendente. Use títulos curtos e fictícios.", {"titulo": str})
+async def adicionar_tarefa(args: dict[str, Any]) -&gt; dict[str, Any]:
+    titulo = str(args.get("titulo", "")).strip()
+    if not titulo:
+        return {"content": [{"type": "text", "text": "Erro: título vazio."}], "is_error": True}
+    tarefas = carregar()
+    tarefas.append({"titulo": titulo, "feita": False})
+    salvar(tarefas)
+    return {"content": [{"type": "text", "text": f"Tarefa {len(tarefas)} adicionada: {titulo}"}]}
+
+
+SERVIDOR = create_sdk_mcp_server(name="taskflow", version="1.0.0", tools=[adicionar_tarefa])</code></div>
+    <table class="tab">
+      <thead><tr><th>Parte</th><th>O que é</th></tr></thead>
+      <tbody>
+        <tr><td>Nome</td><td>Identificador único que o Claude usa na chamada (<code>"adicionar_tarefa"</code>).</td></tr>
+        <tr><td>Descrição</td><td><strong>Quando e para que usar.</strong> É o que o Claude lê para decidir se chama. Escreva com cuidado.</td></tr>
+        <tr><td>Esquema de entrada</td><td>Um dicionário nome → tipo (<code>{"titulo": str}</code>), que o SDK converte em JSON Schema. Para descrever um campo: <code>Annotated[str, "texto"]</code>. Para campo opcional, lista fechada (<code>enum</code>) ou faixa de valores, passe um <strong>JSON Schema completo</strong>.</td></tr>
+        <tr><td>Handler</td><td>Função <code>async</code> que recebe <code>args</code> (já validados) e devolve um dicionário com <code>content</code>: uma lista de blocos, como <code>{"type": "text", "text": "..."}</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Ligar o servidor ao agente</h3>
+    <div class="cod"><span class="rot">agente_ferramentas.py (opções)</span><code>OPCOES = ClaudeAgentOptions(
+    mcp_servers={"taskflow": SERVIDOR},     # a chave "taskflow" vira parte do nome
+    tools=[],                               # tira as embutidas: só as do TaskFlow
+    allowed_tools=["mcp__taskflow__*"],     # pré-aprova todas deste servidor
+)</code></div>
+    <ul>
+      <li><strong>Nome completo:</strong> <code>mcp__{servidor}__{ferramenta}</code>, em que <code>{servidor}</code> é a <strong>chave</strong> que você deu em <code>mcp_servers</code>. Ex.: <code>mcp__taskflow__adicionar_tarefa</code>.</li>
+      <li><strong>Curinga:</strong> <code>mcp__taskflow__*</code> pré-aprova todas as ferramentas desse servidor. Curinga só vale depois do prefixo literal: <code>"*"</code> ou <code>"mcp__*"</code> em <code>allowed_tools</code> são ignorados.</li>
+      <li><strong>Disponível × aprovado:</strong> <code>tools</code> controla quais embutidas o Claude <em>enxerga</em> (<code>tools=[]</code> tira todas; as ferramentas MCP continuam). <code>allowed_tools</code> controla o que roda <em>sem pedir permissão</em>.</li>
+    </ul>
+
+    <h3>Anotações: só leitura roda em paralelo</h3>
+    <div class="cod"><span class="rot">agente_ferramentas.py (trecho)</span><code>from claude_agent_sdk import ToolAnnotations
+
+
+@tool(
+    "listar_tarefas",
+    "Lista as tarefas do TaskFlow com número e status.",
+    {"type": "object", "properties": {}},          # sem parâmetros: JSON Schema completo
+    annotations=ToolAnnotations(readOnlyHint=True),  # não altera nada
+)
+async def listar_tarefas(args):
+    ...</code></div>
+    <p><code>readOnlyHint=True</code> permite ao SDK rodar a ferramenta em paralelo com outras de leitura (ferramentas próprias rodam uma de cada vez por padrão). É uma <strong>informação</strong>, não uma trava: se a função gravar no disco, ela grava. Mantenha a anotação honesta.</p>
+
+    <h3>Erros: devolva, não derrube</h3>
+    <table class="tab">
+      <thead><tr><th>O que acontece</th><th>O que o Claude vê</th></tr></thead>
+      <tbody>
+        <tr><td>A função levanta uma exceção não tratada</td><td>A mensagem crua da exceção, como resultado de erro. O loop continua.</td></tr>
+        <tr><td>A função devolve <code>"is_error": True</code> com um texto</td><td>A <strong>sua</strong> mensagem, com contexto ("a tarefa 9 não existe; liste primeiro"). O loop continua.</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Busca de ferramentas</strong>Por padrão, o SDK adia o carregamento dos esquemas de ferramentas MCP e o Claude os busca quando precisa. Por isso, a saída pode mostrar uma chamada <code>ToolSearch</code> antes da sua ferramenta. É normal.</div>
+    <div class="caixa alerta"><strong>Só no TypeScript</strong>A doc lista recursos de ferramentas próprias que existem só no SDK de TypeScript (por exemplo, a política <code>permission_policy</code>). No Python, o <code>@tool</code> repassa apenas <code>content</code> e <code>is_error</code>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o agente usando o TaskFlow</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: certo ou errado?</h2>
+    <p>Julgue cada afirmação sobre ferramentas próprias: responda <code>certo</code> ou <code>errado</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: ferramentas do TaskFlow</h2>
+    <p>Use a pasta de treino da aula 1 (ambiente virtual e chave no terminal). <strong>Este exercício gasta</strong>: rode poucas vezes e confira o custo estimado.</p>
+    <ol>
+      <li>Na raiz da pasta de treino (ao lado de <code>tarefas.py</code>), crie <code>agente_ferramentas.py</code>.</li>
+      <li>Escreva três ferramentas com <code>@tool</code>: <code>listar_tarefas</code> (sem parâmetros, <code>readOnlyHint=True</code>), <code>adicionar_tarefa</code> (<code>titulo: str</code>) e <code>concluir_tarefa</code> (<code>numero: int</code>). Reaproveite <code>carregar()</code> e <code>salvar()</code> do <code>tarefas.py</code>.</li>
+      <li>Em <code>concluir_tarefa</code>, devolva <code>is_error</code> se o número não existir.</li>
+      <li>Junte tudo com <code>create_sdk_mcp_server(name="taskflow", ...)</code>, registre em <code>mcp_servers</code>, use <code>tools=[]</code>, <code>allowed_tools=["mcp__taskflow__*"]</code> e as travas da aula 1.</li>
+      <li>Peça: <em>"Adicione as tarefas fictícias 'Revisar relatório de teste' e 'Organizar a mesa', conclua a primeira e me mostre a lista final."</em> Imprima cada <code>ToolUseBlock</code> (nome e entrada).</li>
+      <li>Confira com <code>python tarefas.py listar</code> que as tarefas foram gravadas de verdade.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>Arquivo completo em <code>projeto-taskflow/etapa-10/gabarito/agente_ferramentas.py</code>.</p>
+      <div class="cod"><span class="rot">agente_ferramentas.py</span><code>import asyncio
+from typing import Any
+
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    ToolAnnotations,
+    ToolUseBlock,
+    create_sdk_mcp_server,
+    query,
+    tool,
+)
+
+from tarefas import carregar, salvar
+
+
+def _texto(msg: str, erro: bool = False) -&gt; dict[str, Any]:
+    """Monta o resultado no formato que o SDK espera (lista content)."""
+    resultado: dict[str, Any] = {"content": [{"type": "text", "text": msg}]}
+    if erro:
+        resultado["is_error"] = True
+    return resultado
+
+
+@tool(
+    "listar_tarefas",
+    "Lista as tarefas do TaskFlow com número e status ([x] feita, [ ] pendente).",
+    {"type": "object", "properties": {}},  # sem parâmetros: JSON Schema completo
+    annotations=ToolAnnotations(readOnlyHint=True),  # só lê: pode rodar em paralelo
+)
+async def listar_tarefas(args: dict[str, Any]) -&gt; dict[str, Any]:
+    tarefas = carregar()
+    if not tarefas:
+        return _texto("Nenhuma tarefa cadastrada.")
+    linhas = []
+    for i, t in enumerate(tarefas, start=1):
+        marca = "x" if t.get("feita") else " "
+        linhas.append(f"{i}. [{marca}] {t['titulo']}")
+    return _texto("\n".join(linhas))
+
+
+@tool("adicionar_tarefa", "Adiciona uma tarefa pendente. Use títulos curtos e fictícios.", {"titulo": str})
+async def adicionar_tarefa(args: dict[str, Any]) -&gt; dict[str, Any]:
+    titulo = str(args.get("titulo", "")).strip()
+    if not titulo:
+        return _texto("Erro: o título não pode ser vazio.", erro=True)
+    tarefas = carregar()
+    tarefas.append({"titulo": titulo, "feita": False})
+    salvar(tarefas)
+    return _texto(f"Tarefa {len(tarefas)} adicionada: {titulo}")
+
+
+@tool("concluir_tarefa", "Marca como feita a tarefa de número informado (começa em 1).", {"numero": int})
+async def concluir_tarefa(args: dict[str, Any]) -&gt; dict[str, Any]:
+    tarefas = carregar()
+    numero = int(args.get("numero", 0))
+    if numero &lt; 1 or numero &gt; len(tarefas):
+        return _texto(f"Erro: a tarefa {numero} não existe. Liste as tarefas primeiro.", erro=True)
+    tarefas[numero - 1]["feita"] = True
+    salvar(tarefas)
+    return _texto(f"Tarefa {numero} concluída.")
+
+
+SERVIDOR = create_sdk_mcp_server(
+    name="taskflow",
+    version="1.0.0",
+    tools=[listar_tarefas, adicionar_tarefa, concluir_tarefa],
+)
+
+OPCOES = ClaudeAgentOptions(
+    system_prompt="Você gerencia a lista do TaskFlow. Responda em português do Brasil, em poucas linhas.",
+    mcp_servers={"taskflow": SERVIDOR},
+    tools=[],
+    allowed_tools=["mcp__taskflow__*"],
+    max_turns=10,
+    max_budget_usd=0.50,
+)
+
+
+async def main():
+    pedido = (
+        "Adicione as tarefas fictícias 'Revisar relatório de teste' e "
+        "'Organizar a mesa', conclua a primeira e me mostre a lista final."
+    )
+    try:
+        async for mensagem in query(prompt=pedido, options=OPCOES):
+            if isinstance(mensagem, AssistantMessage):
+                for bloco in mensagem.content:
+                    if isinstance(bloco, ToolUseBlock):
+                        print(f"[ferramenta] {bloco.name}({bloco.input})")
+            elif isinstance(mensagem, ResultMessage):
+                if mensagem.subtype == "success":
+                    print(f"\n{mensagem.result}")
+                else:
+                    print(f"\nParou: {mensagem.subtype}")
+                if mensagem.total_cost_usd is not None:
+                    print(f"Custo estimado: US$ {mensagem.total_cost_usd:.4f}")
+    except Exception as erro:
+        print(f"A sessão terminou com erro: {erro}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></div>
+      <p><strong>Resultado esperado</strong> (ilustrativo): chamadas <code>mcp__taskflow__adicionar_tarefa</code> (duas), <code>mcp__taskflow__concluir_tarefa({'numero': 1})</code> e <code>mcp__taskflow__listar_tarefas({})</code>, e a lista final com a primeira marcada <code>[x]</code>. O número da tarefa depende do que já havia no seu <code>tarefas.json</code>.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Nome errado em <code>allowed_tools</code></h4><p>Escrever <code>adicionar_tarefa</code> em vez de <code>mcp__taskflow__adicionar_tarefa</code>: a regra não casa e a chamada cai no fluxo de permissão.</p></div>
+      <div class="mini"><h4>Esquecer o <code>async</code></h4><p>O handler precisa ser <code>async def</code> e devolver o dicionário com <code>content</code>.</p></div>
+      <div class="mini"><h4>Descrição vaga</h4><p>"Faz coisas com tarefas" não ajuda o Claude a escolher. Diga o que faz, o que espera e quando usar.</p></div>
+      <div class="mini"><h4>Deixar a exceção estourar</h4><p>Funciona, mas o Claude recebe uma mensagem crua. Prefira <code>is_error</code> com um texto útil.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/custom-tools">Give Claude custom tools</a> (em inglês): imagens, recursos e o exemplo do conversor de unidades.</li>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/mcp">Connect to external tools with MCP</a>: ligar servidores MCP externos (como o do Módulo 6) ao SDK.</li>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/tool-search">Tool search</a>: quando o agente tem dezenas de ferramentas.</li>
+      <li>Próxima aula: decidir o que roda sozinho, o que pergunta e o que é bloqueado.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Give Claude custom tools", "How the agent loop works" e "Agent SDK reference - Python").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Ferramentas próprias em 1 minuto", cenas: [
+  { fala: "Nesta aula, você dá ao seu agente ferramentas próprias, escritas em Python: listar, adicionar e concluir tarefas do TaskFlow.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 10 · AULA 2</span><p class="v-titulo" data-t="0.3">Ferramentas próprias</p><p class="v-sub" data-t="1.5">suas funções Python viram ferramentas</p>' },
+  { fala: "Uma ferramenta tem quatro partes: o nome, a descrição, os parâmetros de entrada e a função que roda quando o Claude a chama.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="0.8"><b>🏷 Nome</b>adicionar_tarefa</div><div class="v-caixa acc" data-t="2.2"><b>📝 Descrição</b>quando usar</div><div class="v-caixa" data-t="3.6"><b>🧩 Entrada</b>{"titulo": str}</div><div class="v-caixa ok" data-t="5.2"><b>⚙ Função</b>async def …</div></div>' },
+  { fala: "No Python, o decorador arroba tool define a ferramenta. A função é assíncrona e devolve um dicionário com a lista content.",
+    html: '<div class="v-code" data-t="0.2"><div data-t="0.5"><span class="a">@tool</span>(<span class="o">"adicionar_tarefa"</span>, <span class="o">"Adiciona…"</span>, {<span class="o">"titulo"</span>: str})</div><div data-t="3"><span class="a">async def</span> adicionar_tarefa(args):</div><div data-t="4.5">    ...</div><div data-t="5.5">    <span class="a">return</span> {<span class="o">"content"</span>: [{<span class="o">"type"</span>: <span class="o">"text"</span>, …}]}</div></div>' },
+  { fala: "Depois, create sublinhado sdk sublinhado mcp sublinhado server junta as ferramentas num servidor MCP que roda dentro do seu programa. Nada de processo separado, como no Módulo 6.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">🛠</span><b>3 ferramentas</b>@tool</div><span class="v-seta">→</span><div class="v-caixa acc"><span class="v-ic">📦</span><b>create_sdk_mcp_server</b>name="taskflow"</div></div><p class="v-sub" data-t="7.5">🐍 no mesmo processo · sem claude mcp add</p>' },
+  { fala: "O nome completo segue o padrão: mcp, dois sublinhados, o nome do servidor, dois sublinhados, o nome da ferramenta. É esse nome que vai na lista de ferramentas permitidas.",
+    html: '<p class="v-txt" data-t="0">nome completo</p><div class="v-code" data-t="0.4"><div><span class="d">mcp__</span><span class="a">taskflow</span><span class="d">__</span><span class="o">adicionar_tarefa</span></div></div><div class="v-code" data-t="7.5"><div>allowed_tools=[<span class="o">"mcp__taskflow__*"</span>]</div></div>' },
+  { fala: "Erro na ferramenta não derruba o agente. Devolva is sublinhado error verdadeiro com uma mensagem clara, e o Claude tenta outro caminho.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa err" data-t="0.3"><span class="v-ic">💥</span><b>Exceção solta</b>mensagem crua</div><div class="v-caixa ok" data-t="3"><span class="v-ic">🗒</span><b>is_error: True</b>sua mensagem clara</div></div><p class="v-txt" data-t="6.5">o loop continua ↺</p>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧠", rt: "Claude" }, { ic: "🔁", rt: "SDK" }, { ic: "📦", rt: "Servidor taskflow (no seu processo)" }, { ic: "📄", rt: "tarefas.json" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "O Claude escolhe a ferramenta", texto: "Pela descrição, ele decide chamar <code>mcp__taskflow__adicionar_tarefa</code> com <code>{\"titulo\": \"Organizar a mesa\"}</code>." },
+    { ativos: [1], setas: [], titulo: "O SDK confere a permissão", texto: "A chamada passa pelo fluxo de permissões. Com <code>allowed_tools=[\"mcp__taskflow__*\"]</code>, ela está pré-aprovada (a aula 3 mostra o resto do fluxo)." },
+    { ativos: [1, 2], setas: [1], titulo: "Sua função roda", texto: "O SDK chama o handler <code>adicionar_tarefa(args)</code> dentro do seu programa Python, com os argumentos já validados pelo esquema." },
+    { ativos: [2, 3], setas: [2], titulo: "A função faz o trabalho", texto: "Ela usa <code>carregar()</code> e <code>salvar()</code> do TaskFlow, que gravam o <code>tarefas.json</code>. Você controla tudo o que acontece aqui." },
+    { ativos: [0, 1, 2], setas: [0, 1], titulo: "O resultado volta ao Claude", texto: "O dicionário <code>{\"content\": [...]}</code> vira o resultado da ferramenta. O Claude lê e decide o próximo passo do loop." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Rodando agente_ferramentas.py (ilustrativo)", altura: 300, prompt: "PS C:\\treino-agente>",
+  passos: [
+    { t: "cmd", x: ".\\.venv\\Scripts\\python.exe agente_ferramentas.py", leg: "Chave já definida nesta janela; tarefas fictícias" },
+    { t: "out", x: "[ferramenta] mcp__taskflow__adicionar_tarefa({'titulo': 'Revisar relatório de teste'})", leg: "O nome completo: mcp__ + servidor + __ + ferramenta" },
+    { t: "out", x: "[ferramenta] mcp__taskflow__adicionar_tarefa({'titulo': 'Organizar a mesa'})" },
+    { t: "out", x: "[ferramenta] mcp__taskflow__concluir_tarefa({'numero': 1})", leg: "O Claude passa o número como inteiro, conforme o esquema" },
+    { t: "out", x: "[ferramenta] mcp__taskflow__listar_tarefas({})", leg: "Ferramenta de leitura, marcada com readOnlyHint" },
+    { t: "out", x: "Pronto! Lista atual:\n1. [x] Revisar relatório de teste\n2. [ ] Organizar a mesa\nCusto estimado: US$ 0.0150", ms: 1600, leg: "ResultMessage com o texto final e o custo estimado (valores ilustrativos)" },
+    { t: "cmd", x: "python tarefas.py listar", leg: "Conferindo pela CLI: as tarefas estão no tarefas.json de verdade" },
+    { t: "out", x: "1. [x] Revisar relatório de teste\n2. [ ] Organizar a mesa" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Um servidor criado com create_sdk_mcp_server roda num processo separado, como o do Módulo 6.", "errado", "Ele roda dentro do seu programa Python. O do Módulo 6 era um processo stdio separado."],
+    ["Com mcp_servers={\"taskflow\": servidor}, o nome completo de adicionar_tarefa é mcp__taskflow__adicionar_tarefa.", "certo", "Padrão mcp__{chave em mcp_servers}__{nome da ferramenta}."],
+    ["allowed_tools=[\"mcp__*\"] pré-aprova todas as ferramentas MCP.", "errado", "Curinga só vale depois do prefixo literal com o servidor, como mcp__taskflow__*. \"mcp__*\" em allowed_tools é ignorado."],
+    ["O handler pode devolver is_error: True para avisar o Claude de um problema.", "certo", "Assim o Claude recebe a sua mensagem e pode tentar outro caminho; o loop continua."],
+    ["readOnlyHint=True impede a função de gravar arquivos.", "errado", "É só uma informação (permite rodar em paralelo). Quem garante o comportamento é o código da função."],
+    ["tools=[] remove as ferramentas embutidas, mas as do servidor MCP continuam disponíveis.", "certo", "tools controla as embutidas; as ferramentas MCP não são afetadas."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Afirmação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: certo · errado</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ A resposta é: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "certo": function () { return resp("certo"); }, "errado": function () { return resp("errado"); } };
+  Curso.terminal("term", { titulo: "Certo ou errado? (simulação)", prompt: ">", intro: '<span class="t-dim">Julgue cada afirmação sobre ferramentas próprias no SDK.</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: certo ou errado.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual parte da ferramenta o Claude lê para decidir se a chama?", op: ["O nome da função Python", "A descrição", "O arquivo tarefas.json"], c: 1, ex: "A descrição diz o que a ferramenta faz e quando usar. Seja específico." },
+  { p: "O que o handler de uma ferramenta deve devolver?", op: ["Uma string simples", "Um dicionário com a lista <code>content</code> (e opcionalmente <code>is_error</code>)", "Nada; o SDK descobre sozinho"], c: 1, ex: "Ex.: <code>{\"content\": [{\"type\": \"text\", \"text\": \"...\"}]}</code>." },
+  { p: "Você registrou <code>mcp_servers={\"tf\": servidor}</code>. Qual o nome completo de <code>listar_tarefas</code>?", op: ["<code>mcp__taskflow__listar_tarefas</code>", "<code>mcp__tf__listar_tarefas</code>", "<code>tf.listar_tarefas</code>"], c: 1, ex: "O nome usa a <strong>chave</strong> de <code>mcp_servers</code>, não o <code>name</code> do servidor." },
+  { p: "Como fazer o Claude usar <em>só</em> as ferramentas do TaskFlow, sem Bash nem Edit?", op: ["<code>tools=[]</code>", "<code>allowed_tools=[\"mcp__taskflow__*\"]</code> sozinho", "<code>readOnlyHint=True</code>"], c: 0, ex: "<code>tools=[]</code> tira as embutidas do contexto; <code>allowed_tools</code> só pré-aprova." },
+  { p: "Um parâmetro precisa ser opcional ou ter uma lista fechada de valores. O que usar no esquema?", op: ["O dicionário simples nome → tipo", "Um JSON Schema completo", "Não é possível no Python"], c: 1, ex: "O dicionário simples exige todos os campos e não tem <code>enum</code>; o JSON Schema completo resolve." }
+]);
+Curso.checklist("check", [
+  "Escrevo uma ferramenta com <code>@tool</code>: nome, descrição, esquema e handler <code>async</code>",
+  "Devolvo <code>content</code> e uso <code>is_error</code> para erros previstos",
+  "Junto as ferramentas com <code>create_sdk_mcp_server</code> e registro em <code>mcp_servers</code>",
+  "Monto o nome completo <code>mcp__servidor__ferramenta</code> e uso o curinga certo",
+  "Diferencio <code>tools</code> (o que existe) de <code>allowed_tools</code> (o que roda sem perguntar)"
+]);
+</script>
+</body>
+</html>

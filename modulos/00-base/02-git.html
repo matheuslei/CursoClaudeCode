@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git essencial</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m0a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 0 · Aula 2</span><span class="selo cinza">Zero</span><span class="selo cinza">~25 min</span>
+    <h1>Git essencial: sua rede de segurança</h1>
+    <p class="objetivo">Objetivo: criar um repositório, salvar versões com commits e desfazer mudanças, para trabalhar com IA sem medo de estragar nada.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Um agente de IA edita vários arquivos em segundos. Às vezes ele acerta em cheio, às vezes não. O <strong>Git</strong> guarda o histórico de cada versão do seu projeto: se algo der errado, você volta ao último ponto bom.</p>
+    <div class="caixa dica"><strong>Regra de ouro do curso</strong>Antes de pedir uma mudança grande ao Claude, faça um commit. Depois, revise o que mudou com <code>git diff</code>.</div>
+    <p>O Claude Code também tem seus próprios <em>checkpoints</em> (<code>/rewind</code>, Módulo 2), mas eles cuidam só das edições feitas pelo Claude dentro da sessão. O Git é a rede de segurança completa e permanente.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: as três áreas do Git</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Instalação e comandos essenciais</h2>
+    <p>Instale o Git for Windows (recomendado também pelo Claude Code, que passa a ter acesso ao Bash). No PowerShell:</p>
+    <div class="cod"><code>winget install --id Git.Git -e</code></div>
+    <p>Feche e reabra o terminal, e configure seu nome e e-mail (aparecem no histórico):</p>
+    <div class="cod"><code>git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"</code></div>
+    <div class="caixa alerta"><strong>Máquina corporativa</strong>Se o <code>winget</code> estiver bloqueado ou pedir senha de administrador, confirme com a TI como instalar softwares. Não contorne políticas de segurança.</div>
+    <table class="tab">
+      <thead><tr><th>Comando</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td><code>git init</code></td><td>Transforma a pasta atual em repositório</td></tr>
+        <tr><td><code>git status</code></td><td>Mostra o que mudou e o que está preparado. <strong>Use o tempo todo.</strong></td></tr>
+        <tr><td><code>git add arquivo</code> / <code>git add .</code></td><td>Prepara mudanças para o próximo commit</td></tr>
+        <tr><td><code>git commit -m "mensagem"</code></td><td>Salva uma versão com descrição</td></tr>
+        <tr><td><code>git log --oneline</code></td><td>Lista o histórico de commits</td></tr>
+        <tr><td><code>git diff</code></td><td>Mostra exatamente o que mudou (linhas + e −)</td></tr>
+        <tr><td><code>git restore arquivo</code></td><td>Descarta mudanças não commitadas de um arquivo</td></tr>
+        <tr><td><code>git switch -c nome</code></td><td>Cria uma branch (linha paralela) e entra nela</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o ciclo de segurança com IA</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Desafio: inicialize um repositório, faça o primeiro commit, "estrague" o arquivo e recupere-o.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>Na pasta <code>estudos-claude</code> (da aula anterior), inicialize um repositório Git</li>
+      <li>Faça o primeiro commit com o arquivo <code>diario.md</code></li>
+      <li>Adicione uma linha "Dia 2: aprendi Git" ao diário e veja a mudança com <code>git diff</code></li>
+      <li>Faça o segundo commit e confira o histórico</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>cd ~\estudos-claude
+git init
+git add diario.md
+git commit -m "Primeiro registro do diário"
+Add-Content diario.md "Dia 2: aprendi Git"
+git diff
+git add diario.md
+git commit -m "Registro do dia 2"
+git log --oneline</code></div>
+      <p>No <code>git diff</code>, a linha nova aparece com <code>+</code> na frente. O <code>git log --oneline</code> deve mostrar 2 commits.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"not a git repository"</h4><p>Você não está na pasta do repositório ou esqueceu o <code>git init</code>.</p></div>
+      <div class="mini"><h4>"nothing to commit"</h4><p>Ou não houve mudança, ou faltou o <code>git add</code>. Veja com <code>git status</code>.</p></div>
+      <div class="mini"><h4>"Please tell me who you are"</h4><p>Falta configurar <code>user.name</code> e <code>user.email</code>.</p></div>
+      <div class="mini"><h4>Commits gigantes</h4><p>Commits pequenos e frequentes facilitam voltar atrás. Um commit por ideia.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://git-scm.com/book/pt-br/v2">Livro Pro Git (gratuito, em português)</a></li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">Fluxos comuns com Git no Claude Code</a> (em inglês)</li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Git em 1 minuto", cenas: [
+  { fala: "O Git é a sua rede de segurança para trabalhar com inteligência artificial sem medo.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 0 · AULA 2</span><p class=\"v-titulo\" data-t=\"0.3\">Git essencial</p><p class=\"v-sub\" data-t=\"0.9\">Sua rede de segurança para trabalhar com IA</p>" },
+  { fala: "Um agente edita vários arquivos em segundos. Às vezes acerta em cheio, às vezes não. O Git guarda cada versão do projeto, e você sempre pode voltar ao último ponto bom.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">⚡</span><b>O agente edita rápido</b>às vezes acerta, às vezes não</div><span class=\"v-seta\" data-t=\"4\">→</span><div class=\"v-caixa ok\" data-t=\"4.6\"><span class=\"v-ic\">🗄</span><b>O Git guarda versões</b>você volta ao último ponto bom</div></div>" },
+  { fala: "O Git tem três áreas. Você edita na pasta de trabalho, escolhe o que vai salvar com git add, e grava uma versão no histórico com git commit.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">📝</span><b>Pasta de trabalho</b>onde você edita</div><span class=\"v-seta\" data-t=\"2.4\">→</span><div class=\"v-caixa\" data-t=\"3\"><span class=\"v-ic\">📦</span><b>Área de preparo</b>git add</div><span class=\"v-seta\" data-t=\"4.6\">→</span><div class=\"v-caixa acc\" data-t=\"5.2\"><span class=\"v-ic\">🗄</span><b>Histórico</b>git commit</div></div>" },
+  { fala: "O ciclo do dia a dia: git status mostra o que mudou, git diff mostra as linhas, git add prepara e git commit salva a versão.",
+    html: "<div class=\"v-code\"><div data-t=\"0.8\"><span class=\"u\">git status</span>              <span class=\"d\"># o que mudou?</span></div><div data-t=\"2.2\"><span class=\"u\">git diff</span>                <span class=\"d\"># quais linhas?</span></div><div data-t=\"3.4\"><span class=\"u\">git add tarefas.py</span>      <span class=\"d\"># preparar</span></div><div data-t=\"4.4\"><span class=\"u\">git commit -m \"...\"</span>     <span class=\"d\"># salvar a versão</span></div></div>" },
+  { fala: "Não gostou de uma mudança que ainda não foi salva? git restore descarta a mudança, e o arquivo volta ao último commit.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:21\">git restore README.md</span></div><div class=\"v-caixa ok\" data-t=\"2.4\"><span class=\"v-ic\">↩</span><b>De volta ao último commit</b>a mudança não salva foi descartada</div>" },
+  { fala: "A regra de ouro do curso: faça commit antes de pedir uma mudança grande ao Claude, e revise com git diff depois.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A regra de ouro</p><p class=\"v-titulo\" data-t=\"0.4\">Commit antes. Diff depois.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📝", rt: "Pasta de trabalho" }, { ic: "📦", rt: "Área de preparo" }, { ic: "🗄", rt: "Histórico (commits)" }],
+  passos: [
+    { ativos: [0], titulo: "Você (ou o Claude) edita arquivos", texto: "Toda edição acontece na <strong>pasta de trabalho</strong>. O Git percebe a mudança, mas ainda não guardou nada. <code>git status</code> mostra os arquivos <em>modificados</em>." },
+    { ativos: [0, 1], setas: [0], titulo: "git add: escolher o que entra", texto: "<code>git add</code> coloca mudanças na <strong>área de preparo</strong> (staging). É como separar as fotos que vão para o álbum." },
+    { ativos: [1, 2], setas: [1], titulo: "git commit: salvar a versão", texto: "<code>git commit -m \"...\"</code> grava uma versão permanente no <strong>histórico</strong>, com data, autor e mensagem." },
+    { ativos: [2, 0], setas: [], titulo: "Voltar quando precisar", texto: "Se a próxima edição der errado, <code>git restore</code> descarta mudanças não salvas e <code>git diff</code> mostra o que mudou desde o último commit. Seu trabalho bom está protegido." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell + Git (demonstração)", prompt: "PS C:\\estudos\\taskflow>", altura: 280,
+  passos: [
+    { t: "cmd", x: "git status", leg: "Antes de pedir algo ao Claude: tudo limpo?" },
+    { t: "html", x: "On branch main\nnothing to commit, working tree clean" },
+    { t: "nota", x: "Você pede ao Claude: 'adicione validação de datas'. Ele edita 2 arquivos.", ms: 1400 },
+    { t: "cmd", x: "git status", leg: "Depois: o que o Claude mudou?" },
+    { t: "html", x: 'Changes not staged for commit:\n  <span class="t-warn">modified:   tarefas.py\n  modified:   README.md</span>' },
+    { t: "cmd", x: "git diff tarefas.py", leg: "Revise linha a linha" },
+    { t: "html", x: '<span class="t-dim">@@ -12,6 +12,9 @@</span>\n def adicionar(titulo, prazo):\n<span class="t-ok">+    if prazo and not validar_data(prazo):\n+        raise ValueError("Data inválida")</span>\n     tarefas.append(...)' },
+    { t: "nota", x: "Gostou da mudança em tarefas.py, mas não da no README.", ms: 1300 },
+    { t: "cmd", x: "git restore README.md", leg: "Descarta só o que não presta" },
+    { t: "cmd", x: "git add tarefas.py", leg: "Prepara o que presta" },
+    { t: "cmd", x: 'git commit -m "Valida datas ao adicionar tarefa"', leg: "Salva a versão boa" },
+    { t: "html", x: '<span class="t-ok">[main 3f2a1c9] Valida datas ao adicionar tarefa\n 1 file changed, 3 insertions(+)</span>' }
+  ]
+});
+(function () {
+  var repo = false, commits = [], mod = false, staged = false, conteudo = "Dia 1";
+  Curso.terminal("term", {
+    titulo: "PowerShell + Git (simulação)", prompt: "PS C:\\estudos>",
+    intro: '<span class="t-dim">A pasta tem um arquivo: diario.md. Comandos: git init, git status, git add, git commit -m "...", git log --oneline, git diff, git restore, estragar</span>',
+    metas: ["git init", "git add diario.md", 'git commit -m "primeiro"', "estragar", "git diff", "git restore diario.md", "git log --oneline"],
+    comandos: {
+      "git init": function () { if (repo) return "Reinitialized existing Git repository"; repo = true; mod = true; return "Initialized empty Git repository in C:/estudos/.git/"; },
+      "git status": function () {
+        if (!repo) return '<span class="t-warn">fatal: not a git repository</span>\n<span class="t-dim">Dica: comece com git init</span>';
+        if (staged) return 'Changes to be committed:\n  <span class="t-ok">' + (commits.length ? "modified" : "new file") + ":   diario.md</span>";
+        if (mod) return (commits.length ? 'Changes not staged for commit:\n  <span class="t-warn">modified:   diario.md</span>' : 'Untracked files:\n  <span class="t-warn">diario.md</span>') + '\n<span class="t-dim">Dica: git add diario.md</span>';
+        return "nothing to commit, working tree clean";
+      },
+      "git log --oneline": function () { if (!commits.length) return '<span class="t-warn">fatal: your current branch \'main\' does not have any commits yet</span>'; return commits.slice().reverse().map(function (c, i) { return '<span class="t-warn">' + c.h + "</span> " + c.m; }).join("\n"); },
+      "git diff": function () { if (!repo) return '<span class="t-warn">fatal: not a git repository</span>'; if (!mod || !commits.length) return '<span class="t-dim">(sem diferenças em relação ao último commit)</span>'; return '<span class="t-dim">--- a/diario.md\n+++ b/diario.md</span>\n<span class="t-warn">-Dia 1</span>\n<span class="t-ok">+TEXTO ESTRAGADO PELO TESTE</span>'; },
+      "git restore diario.md": function () { if (!commits.length) return '<span class="t-warn">Faça um commit antes: sem commit não há versão para restaurar.</span>'; mod = false; conteudo = "Dia 1"; return '<span class="t-dim">(sem saída = sucesso)</span>  diario.md voltou ao último commit.'; },
+      "cat diario.md": function () { return conteudo; },
+      "estragar": function () { if (!commits.length) return '<span class="t-warn">Faça o primeiro commit antes de estragar o arquivo :)</span>'; mod = true; conteudo = "TEXTO ESTRAGADO PELO TESTE"; return '<span class="t-warn">[simulação] diario.md foi sobrescrito com texto errado. Veja com git diff e recupere com git restore diario.md</span>'; }
+    },
+    padroes: [
+      [/^git add (\.|diario\.md)$/i, function () { if (!repo) return '<span class="t-warn">fatal: not a git repository</span>'; if (!mod) return '<span class="t-dim">(nada para adicionar)</span>'; staged = true; return '<span class="t-dim">(sem saída = sucesso)</span>'; }],
+      [/^git commit -m ["'](.+)["']$/i, function (m) { if (!repo) return '<span class="t-warn">fatal: not a git repository</span>'; if (!staged) return 'nothing added to commit\n<span class="t-dim">Dica: faltou o git add</span>'; staged = false; mod = false; var h = Math.random().toString(16).slice(2, 9); commits.push({ h: h, m: m[1] }); return '<span class="t-ok">[main ' + (commits.length === 1 ? "(root-commit) " : "") + h + "] " + m[1] + "\n 1 file changed</span>"; }],
+      [/^git commit$/i, function () { return '<span class="t-dim">No terminal real, isso abriria um editor. Use git commit -m "mensagem"</span>'; }]
+    ]
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual a sequência certa para salvar uma versão?", op: ["<code>git commit</code> → <code>git add</code>", "<code>git add</code> → <code>git commit -m \"...\"</code>", "<code>git init</code> → <code>git log</code>"], c: 1, ex: "Primeiro você prepara (add), depois salva (commit)." },
+  { p: "O Claude editou 5 arquivos. Qual comando mostra exatamente quais linhas mudaram?", op: ["<code>git log</code>", "<code>git status</code>", "<code>git diff</code>"], c: 2, ex: "<code>git status</code> lista os arquivos; <code>git diff</code> mostra as linhas adicionadas (+) e removidas (−)." },
+  { p: "Por que fazer commit ANTES de pedir uma mudança grande ao Claude?", op: ["Porque o Claude só funciona em repositórios com commits", "Para ter um ponto seguro e conseguir comparar e desfazer o que ele fizer", "Para o Claude ficar mais rápido"], c: 1, ex: "O commit é o seu ponto de restauração. Com ele, o <code>git diff</code> mostra só o que o Claude mudou." },
+  { p: "Quer testar uma ideia arriscada sem mexer na versão principal. O que usar?", op: ["Uma branch: <code>git switch -c experimento</code>", "Apagar a pasta e começar de novo", "<code>git restore .</code>"], c: 0, ex: "Branches são linhas paralelas. Deu certo? Junta (merge). Deu errado? Volta para a main." }
+]);
+Curso.checklist("check", [
+  "Git instalado e <code>git --version</code> funciona",
+  "Configurei <code>user.name</code> e <code>user.email</code>",
+  "Faço o ciclo <code>status → add → commit</code> sem consultar",
+  "Uso <code>git diff</code> para revisar mudanças",
+  "Sei desfazer mudanças não salvas com <code>git restore</code>"
+]);
+</script>
+</body>
+</html>

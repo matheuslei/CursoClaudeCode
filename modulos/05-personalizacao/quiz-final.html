@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 5</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m5qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 5 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Personalização</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 5</a>
+    <a class="prox" href="../06-mcp/01-o-que-e-mcp.html"><small>Próximo módulo →</small>Módulo 6: MCP e integrações</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 5 · Personalização › Quiz final");
+Curso.quiz("quiz", [{"p": "Você colocou <code>permissions.allow</code> no usuário e no projeto. O que acontece?", "op": ["Só a lista do projeto vale", "As listas se combinam", "Dá erro"], "c": 1, "ex": "Listas se somam entre os níveis. <span class=\"t-dim\">(aula: settings.json e precedência)</span>"}, {"p": "Você criou <code>/deploy</code> e não quer que o Claude o dispare por conta própria. O que usar?", "op": ["<code>disable-model-invocation: true</code>", "<code>user-invocable: false</code>", "Apagar a description"], "c": 0, "ex": "<code>disable-model-invocation: true</code> deixa a skill só para você chamar. <code>user-invocable: false</code> faz o contrário. <span class=\"t-dim\">(aula: Skills)</span>"}, {"p": "Você quer que o código SEMPRE seja validado após cada edição. Output style resolve?", "op": ["Sim, basta escrever no estilo", "Não: estilo é instrução; para garantir, use um hook"], "c": 1, "ex": "Output style orienta o Claude, mas não há garantia. Hooks são executados pela ferramenta. <span class=\"t-dim\">(aula: Output styles e status line)</span>"}, {"p": "O que o matcher <code>\"Edit|Write\"</code> faz num PostToolUse?", "op": ["Roda o hook só depois de edições e escritas de arquivo", "Roda após qualquer ferramenta", "Bloqueia edições"], "c": 0, "ex": "O matcher filtra pelo nome da ferramenta; <code>|</code> separa alternativas. <span class=\"t-dim\">(aula: Hooks)</span>"}, {"p": "O time definiu um modelo em <code>.claude/settings.json</code>, mas você quer outro só para você neste projeto. Onde?", "op": ["<code>.claude/settings.local.json</code>", "<code>~/.claude/settings.json</code>", "Editar o arquivo do time"], "c": 0, "ex": "O local fica acima do compartilhado e é só seu. O de usuário perderia para o do time. <span class=\"t-dim\">(aula: settings.json e precedência)</span>"}, {"p": "Qual campo o Claude usa para decidir carregar a skill sozinho?", "op": ["<code>argument-hint</code>", "<code>description</code>", "O nome do arquivo"], "c": 1, "ex": "A description fica no contexto como um cardápio. O corpo só entra quando a skill é usada. <span class=\"t-dim\">(aula: Skills)</span>"}, {"p": "No settings, você escreveu <code>\"outputStyle\": \"concise\"</code> e nada mudou. Por quê?", "op": ["Output styles não funcionam no Windows", "O valor no arquivo é sensível a maiúsculas: <code>Concise</code>", "Precisa de plano Enterprise"], "c": 1, "ex": "O comando <code>/output-style</code> ignora maiúsculas; o arquivo não. <span class=\"t-dim\">(aula: Output styles e status line)</span>"}, {"p": "Seu hook de bloqueio termina com <code>exit 1</code> e o comando rodou mesmo assim. Por quê?", "op": ["Bug do Claude Code", "Só <code>exit 2</code> é bloqueante; outros códigos são erro não bloqueante", "Hooks não funcionam no Windows"], "c": 1, "ex": "Para bloquear, <code>exit 2</code> com o motivo no stderr. <span class=\"t-dim\">(aula: Hooks)</span>"}, {"p": "Como saber quais arquivos de configuração foram carregados?", "op": ["<code>/status</code> (linha Setting sources)", "<code>/context</code>", "Reiniciar o computador"], "c": 0, "ex": "<code>/status</code> lista as fontes carregadas. Para erros de entradas rejeitadas, <code>claude doctor</code>. <span class=\"t-dim\">(aula: settings.json e precedência)</span>"}, {"p": "O que faz a linha <code>!`git diff HEAD`</code> dentro do SKILL.md?", "op": ["Pede permissão ao usuário", "Roda o comando antes e coloca a saída no lugar da linha", "Nada, é um comentário"], "c": 1, "ex": "É uma injeção de contexto dinâmica: a skill já chega ao Claude com o diff atual. <span class=\"t-dim\">(aula: Skills)</span>"}]);
+</script>
+</body>
+</html>

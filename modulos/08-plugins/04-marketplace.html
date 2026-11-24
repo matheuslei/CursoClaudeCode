@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace local</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m8a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 8 · Aula 4</span><span class="selo cinza">Avançado</span><span class="selo cinza">~20 min</span>
+    <h1>Compartilhar por um marketplace local</h1>
+    <p class="objetivo">Objetivo: criar um catálogo na sua máquina que lista o plugin taskflow, instalar o plugin por nome a partir dele e entender como o mesmo catálogo serviria a outras pessoas, sem publicar nada.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O <code>--plugin-dir</code> serve para desenvolver: vale só naquela sessão. Para usar o plugin em qualquer sessão, com escopo e atualização, ele precisa ser <strong>instalado</strong>, e instalar exige um marketplace.</p>
+    <p>A boa notícia: um marketplace pode ser só uma pasta no seu computador. É exatamente o mesmo arquivo que um time colocaria num repositório.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo completo</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>O catálogo</h2>
+    <div class="cod"><span class="rot">marketplace-taskflow/</span><code>.claude-plugin/
+  marketplace.json        ← o catálogo
+plugins/
+  taskflow/               ← o plugin da aula 2
+    .claude-plugin/plugin.json
+    ...</code></div>
+    <div class="cod"><span class="rot">marketplace-taskflow/.claude-plugin/marketplace.json</span><code>{
+  "name": "treino-taskflow",
+  "description": "Marketplace local de treino do curso (não publicado)",
+  "owner": { "name": "Aluno do curso" },
+  "plugins": [
+    {
+      "name": "taskflow",
+      "source": "./plugins/taskflow",
+      "description": "Skills, revisor, hook de sintaxe e servidor MCP do TaskFlow"
+    }
+  ]
+}</code></div>
+    <ul>
+      <li>Obrigatórios: <code>name</code>, <code>owner</code> e <code>plugins</code>; cada plugin precisa de <code>name</code> e <code>source</code>.</li>
+      <li>O <code>source</code> relativo parte da <strong>raiz do marketplace</strong> (a pasta que contém <code>.claude-plugin/</code>) e não pode ter <code>..</code>.</li>
+      <li>Use o mesmo nome no catálogo e no <code>plugin.json</code>.</li>
+      <li>Nomes oficiais, como <code>claude-plugins-official</code>, são reservados: o Claude Code recusa.</li>
+    </ul>
+
+    <h3>Os comandos</h3>
+    <div class="cod"><span class="rot">PowerShell, na pasta de treino</span><code>claude plugin validate .\marketplace-taskflow                 # confere o catálogo e cada plugin
+claude plugin marketplace add .\marketplace-taskflow          # registra (nas settings do usuário)
+claude plugin install taskflow@treino-taskflow --scope local  # instala por nome
+claude plugin list                                            # confere
+claude plugin marketplace remove treino-taskflow              # remove o catálogo e os plugins dele</code></div>
+    <p>Dentro da sessão, o equivalente é <code>/plugin marketplace add ./marketplace-taskflow</code> e <code>/plugin install taskflow@treino-taskflow</code>.</p>
+    <div class="caixa dica"><strong>Editou o plugin?</strong>Num marketplace local com <code>source</code> relativo, o Claude Code lê os arquivos direto da pasta: a mudança vale na próxima sessão ou com <code>/reload-plugins</code>, sem mudar a versão.</div>
+
+    <h3>E para outras pessoas?</h3>
+    <table class="tab">
+      <thead><tr><th>Forma</th><th>Como</th><th>No curso</th></tr></thead>
+      <tbody>
+        <tr><td>Direto</td><td>Mandar a pasta ou um <code>.zip</code> do plugin; a pessoa usa <code>--plugin-dir</code></td><td>Não</td></tr>
+        <tr><td>Marketplace próprio</td><td>O mesmo catálogo num repositório; a pessoa roda <code>claude plugin marketplace add dono/repo</code></td><td>Não</td></tr>
+        <tr><td>Diretório da Anthropic</td><td>Enviar para revisão; aparece no claude.ai e no Cowork</td><td>Não</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa alerta"><strong>Nada é publicado no curso</strong>Distribuir um plugin para outras pessoas, ainda mais com código ou dados da empresa, é decisão da área responsável e da segurança da informação. No curso, o marketplace fica só na sua máquina.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: do catálogo à instalação</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual comando?</h2>
+    <p>Para cada objetivo, responda: <code>validate</code>, <code>add</code>, <code>install</code>, <code>list</code> ou <code>remove</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: instalar o seu plugin por nome</h2>
+    <p>Na pasta de treino, com o plugin da aula 2 em <code>marketplace-taskflow\plugins\taskflow\</code>.</p>
+    <ol>
+      <li>Crie <code>marketplace-taskflow\.claude-plugin\marketplace.json</code> como no bloco 3.</li>
+      <li>Rode <code>claude plugin validate .\marketplace-taskflow</code> até passar.</li>
+      <li>Rode <code>claude plugin marketplace add .\marketplace-taskflow</code>.</li>
+      <li>Rode <code>claude plugin install taskflow@treino-taskflow --scope local</code> e depois <code>claude plugin list</code>.</li>
+      <li>Abra <code>claude</code> (sem <code>--plugin-dir</code>!) e digite <code>/taskflow:</code>. Rode <code>/plugin</code> e veja o plugin na aba Installed.</li>
+      <li>Limpe tudo: <code>claude plugin marketplace remove treino-taskflow</code>. Confira com <code>claude plugin list</code> que o plugin saiu junto.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>O catálogo completo está em <code>projeto-taskflow/etapa-08/gabarito/marketplace-taskflow/</code>, conferido com <code>claude plugin validate</code> (Claude Code 2.1.327, 19/11/2026: <code>✔ Validation passed</code>).</p>
+      <ul>
+        <li><strong>Passo 3:</strong> o <code>add</code> registra o marketplace nas settings do <strong>usuário</strong>; por isso o passo 6 remove no fim.</li>
+        <li><strong>Passo 4:</strong> o id de instalação é <code>&lt;nome do plugin&gt;@&lt;nome do marketplace&gt;</code>.</li>
+        <li><strong>Passo 6:</strong> remover o marketplace desinstala todos os plugins que vieram dele.</li>
+        <li>Erro <code>Source path does not exist</code>: o <code>source</code> não parte da raiz do marketplace.</li>
+      </ul>
+      <p>A instalação a partir do marketplace não foi executada na preparação do curso, para não mexer nas settings do computador; só a validação.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Caminho com ..</h4><p>O <code>source</code> parte da raiz do marketplace e não pode sair dela.</p></div>
+      <div class="mini"><h4>Nomes diferentes</h4><p>Nome no catálogo diferente do <code>plugin.json</code> confunde a instalação. Use o mesmo.</p></div>
+      <div class="mini"><h4>Nome reservado</h4><p>Nomes oficiais da Anthropic são recusados ao adicionar.</p></div>
+      <div class="mini"><h4>Esquecer de limpar</h4><p>O marketplace fica nas settings do usuário até você remover.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/plugins/create-marketplace">Criar um marketplace</a> e <a href="https://code.claude.com/docs/en/plugins/publish">Publicar e distribuir</a> (em inglês): versões, atualizações e repositórios privados.</li>
+      <li>Revise o módulo nos <a href="slides.html">slides do Módulo 8</a>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Create a marketplace"; gabarito validado com Claude Code 2.1.327).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Marketplace local em 1 minuto", cenas: [
+  { fala: "Para fechar o módulo, você vai instalar o seu plugin pelo nome, a partir de um marketplace na sua própria máquina.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 8 · AULA 4</span><p class="v-titulo" data-t="0.3">Marketplace local</p><p class="v-sub" data-t="1.5">instalar o seu plugin pelo nome</p>' },
+  { fala: "Um marketplace é uma pasta com o arquivo marketplace ponto JSON, que lista os plugins e onde buscar cada um.",
+    html: '<p class="v-txt" data-t="0">.claude-plugin/marketplace.json</p><div class="v-code" data-t="0.5"><div><span class="a">"name":</span> "treino-taskflow",</div><div data-t="3.5"><span class="a">"plugins":</span> [ { "name": "taskflow",</div><div data-t="5">    <span class="a">"source":</span> "./plugins/taskflow" } ]</div></div>' },
+  { fala: "Adicione com claude plugin marketplace add e o caminho da pasta. Depois, instale com taskflow, arroba, e o nome do marketplace.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span>claude plugin marketplace add .\\marketplace-taskflow</div><div data-t="5"><span class="u">&gt; </span>claude plugin install <span class="w">taskflow@treino-taskflow</span></div></div>' },
+  { fala: "Para outras pessoas, o mesmo catálogo iria para um repositório. No curso, nada é publicado. Remover o marketplace desinstala os plugins dele.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="0.3"><span class="v-ic">🗂</span><b>Mesmo catálogo</b>num repositório</div><div class="v-caixa warn" data-t="3.6"><span class="v-ic">🚫</span><b>No curso</b>nada publicado</div></div><div class="v-caixa err" data-t="6"><span class="v-ic">🧹</span><b>marketplace remove</b>leva os plugins junto</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧳", rt: "Plugin (aula 2)" }, { ic: "📚", rt: "marketplace.json" }, { ic: "⚙", rt: "marketplace add" }, { ic: "✻", rt: "install → sessão" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Listar no catálogo", texto: "O <code>marketplace.json</code> diz o nome do plugin e o <code>source</code>, relativo à raiz do marketplace." },
+    { ativos: [1, 2], setas: [1], titulo: "Registrar o catálogo", texto: "<code>claude plugin marketplace add</code> com o caminho da pasta. Fica nas settings do usuário." },
+    { ativos: [2, 3], setas: [2], titulo: "Instalar por nome", texto: "<code>claude plugin install taskflow@treino-taskflow</code>, com o escopo escolhido. O plugin carrega em toda sessão daquele escopo." },
+    { ativos: [1, 2, 3], setas: [1, 2], titulo: "Limpar", texto: "<code>claude plugin marketplace remove</code> tira o catálogo e desinstala os plugins dele." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Do catálogo à instalação (ilustrativo)", altura: 300,
+  passos: [
+    { t: "cmd", x: "claude plugin validate .\\marketplace-taskflow", leg: "Conferir o catálogo" },
+    { t: "out", x: "✔ Validation passed", leg: "Saída real com o gabarito" },
+    { t: "cmd", x: "claude plugin marketplace add .\\marketplace-taskflow", leg: "Registrar" },
+    { t: "out", x: "✔ Successfully added marketplace: treino-taskflow (declared in user settings)", leg: "Nas settings do usuário" },
+    { t: "cmd", x: "claude plugin install taskflow@treino-taskflow --scope local", leg: "Instalar por nome" },
+    { t: "out", x: "✔ Successfully installed plugin: taskflow@treino-taskflow (scope: local)", leg: "Pronto" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Conferir se o marketplace.json tem os campos obrigatórios", "validate", "claude plugin validate .\\marketplace-taskflow"],
+    ["Fazer o Claude Code conhecer o seu catálogo", "add", "claude plugin marketplace add .\\marketplace-taskflow"],
+    ["Instalar o plugin taskflow a partir do catálogo", "install", "claude plugin install taskflow@treino-taskflow"],
+    ["Ver o que está instalado e com qual escopo", "list", "claude plugin list"],
+    ["Apagar o catálogo e os plugins que vieram dele", "remove", "claude plugin marketplace remove treino-taskflow"]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Objetivo ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: validate · add · install · list · remove</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["validate", "add", "install", "list", "remove"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  Curso.terminal("term", { titulo: "Qual comando? (simulação)", prompt: ">", intro: '<span class="t-dim">validate · add · install · list · remove</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: validate, add, install, list ou remove.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Onde fica o catálogo de um marketplace?", op: ["<code>.claude-plugin/marketplace.json</code> na raiz do marketplace", "No <code>plugin.json</code>", "Em <code>~/.claude/settings.json</code>"], c: 0, ex: "É o arquivo que lista os plugins e de onde buscar cada um." },
+  { p: "O <code>source</code> relativo parte de onde?", op: ["De dentro de <code>.claude-plugin/</code>", "Da raiz do marketplace", "Da sua pasta de usuário"], c: 1, ex: "E não pode conter <code>..</code>." },
+  { p: "Qual é o id para instalar o plugin <code>taskflow</code> do marketplace <code>treino-taskflow</code>?", op: ["<code>treino-taskflow/taskflow</code>", "<code>taskflow@treino-taskflow</code>", "<code>taskflow:treino-taskflow</code>"], c: 1, ex: "plugin@marketplace." },
+  { p: "O que acontece ao remover o marketplace?", op: ["Nada com os plugins", "Os plugins instalados dele são desinstalados", "O plugin vira peça solta"], c: 1, ex: "Por isso é um bom jeito de limpar o treino." },
+  { p: "No curso, o marketplace…", op: ["é publicado no GitHub", "fica só na sua máquina", "é enviado ao diretório da Anthropic"], c: 1, ex: "Distribuir é decisão da área responsável; no estudo, fica local." }
+]);
+Curso.checklist("check", [
+  "Escrevo um <code>marketplace.json</code> com os campos obrigatórios",
+  "Valido e adiciono o marketplace local",
+  "Instalo o plugin por <code>plugin@marketplace</code> com o escopo certo",
+  "Explico as três formas de distribuir um plugin",
+  "Limpo tudo removendo o marketplace"
+]);
+</script>
+</body>
+</html>

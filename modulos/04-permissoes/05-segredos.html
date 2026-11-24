@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Segredos e dados pessoais</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m4a5">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 4 · Aula 5</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Segredos e dados pessoais</h1>
+    <p class="objetivo">Objetivo: manter senhas, tokens e dados pessoais fora do contexto do Claude, entender o que é enviado à Anthropic e saber quando procurar a área responsável.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Tudo o que entra no contexto (o que você digita, os arquivos que o Claude lê, as saídas de comandos) é <strong>enviado pela rede</strong> ao modelo. Um token colado "só para testar" ou uma planilha com CPFs lida "para analisar" saiu da sua máquina. A regra de ouro: <strong>o que não deve sair, não entra no contexto</strong>.</p>
+    <div class="caixa erro"><strong>Aviso informativo</strong>Esta aula traz boas práticas gerais, não orientação jurídica. Uso de dados pessoais (LGPD), dados de clientes e informações internas segue as políticas da sua organização. Antes de usar o Claude Code com qualquer dado real, consulte a área de <strong>segurança da informação</strong> e a de <strong>privacidade/proteção de dados</strong>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: por onde um segredo vaza</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Práticas e fatos</h2>
+    <h3>Mantenha segredos fora do contexto</h3>
+    <ul>
+      <li><strong>Nunca cole</strong> senhas, tokens, chaves de API, certificados ou strings de conexão no prompt, nem em prints colados com <kbd>Alt</kbd>+<kbd>V</kbd>.</li>
+      <li>Segredos em <code>.env</code>, com o arquivo no <code>.gitignore</code>. Para o Claude saber os nomes das variáveis, crie um <code>.env.example</code> com valores falsos.</li>
+      <li>Bloqueie a leitura com regras deny: <code>Read(./.env)</code>, <code>Read(./.env.*)</code>, <code>Read(./secrets/**)</code> (aula 4.3).</li>
+      <li>Revise o <code>git diff</code> antes de cada commit: segredo commitado fica no histórico, e apagar o arquivo depois não remove.</li>
+      <li>Se um segredo vazou (colou, commitou, apareceu numa saída): <strong>revogue e gere outro</strong>. Avise a área responsável se for credencial corporativa.</li>
+    </ul>
+    <h3>Dados pessoais</h3>
+    <ul>
+      <li>Para estudar e testar, use <strong>dados fictícios</strong> (nomes inventados, CPFs gerados para teste, e-mails <code>@exemplo.com</code>).</li>
+      <li>Precisa trabalhar com uma base real? Primeiro, confirme com a área de privacidade se é permitido e em quais condições. Prefira amostras anonimizadas.</li>
+      <li>Peça ao Claude para gerar <strong>scripts</strong> que processam os dados localmente, em vez de mandar os dados para ele ler.</li>
+    </ul>
+    <h3>O que a documentação diz sobre os seus dados</h3>
+    <table class="tab">
+      <thead><tr><th>Tipo de conta</th><th>Treino de modelos</th><th>Retenção padrão</th></tr></thead>
+      <tbody>
+        <tr><td>Consumidor (Free, Pro, Max, Ultra)</td><td>Só se a opção de melhorar modelos estiver ligada (você escolhe nas configurações de privacidade do claude.ai)</td><td>5 anos com a opção ligada; 30 dias com ela desligada</td></tr>
+        <tr><td>Comercial (Team, Enterprise, API)</td><td>A Anthropic não treina com código e prompts enviados nos termos comerciais, salvo adesão a programas específicos</td><td>30 dias (Zero Data Retention disponível para contas elegíveis)</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Prompts e respostas trafegam criptografados (TLS 1.2+).</li>
+      <li>As conversas ficam salvas <strong>localmente</strong>, em texto puro, em <code>~/.claude/projects/</code>, por 30 dias por padrão (para permitir retomar sessões).</li>
+      <li><code>/feedback</code> e <code>/bug</code> enviam a conversa (inclusive código) à Anthropic, com retenção de 5 anos. Não use em sessões com conteúdo sensível.</li>
+    </ul>
+    <p class="ilustrativo">Resumo de code.claude.com/docs/en/data-usage em 18/11/2026. Políticas mudam; os termos de uso e a política de privacidade são a referência oficial.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o jeito certo de configurar um token</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: detector de vazamento</h2>
+    <p>Cole (ou digite) prompts e veja se o detector simulado encontra algo que não deveria estar ali. Experimente os exemplos do desafio.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow (o <code>.env</code> fictício e a regra deny vêm da aula 4.3):</p>
+    <ol>
+      <li>Crie um <code>.env.example</code> com <code>API_TOKEN=coloque-seu-token-aqui</code> e commite</li>
+      <li>Peça ao Claude: <code>adicione ao tarefas.py a leitura opcional de API_TOKEN via variável de ambiente; se não existir, siga sem ela. Não leia o .env</code></li>
+      <li>Confira no diff que nenhum valor de token foi escrito no código</li>
+      <li>Rode <code>git log -p</code> e confirme que o <code>.env</code> nunca entrou no histórico</li>
+      <li>Escreva no diário: "com quem eu falaria na minha organização antes de usar dados reais?"</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>import os
+
+API_TOKEN = os.environ.get("API_TOKEN")  # None se não definido; nunca escreva o valor no código</code></div>
+      <p>No diff deve aparecer só a leitura via <code>os.environ.get</code>, nunca o valor. No <code>git log -p</code> podem aparecer <code>.env.example</code> e <code>.gitignore</code>, mas não o <code>.env</code>. Resposta do passo 5: segurança da informação (credenciais, ferramentas) e privacidade/proteção de dados (dados pessoais, LGPD), e o gestor da área dona dos dados.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"É só um token de teste"</h4><p>Token de teste costuma dar acesso a ambiente real. Trate todo token como segredo.</p></div>
+      <div class="mini"><h4>Print com dados na tela</h4><p>Uma imagem colada também é contexto. Recorte ou anonimize antes.</p></div>
+      <div class="mini"><h4>Apagar o arquivo e achar que resolveu</h4><p>Segredo commitado continua no histórico do Git. Revogue o segredo.</p></div>
+      <div class="mini"><h4><code>/feedback</code> com sessão sensível</h4><p>Envia a conversa, inclusive código. Use só com conteúdo que pode sair.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/data-usage">Data usage</a>: políticas de dados</li>
+      <li><a href="https://code.claude.com/docs/en/security">Security</a>: boas práticas e prompt injection</li>
+      <li><a href="https://www.gov.br/anpd/pt-br">ANPD</a>: Autoridade Nacional de Proteção de Dados (conteúdo informativo sobre a LGPD)</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026. Conteúdo informativo; não substitui as políticas da sua organização nem orientação jurídica.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Segredos e dados pessoais em 1 minuto", cenas: [
+  { fala: "Tudo o que entra no contexto é enviado pela rede ao modelo. Inclusive aquele token colado só para testar.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 4 · AULA 5</span><p class="v-titulo" data-t="0.3">Segredos e dados pessoais</p><p class="v-sub" data-t="0.9">O que não deve sair, não entra</p>' },
+  { fala: "Um segredo pode vazar pelo prompt, por um arquivo que o Claude leu, ou pela saída de um comando.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa err" data-t="0.3"><span class="v-ic">⌨</span><b>Prompt</b>senha ou token colado</div><div class="v-caixa err" data-t="1.8"><span class="v-ic">📄</span><b>Arquivo lido</b>.env, planilha com CPFs</div><div class="v-caixa err" data-t="3.6"><span class="v-ic">🖥</span><b>Saída de comando</b>logs, variáveis</div></div>' },
+  { fala: "Guarde segredos no .env, fora do Git. Crie um .env.example com valores falsos. E bloqueie a leitura com uma regra deny.",
+    html: '<div class="v-code"><div data-t="0.3"><span class="a">.env</span>           <span class="d">valores reais, no .gitignore</span></div><div data-t="2.2"><span class="o">.env.example</span>   <span class="d">valores falsos</span></div><div data-t="4.2"><span class="w">deny:</span> <span class="u">Read(./.env)</span></div></div>' },
+  { fala: "Vazou? Revogue e gere outro. Apagar o arquivo depois não remove do histórico do Git. Se for credencial corporativa, avise a área responsável.",
+    html: '<div class="v-linha"><div class="v-caixa err" data-t="0.4"><span class="v-ic">⛔</span><b>Revogue</b>o segredo vazado</div><span class="v-seta" data-t="1.2">→</span><div class="v-caixa ok" data-t="1.6"><span class="v-ic">🔑</span><b>Gere outro</b>novo segredo</div><span class="v-seta" data-t="5.4">→</span><div class="v-caixa warn" data-t="6"><span class="v-ic">📣</span><b>Avise</b>a área responsável</div></div>' },
+  { fala: "Para estudar, use dados fictícios. Precisa de uma base real? Primeiro confirme com a área de privacidade. E prefira scripts que processam os dados localmente.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa ok" data-t="0.3"><span class="v-ic">🧪</span><b>Estudo</b>dados fictícios</div><div class="v-caixa warn" data-t="2.2"><span class="v-ic">🏛</span><b>Base real</b>consulte a privacidade antes</div><div class="v-caixa acc" data-t="5"><span class="v-ic">⚙</span><b>Prefira</b>scripts que processam localmente</div></div>' },
+  { fala: "Isto são boas práticas gerais, não orientação jurídica. Antes de usar dados reais, consulte a área de segurança da informação e a de privacidade da sua organização.",
+    html: '<div class="v-caixa warn" data-t="0.3"><span class="v-ic">ℹ</span><b>Boas práticas gerais, não orientação jurídica</b>Dados reais? Consulte segurança da informação e privacidade da sua organização.</div>' },
+  { fala: "A regra de ouro: o que não deve sair, não entra no contexto.",
+    html: '<p class="v-sub" data-t="0">A regra de ouro</p><p class="v-titulo" data-t="0.4">O que não deve sair, não entra no contexto</p>' }
+] });
+
+Curso.passos("diag", {
+  nos: [{ ic: "⌨", rt: "Prompt" }, { ic: "📄", rt: "Arquivo lido" }, { ic: "🖥", rt: "Saída de comando" }, { ic: "🗄", rt: "Commit" }],
+  passos: [
+    { ativos: [0], titulo: "Você cola no prompt", texto: "\"Usa esse token: sk-…\". Foi direto para o contexto e para a rede. <strong>Prevenção:</strong> nunca cole; use variável de ambiente." },
+    { ativos: [1], titulo: "O Claude lê um arquivo", texto: "Ele lê o <code>.env</code> para \"entender a configuração\". <strong>Prevenção:</strong> regra <code>Read(./.env)</code> em deny e um <code>.env.example</code> com valores falsos." },
+    { ativos: [2], titulo: "Uma saída de comando mostra o segredo", texto: "<code>env</code>, <code>Get-ChildItem Env:</code> ou um log verboso imprimem variáveis. <strong>Prevenção:</strong> desconfie de comandos que listam ambiente; recuse ou peça alternativa." },
+    { ativos: [3], titulo: "O segredo vai para o Git", texto: "<code>git add .</code> com o <code>.env</code> fora do <code>.gitignore</code>. <strong>Prevenção:</strong> .gitignore antes de criar o arquivo e revisão do diff. Se aconteceu, revogue." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: token do jeito certo (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "preciso usar uma API com token. como configuro sem expor?", leg: "Pergunte sem colar o token" },
+    { t: "claude", x: "Vamos usar variável de ambiente: crio .env.example com valor falso, garanto .env no .gitignore e o código lê com os.environ.get.", ms: 1500 },
+    { t: "tool", x: "Write(.env.example)" },
+    { t: "out", x: "API_TOKEN=coloque-seu-token-aqui" },
+    { t: "tool", x: "Update(.gitignore)" },
+    { t: "out", x: "+ .env" },
+    { t: "tool", x: "Read(.env)", leg: "A regra deny segura a tentativa de leitura" },
+    { t: "html", x: '<span class="t-warn">⛔ Permission to read .env has been denied.</span>' },
+    { t: "claude", x: "Não li o .env (bloqueado por regra, ótimo). Preencha você o valor real no .env; o código não precisa conhecê-lo." },
+    { t: "nota", x: "Você edita o .env no seu editor, fora do Claude.", ms: 1200 }
+  ]
+});
+(function () {
+  var padroes = [
+    [/sk-[a-z0-9-_]{8,}/i, "algo com cara de chave de API (sk-…)"],
+    [/(senha|password|pwd)\s*[:=]\s*\S+/i, "uma senha"],
+    [/(token|api[_-]?key|secret)\s*[:=]\s*\S+/i, "um token/chave"],
+    [/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/, "algo com formato de CPF"],
+    [/[a-z0-9._%+-]+@(?!exemplo\.com)[a-z0-9.-]+\.[a-z]{2,}/i, "um e-mail real (não @exemplo.com)"],
+    [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, "uma chave privada"]
+  ];
+  Curso.terminal("term", {
+    titulo: "Detector de vazamento (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Digite um prompt. O detector procura segredos e dados pessoais (simplificado).</span>',
+    metas: ["usa o token sk-teste-12345678 para chamar a api", "analise o cliente joao.silva@empresa.com cpf 123.456.789-00", "crie um script que leia API_TOKEN do ambiente"],
+    desconhecido: function (t) {
+      var achou = padroes.filter(function (p) { return p[0].test(t); }).map(function (p) { return p[1]; });
+      if (achou.length) return '<span class="t-warn">⚠ Encontrei: ' + achou.join(", ") + '.</span>\n<span class="t-dim">Isso iria para o contexto e para a rede. Remova, use variável de ambiente ou dados fictícios. Se era real, revogue/troque o segredo.</span>';
+      return '<span class="t-ok">✓ Nada suspeito encontrado.</span> <span class="t-dim">(Um detector real é mais complexo. Na dúvida, não cole.)</span>';
+    }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Você colou sem querer um token real no prompt. O que fazer?", op: ["Apagar a mensagem com Esc", "Revogar o token e gerar outro; avisar a área responsável se for corporativo", "Rodar /clear e seguir"], c: 1, ex: "O token já foi enviado. Limpar a conversa não desfaz o envio. Revogue." },
+  { p: "Qual a melhor forma de o Claude saber quais variáveis o projeto usa, sem ver os valores?", op: ["Deixar ele ler o .env", "Um .env.example com valores falsos + deny para o .env", "Colar os valores no CLAUDE.md"], c: 1, ex: ".env.example documenta os nomes; deny garante que os valores reais não entrem." },
+  { p: "Precisa analisar uma planilha real de clientes. Primeiro passo?", op: ["Mandar o Claude ler a planilha", "Consultar a área de privacidade/segurança e, se permitido, preferir dados anonimizados ou scripts que processem localmente", "Renomear o arquivo"], c: 1, ex: "Dados pessoais envolvem políticas internas e a LGPD; a decisão não é só técnica." },
+  { p: "O que o comando <code>/feedback</code> envia?", op: ["Só uma nota de 1 a 5", "Uma cópia da conversa, incluindo código, retida por 5 anos", "Nada"], c: 1, ex: "Conforme a documentação, /feedback envia a conversa. Evite em sessões com conteúdo sensível." }
+]);
+Curso.checklist("check", [
+  "Nunca colo segredos ou dados pessoais reais em prompts e prints",
+  "Uso .env + .gitignore + .env.example + regra Read deny",
+  "Sei o que fazer se um segredo vazar (revogar e avisar)",
+  "Conheço, em linhas gerais, a política de dados do meu tipo de conta",
+  "Sei a quem recorrer na organização antes de usar dados reais"
+]);
+</script>
+</body>
+</html>

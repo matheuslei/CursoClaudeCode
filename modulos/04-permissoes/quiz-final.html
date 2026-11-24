@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 4</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m4qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 4 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Permissões e segurança</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 4</a>
+    <a class="prox" href="../05-personalizacao/01-settings.html"><small>Próximo módulo →</small>Módulo 5: Personalização</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 4 · Permissões e segurança › Quiz final");
+Curso.quiz("quiz", [{"p": "Você tem uma regra <code>deny</code> para <code>git push</code> e abre em <code>bypassPermissions</code>. O push roda?", "op": ["Sim, bypass libera tudo", "Não, regras deny valem em todos os modos"], "c": 1, "ex": "Deny bloqueia em qualquer modo, inclusive bypassPermissions. <span class=\"t-dim\">(aula: Modos de permissão)</span>"}, {"p": "O que acontece após 3 bloqueios seguidos?", "op": ["A sessão é encerrada", "O auto mode pausa e volta a perguntar para você", "O Claude ignora o classificador"], "c": 1, "ex": "3 seguidos ou 20 no total fazem o auto mode voltar a pedir sua aprovação. <span class=\"t-dim\">(aula: Auto mode)</span>"}, {"p": "Qual regra libera <code>npm run test</code> e <code>npm run build</code>, mas não <code>npm install</code>?", "op": ["<code>Bash(npm *)</code>", "<code>Bash(npm run *)</code>", "<code>Bash(npm)</code>"], "c": 1, "ex": "O <code>*</code> depois do subcomando <code>run</code> limita a família. <span class=\"t-dim\">(aula: Regras allow, ask e deny)</span>"}, {"p": "Com o sandbox ligado, a ferramenta Read do Claude pode ler <code>~/.aws/credentials</code>?", "op": ["Não, o sandbox bloqueia", "Sim, Read fica fora do sandbox; use regra Read deny"], "c": 1, "ex": "Ferramentas internas (Read, Edit, WebFetch…) não passam pelo sandbox. <span class=\"t-dim\">(aula: Sandbox)</span>"}, {"p": "Precisa analisar uma planilha real de clientes. Primeiro passo?", "op": ["Mandar o Claude ler a planilha", "Consultar a área de privacidade/segurança e, se permitido, preferir dados anonimizados ou scripts que processem localmente", "Renomear o arquivo"], "c": 1, "ex": "Dados pessoais envolvem políticas internas e a LGPD; a decisão não é só técnica. <span class=\"t-dim\">(aula: Segredos e dados pessoais)</span>"}, {"p": "No <code>acceptEdits</code>, o que ainda pede permissão?", "op": ["Nada", "Comandos que não são operações comuns de arquivo (ex.: rodar testes) e caminhos fora da pasta/protegidos", "Leitura de arquivos"], "c": 1, "ex": "acceptEdits libera edições e comandos de arquivo como mkdir, mv, cp e rm dentro da pasta de trabalho. O resto continua perguntando. <span class=\"t-dim\">(aula: Modos de permissão)</span>"}, {"p": "Você disse na conversa \"nunca faça push\". Isso é garantido?", "op": ["Sim, vira regra permanente", "Não: é um sinal para o classificador e pode se perder na compactação; use uma regra deny", "Só se repetir três vezes"], "c": 1, "ex": "A documentação é explícita: limites ditos na conversa não são gravados como regras. <span class=\"t-dim\">(aula: Auto mode)</span>"}, {"p": "Você tem deny <code>Bash(aws *)</code> e allow <code>Bash(aws s3 ls)</code>. O <code>aws s3 ls</code> roda sem perguntar?", "op": ["Sim, o allow é mais específico", "Não, o deny bloqueia; allow não abre exceção em deny"], "c": 1, "ex": "Deny sempre vence. Para liberar só parte, não use um deny tão amplo. <span class=\"t-dim\">(aula: Regras allow, ask e deny)</span>"}, {"p": "Qual a diferença principal entre regras de permissão e sandbox?", "op": ["Nenhuma", "Regras olham a ação/texto do comando; o sandbox impõe limites no sistema operacional ao que o processo consegue fazer", "Sandbox só serve para Python"], "c": 1, "ex": "São camadas complementares: uma cobre o ponto cego da outra. <span class=\"t-dim\">(aula: Sandbox)</span>"}, {"p": "Qual a melhor forma de o Claude saber quais variáveis o projeto usa, sem ver os valores?", "op": ["Deixar ele ler o .env", "Um .env.example com valores falsos + deny para o .env", "Colar os valores no CLAUDE.md"], "c": 1, "ex": ".env.example documenta os nomes; deny garante que os valores reais não entrem. <span class=\"t-dim\">(aula: Segredos e dados pessoais)</span>"}]);
+</script>
+</body>
+</html>

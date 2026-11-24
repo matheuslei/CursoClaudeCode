@@ -1,0 +1,42 @@
+# Módulo 9 · Aula 3: revisão automática do TaskFlow com o Claude Code GitHub Action.
+# Use só num repositório PESSOAL de teste, com dados fictícios.
+# Código ou dados da empresa: só com aval da área de segurança da informação.
+# A chave NUNCA fica neste arquivo. Cadastre-a no GitHub em:
+#   Settings > Secrets and variables > Actions > New repository secret (nome: ANTHROPIC_API_KEY)
+# Custo: cada execução gasta minutos do GitHub Actions e tokens da API.
+name: Revisão do TaskFlow
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+# Uma revisão por PR de cada vez: um push novo cancela a revisão antiga (economiza).
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Revise o código Python deste repositório seguindo o CLAUDE.md.
+            Rode python -m unittest. Não edite arquivos.
+            Responda em português com Testes, Achados (Grave / Ajustar / Sugestão) e Veredito.
+          claude_args: |
+            --max-turns 10
+            --allowedTools "Read,Grep,Glob,Bash(python -m unittest *)"

@@ -1,0 +1,14 @@
+{
+  "name": "treino-taskflow",
+  "description": "Marketplace local de treino do curso (não publicado)",
+  "owner": {
+    "name": "Aluno do curso"
+  },
+  "plugins": [
+    {
+      "name": "taskflow",
+      "source": "./plugins/taskflow",
+      "description": "Skills, revisor, hook de sintaxe e servidor MCP do TaskFlow"
+    }
+  ]
+}

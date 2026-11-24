@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalar e autenticar um servidor MCP</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m6a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 6 · Aula 2</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Instalar e autenticar um servidor</h1>
+    <p class="objetivo">Objetivo: adicionar, verificar, usar e remover um servidor MCP pela linha de comando, escolher o escopo certo e entender o fluxo de login dos servidores que pedem autenticação.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O fluxo é sempre o mesmo para qualquer servidor: <strong>adicionar → conferir → usar → (remover)</strong>. Dominando esses quatro passos com um servidor inofensivo, você consegue conectar qualquer outro com segurança.</p>
+    <p>Vamos usar o <strong>servidor de documentação do Claude Code</strong>, sugerido na própria documentação para o primeiro teste: é hospedado, faz busca nos docs e não exige login.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo de vida de um servidor</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os comandos</h2>
+    <p>Rode no <strong>PowerShell</strong>, fora de uma sessão do <code>claude</code>. O <code>claude mcp add</code> funciona igual no PowerShell e no Prompt de Comando.</p>
+    <h3>Servidor hospedado (http)</h3>
+    <div class="cod"><code>claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp</code></div>
+    <ul>
+      <li><code>--transport http</code>: o servidor está numa URL</li>
+      <li><code>claude-code-docs</code>: um nome que <strong>você</strong> escolhe (aparece nas chamadas e nos comandos)</li>
+      <li>a URL do servidor</li>
+    </ul>
+    <h3>Servidor local (stdio)</h3>
+    <div class="cod"><code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code></div>
+    <p>Sem <code>--transport</code>, o padrão é <code>stdio</code>. <strong>Tudo depois do <code>--</code></strong> é o comando que o Claude Code roda para iniciar o servidor. Este exemplo precisa do Node.js 18+ e usa o Chrome instalado.</p>
+    <div class="caixa alerta"><strong>O <code>--</code> importa</strong>Ele separa as opções do Claude Code (<code>--transport</code>, <code>--env</code>, <code>--scope</code>) do comando do servidor. Esquecer o <code>--</code> é a causa mais comum de servidor stdio que não inicia.</div>
+    <h3>Gerenciar</h3>
+    <table class="tab">
+      <thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude mcp list</code></td><td>Lista os servidores e o status (<code>✔ Connected</code>, <code>! Needs authentication</code>, <code>✘ Failed to connect</code>…)</td></tr>
+        <tr><td><code>claude mcp get &lt;nome&gt;</code></td><td>Detalhes e escopo de um servidor, incluindo a mensagem de erro</td></tr>
+        <tr><td><code>claude mcp remove &lt;nome&gt;</code></td><td>Remove o servidor</td></tr>
+        <tr><td><code>claude mcp login &lt;nome&gt;</code></td><td>Faz o login OAuth pelo terminal</td></tr>
+        <tr><td><code>claude mcp logout &lt;nome&gt;</code></td><td>Apaga as credenciais guardadas</td></tr>
+        <tr><td><code>/mcp</code> (dentro da sessão)</td><td>Painel: status, autenticar, reconectar</td></tr>
+      </tbody>
+    </table>
+    <h3>Escopos: onde o servidor fica salvo</h3>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Arquivo</th><th>Vale para</th></tr></thead>
+      <tbody>
+        <tr><td><code>local</code> (padrão)</td><td><code>%USERPROFILE%\.claude.json</code>, na entrada do projeto</td><td>Só você, só este projeto</td></tr>
+        <tr><td><code>project</code></td><td><code>.mcp.json</code> na raiz do projeto</td><td>Todos que clonarem o projeto (vai para o Git)</td></tr>
+        <tr><td><code>user</code></td><td><code>%USERPROFILE%\.claude.json</code>, chave <code>mcpServers</code></td><td>Só você, todos os projetos</td></tr>
+      </tbody>
+    </table>
+    <div class="cod"><code>claude mcp add --scope user --transport http claude-code-docs https://code.claude.com/docs/mcp</code></div>
+    <p>O escopo é fixo: para mudar, remova e adicione de novo. Exemplo de <code>.mcp.json</code> (escopo project):</p>
+    <div class="cod"><code>{
+  "mcpServers": {
+    "claude-code-docs": {
+      "type": "http",
+      "url": "https://code.claude.com/docs/mcp"
+    }
+  }
+}</code></div>
+    <p>Na primeira vez que o Claude Code encontra um servidor de <code>.mcp.json</code>, ele <strong>pede sua aprovação</strong>. Isso existe para que um repositório clonado não rode programas na sua máquina sem você consentir.</p>
+    <h3>Servidores que pedem login</h3>
+    <p>Serviços como Sentry, Linear e Notion usam OAuth: você adiciona a URL e o status fica <code>! Needs authentication</code>. Depois abra <code>/mcp</code>, selecione o servidor e escolha <strong>Authenticate</strong>, ou rode <code>claude mcp login &lt;nome&gt;</code>. O navegador abre para você autorizar.</p>
+    <div class="caixa erro"><strong>Contas e tokens</strong>Não conecte contas corporativas sem aprovação da TI e da segurança da informação. Nunca cole tokens em prompts. Se um servidor exigir token (<code>--header "Authorization: Bearer ..."</code>), trate-o como senha: ele fica gravado no arquivo de configuração.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Faça o ciclo completo: adicione o servidor de docs, liste, veja os detalhes, tente adicionar um stdio <em>sem</em> o <code>--</code> e remova.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>Na pasta <code>taskflow</code>, adicione o servidor de documentação (escopo padrão)</li>
+      <li>Confirme com <code>claude mcp list</code> que aparece <code>✔ Connected</code></li>
+      <li>Abra <code>claude</code>, rode <code>/mcp</code> e veja as ferramentas do servidor</li>
+      <li>Peça: <code>use o servidor claude-code-docs para explicar o que são escopos de MCP</code>. Aprove a chamada e confira que ela vem rotulada com o nome do servidor</li>
+      <li>Rode <code>/context</code> e procure as ferramentas MCP (podem aparecer como <em>deferred</em>, pelo tool search)</li>
+      <li>Saia e remova o servidor</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>cd ~\estudos-claude\taskflow
+claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp
+claude mcp list
+claude
+# dentro da sessão:
+/mcp
+use o servidor claude-code-docs para explicar o que são escopos de MCP
+/context
+/exit
+# de volta ao PowerShell:
+claude mcp remove claude-code-docs</code></div>
+      <p>Ao adicionar, o comando confirma algo como <code>Added HTTP MCP server claude-code-docs ... to local config</code> e mostra qual arquivo foi alterado. Se aparecer <code>✘ Failed to connect</code>, rode <code>claude mcp get claude-code-docs</code> para ver o erro. Em rede corporativa, pode ser proxy (fale com a TI).</p>
+      <p>Para testar a URL no PowerShell, use <code>curl.exe -I https://code.claude.com/docs/mcp</code> (com <code>.exe</code>, para não cair no alias <code>Invoke-WebRequest</code>). Um 404 ou 405 ainda indica que o servidor responde.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"No MCP servers configured"</h4><p>Você adicionou em outro projeto (escopo local é por pasta). Adicione de novo aqui ou use <code>--scope user</code>.</p></div>
+      <div class="mini"><h4>stdio não inicia</h4><p>Faltou o <code>--</code>, ou o programa (Node, Python) não está instalado. Rode o comando do servidor direto no terminal para ver o erro.</p></div>
+      <div class="mini"><h4>Demora para iniciar</h4><p>O padrão de espera é 30 s. Aumente: <code>$env:MCP_TIMEOUT = "60000"; claude</code></p></div>
+      <div class="mini"><h4>Editou o .mcp.json e nada mudou</h4><p>Ele é lido ao iniciar a sessão. Saia e abra de novo.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/mcp-quickstart">MCP quickstart oficial</a>, que é a base desta aula</li>
+      <li><a href="https://code.claude.com/docs/en/mcp">Referência MCP</a>: escopos, autenticação, variáveis de ambiente</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (MCP quickstart e MCP reference). As mensagens exatas de saída podem variar entre versões.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Instalar um servidor MCP em 1 minuto", cenas: [
+  { fala: "O fluxo é sempre o mesmo, para qualquer servidor: adicionar, conferir, usar e, se precisar, remover.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 6 · AULA 2</span><p class=\"v-titulo\" data-t=\"0.3\">Instalar e autenticar um servidor</p><p class=\"v-sub\" data-t=\"0.9\">Adicionar · conferir · usar · remover</p>" },
+  { fala: "Para um servidor hospedado, use claude mcp add com transporte http, um nome que você escolhe e a URL. O servidor de documentação do Claude Code é um ótimo primeiro teste.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">claude mcp add</span> <span class=\"u\">--transport http</span> \\</div><div data-t=\"2.6\">  <span class=\"w\">claude-code-docs</span> <span class=\"d\">https://code.claude.com/docs/mcp</span></div></div><div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa \" data-t=\"3.4\"><span class=\"v-ic\">🌐</span><b>http</b>o servidor está numa URL</div><div class=\"v-caixa \" data-t=\"4.4\"><span class=\"v-ic\">🏷</span><b>nome</b>você escolhe</div><div class=\"v-caixa \" data-t=\"5.4\"><span class=\"v-ic\">🔗</span><b>URL</b>do servidor</div></div>" },
+  { fala: "Para um servidor local, o padrão é stdio. Tudo depois dos dois traços é o comando que inicia o servidor. Esquecer os dois traços é o erro mais comum.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">claude mcp add</span> playwright <span class=\"w\">--</span> npx -y @playwright/mcp@latest</div></div><div class=\"v-caixa warn\" data-t=\"3.6\"><span class=\"v-ic\">⚠</span><b>Os dois traços importam</b>separam as opções do comando do servidor</div>" },
+  { fala: "Confira com claude mcp list, que mostra o status de cada servidor. Dentro da sessão, o /mcp abre o painel para autenticar e reconectar.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">claude mcp list</span></div><div data-t=\"1.8\">  claude-code-docs  <span class=\"o\">✔ Connected</span></div><div data-t=\"4.6\"><span class=\"u\">/mcp</span>  <span class=\"d\">← painel dentro da sessão</span></div></div>" },
+  { fala: "O escopo define onde fica salvo: local, o padrão, só para você neste projeto; project, num arquivo .mcp.json que vai para o Git; ou user, para todos os seus projetos.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">📍</span><b>local</b>padrão: só você, este projeto</div><div class=\"v-caixa \" data-t=\"2.8\"><span class=\"v-ic\">📁</span><b>project</b>.mcp.json, vai para o Git</div><div class=\"v-caixa \" data-t=\"5.4\"><span class=\"v-ic\">👤</span><b>user</b>você, todos os projetos</div></div>" },
+  { fala: "Serviços com login usam claude mcp login. E servidores vindos de um .mcp.json pedem sua aprovação antes de rodar, para que um repositório clonado não execute nada sem você consentir.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">claude mcp login</span> <span class=\"u\">&lt;nome&gt;</span></div></div><div class=\"v-caixa ok\" data-t=\"3.2\"><span class=\"v-ic\">✋</span><b>Aprovação</b>servidores de .mcp.json só rodam com o seu consentimento</div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "➕", rt: "Adicionar" }, { ic: "🩺", rt: "Conferir" }, { ic: "🔑", rt: "Autenticar (se pedir)" }, { ic: "💬", rt: "Usar" }, { ic: "🗑", rt: "Remover" }],
+  passos: [
+    { ativos: [0], titulo: "Adicionar: claude mcp add", texto: "No PowerShell, fora da sessão. Você escolhe nome, transporte e escopo. O comando só <strong>registra</strong> o servidor; não garante que ele funciona." },
+    { ativos: [1], setas: [0], titulo: "Conferir: claude mcp list", texto: "Mostra o status de cada servidor. <code>✔ Connected</code> é o esperado. Em consoles antigos do Windows os símbolos podem aparecer como <code>√</code> e <code>×</code>." },
+    { ativos: [2], setas: [1], titulo: "Autenticar, se necessário", texto: "Status <code>! Needs authentication</code>? Abra <code>/mcp</code> → servidor → <strong>Authenticate</strong>, ou rode <code>claude mcp login &lt;nome&gt;</code>. O login acontece no navegador." },
+    { ativos: [3], setas: [2], titulo: "Usar na sessão", texto: "Peça normalmente. O Claude escolhe a ferramenta sozinho; citar o servidor pelo nome garante que ele seja usado. Na primeira chamada, aprove a permissão." },
+    { ativos: [4], setas: [3], titulo: "Remover o que não usa", texto: "<code>claude mcp remove &lt;nome&gt;</code>. Em servidores com login, rode antes <code>claude mcp logout &lt;nome&gt;</code>: remover apaga os tokens locais, mas não os revoga no provedor." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell (demonstração)", prompt: "PS C:\\Users\\ana\\estudos-claude\\taskflow>", altura: 260,
+  passos: [
+    { t: "cmd", x: "claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp", leg: "Registrar o servidor hospedado" },
+    { t: "html", x: 'Added HTTP MCP server claude-code-docs with URL: https://code.claude.com/docs/mcp to local config\n<span class="t-dim">File modified: C:\\Users\\ana\\.claude.json</span>' },
+    { t: "cmd", x: "claude mcp list", leg: "Conferir o status" },
+    { t: "html", x: 'claude-code-docs: https://code.claude.com/docs/mcp (HTTP) - <span class="t-ok">✔ Connected</span>' },
+    { t: "cmd", x: "claude", leg: "Usar numa sessão" },
+    { t: "user", x: "use o servidor claude-code-docs para explicar escopos de MCP" },
+    { t: "tool", x: "claude-code-docs - search (MCP)(query: \"MCP scopes\")" },
+    { t: "claude", x: "Há três escopos: local (padrão, só você neste projeto), project (.mcp.json, compartilhado via Git) e user (você, em todos os projetos).", ms: 1500 },
+    { t: "cmd", x: "claude mcp remove claude-code-docs", leg: "Limpar ao terminar" },
+    { t: "html", x: 'Removed MCP server "claude-code-docs" from local config' }
+  ]
+});
+(function () {
+  var servidores = {};
+  function lista() { var k = Object.keys(servidores); if (!k.length) return '<span class="t-dim">No MCP servers configured.</span>'; return k.map(function (n) { var s = servidores[n]; return n + ": " + s.alvo + " (" + s.tipo + ") - " + (s.ok ? '<span class="t-ok">✔ Connected</span>' : '<span class="t-warn">✘ Failed to connect</span>'); }).join("\n"); }
+  Curso.terminal("term", {
+    titulo: "PowerShell: claude mcp (simulação)", prompt: "PS C:\\estudos-claude\\taskflow>",
+    intro: '<span class="t-dim">Comandos: claude mcp add · list · get &lt;nome&gt; · remove &lt;nome&gt;</span>',
+    metas: ["claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp", "claude mcp list", "claude mcp add playwright npx -y @playwright/mcp@latest", "claude mcp get playwright", "claude mcp remove playwright"],
+    comandos: { "claude mcp list": lista },
+    padroes: [
+      [/^claude mcp add (?:--scope (local|project|user) )?--transport (http|sse) (\S+) (https?:\/\/\S+)$/i, function (m) { servidores[m[3]] = { tipo: m[2].toUpperCase(), alvo: m[4], ok: true }; return "Added " + m[2].toUpperCase() + " MCP server " + m[3] + " with URL: " + m[4] + " to " + (m[1] || "local") + ' config\n<span class="t-dim">File modified: ' + (m[1] === "project" ? ".mcp.json" : "C:\\Users\\voce\\.claude.json") + "</span>" + (m[2].toLowerCase() === "sse" ? '\n<span class="t-warn">Lembre: sse está depreciado; prefira http.</span>' : ""); }],
+      [/^claude mcp add (\S+) -- (.+)$/i, function (m) { servidores[m[1]] = { tipo: "stdio", alvo: m[2], ok: true }; return "Added stdio MCP server " + m[1] + " with command: " + m[2] + " to local config"; }],
+      [/^claude mcp add (\S+) (npx|python|node)\b(.*)$/i, function (m) { servidores[m[1]] = { tipo: "stdio", alvo: "(comando mal interpretado)", ok: false }; return '<span class="t-warn">Faltou o -- antes do comando do servidor!</span>\n<span class="t-dim">Sem o --, as opções do servidor (como -y) se misturam com as do Claude Code e ele não inicia direito. Forma correta:\n  claude mcp add ' + m[1] + " -- " + m[2] + m[3] + "\nRode claude mcp get " + m[1] + " para ver o problema e depois remova.</span>"; }],
+      [/^claude mcp get (\S+)$/i, function (m) { var s = servidores[m[1]]; if (!s) return '<span class="t-warn">No MCP server found with name: ' + m[1] + "</span>"; return m[1] + ":\n  Scope: Local config\n  Type: " + s.tipo + "\n  " + (s.tipo === "stdio" ? "Command: " : "URL: ") + s.alvo + "\n  Status: " + (s.ok ? '<span class="t-ok">✔ Connected</span>' : '<span class="t-warn">✘ Failed to connect</span>\n<span class="t-dim">  Dica: confira se o comando foi salvo depois de um --</span>'); }],
+      [/^claude mcp remove (\S+)$/i, function (m) { if (!servidores[m[1]]) return '<span class="t-warn">No MCP server found with name: ' + m[1] + "</span>"; delete servidores[m[1]]; return 'Removed MCP server "' + m[1] + '" from local config'; }],
+      [/^claude mcp (login|logout) (\S+)$/i, function (m) { return '<span class="t-dim">(' + m[1] + ' simulado: na versão real, ' + (m[1] === "login" ? "o navegador abriria para você autorizar" : "as credenciais guardadas seriam apagadas") + ")</span>"; }]
+    ],
+    desconhecido: '<span class="t-dim">Comando não simulado. Use claude mcp add / list / get / remove.</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual comando adiciona um servidor hospedado numa URL?", op: ["<code>claude mcp add claude-code-docs https://code.claude.com/docs/mcp</code>", "<code>claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp</code>", "<code>/mcp add claude-code-docs</code>"], c: 1, ex: "Para URL, informe <code>--transport http</code>. Sem ele, o padrão é stdio." },
+  { p: "Em <code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code>, para que serve o <code>--</code>?", op: ["É um comentário", "Separa as opções do Claude Code do comando que inicia o servidor", "Desliga as permissões"], c: 1, ex: "Tudo depois do <code>--</code> é repassado sem alteração como comando do servidor." },
+  { p: "Você quer que todos que clonarem o projeto tenham o mesmo servidor. Qual escopo?", op: ["<code>local</code>", "<code>user</code>", "<code>project</code> (grava no <code>.mcp.json</code>)"], c: 2, ex: "O <code>.mcp.json</code> vai para o Git. Cada pessoa ainda precisa aprovar o servidor na primeira vez." },
+  { p: "<code>claude mcp list</code> mostra <code>! Needs authentication</code>. O que fazer?", op: ["Remover e desistir", "Abrir <code>/mcp</code> → Authenticate, ou rodar <code>claude mcp login &lt;nome&gt;</code>", "Colar sua senha no prompt"], c: 1, ex: "O login OAuth acontece no navegador. Nunca cole senhas ou tokens no prompt." },
+  { p: "Por que o Claude Code pede aprovação para servidores de um <code>.mcp.json</code> recém-clonado?", op: ["Para cobrar pelo uso", "Para que um repositório não rode programas na sua máquina sem você consentir", "Porque o arquivo está corrompido"], c: 1, ex: "É uma proteção de segurança. Leia o que o servidor faz antes de aprovar." }
+]);
+Curso.checklist("check", [
+  "Adiciono servidores <code>http</code> e <code>stdio</code> com a sintaxe certa (incluindo o <code>--</code>)",
+  "Confiro status com <code>claude mcp list</code> e detalhes com <code>claude mcp get</code>",
+  "Sei escolher entre os escopos <code>local</code>, <code>project</code> e <code>user</code>",
+  "Sei autenticar com <code>/mcp</code> ou <code>claude mcp login</code>",
+  "Usei e removi o servidor de documentação no meu projeto"
+]);
+</script>
+</body>
+</html>

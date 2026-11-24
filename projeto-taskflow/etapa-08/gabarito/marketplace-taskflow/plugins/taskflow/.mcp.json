@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tarefas": {
+      "command": "python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servidor/servidor_mcp.py"],
+      "env": { "TASKFLOW_DIR": "${CLAUDE_PROJECT_DIR}" }
+    }
+  }
+}

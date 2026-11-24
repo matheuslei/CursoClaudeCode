@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 3</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Fluxo profissional</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 3</a>
+    <a class="prox" href="../04-permissoes/01-modos.html"><small>Próximo módulo →</small>Módulo 4: Permissões e segurança</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 3 · Fluxo profissional › Quiz final");
+Curso.quiz("quiz", [{"p": "Você corrigiu o Claude duas vezes e ainda está errado. O que a documentação recomenda?", "op": ["Corrigir uma terceira vez com mais ênfase", "<code>/clear</code> e um pedido novo que incorpore o que você aprendeu", "Trocar de computador"], "c": 1, "ex": "Cada tentativa falha fica no contexto. Recomeçar limpo com um pedido melhor funciona melhor. <span class=\"t-dim\">(aula: Explorar → Planejar → Codar → Commitar)</span>"}, {"p": "Na tela de aprovação, você quer sair do plan mode SEM aprovar. O que fazer?", "op": ["Apertar <kbd>Shift</kbd>+<kbd>Tab</kbd>", "Apertar <kbd>Esc</kbd> e depois <kbd>Shift</kbd>+<kbd>Tab</kbd>", "Fechar o terminal"], "c": 1, "ex": "Na tela de aprovação, <kbd>Shift</kbd>+<kbd>Tab</kbd> aprova o plano. <kbd>Esc</kbd> primeiro fecha a tela. <span class=\"t-dim\">(aula: Plan mode)</span>"}, {"p": "Você não sabe todos os detalhes da feature. O que fazer?", "op": ["Esperar até ter tudo definido", "Pedir para o Claude te entrevistar até conseguir escrever a spec", "Deixar o Claude decidir tudo sozinho"], "c": 1, "ex": "A entrevista transforma o que está na sua cabeça em decisões explícitas, uma pergunta de cada vez. <span class=\"t-dim\">(aula: Spec-Driven Development)</span>"}, {"p": "O Claude diz: \"ajustei o teste para refletir o comportamento atual\". O que fazer?", "op": ["Aceitar, ele sabe o que faz", "Ler o diff do teste: se o teste representava a spec, desfazer e pedir para corrigir o código", "Apagar todos os testes"], "c": 1, "ex": "O teste é o contrato. Se ele mudou, o contrato mudou. Só aceite se a spec realmente estava errada. <span class=\"t-dim\">(aula: TDD com o Claude)</span>"}, {"p": "Você quer menos falsos positivos na revisão. Qual nível usar?", "op": ["<code>/code-review low</code>", "<code>/code-review max</code>", "<code>/code-review --fix</code>"], "c": 0, "ex": "Em <code>low</code>, a revisão reporta só o que tem mais certeza. Níveis maiores ampliam a cobertura. <span class=\"t-dim\">(aula: Verificação e revisão)</span>"}, {"p": "Qual é a melhor forma de o Claude saber que terminou de verdade?", "op": ["Ele avisar que está pronto", "Ter algo para rodar que responda passou/falhou, como testes", "Usar o modelo mais caro"], "c": 1, "ex": "Com um teste ou comando de verificação, ele fecha o ciclo sozinho e você recebe evidência, não opinião. <span class=\"t-dim\">(aula: Explorar → Planejar → Codar → Commitar)</span>"}, {"p": "Como abrir o plano proposto no seu editor de texto para ajustá-lo?", "op": ["<kbd>Ctrl</kbd>+<kbd>G</kbd> na tela de aprovação", "<code>/edit</code>", "<kbd>Alt</kbd>+<kbd>P</kbd>"], "c": 0, "ex": "<kbd>Ctrl</kbd>+<kbd>G</kbd> abre o plano no editor padrão. Você edita e o Claude segue a versão nova. <span class=\"t-dim\">(aula: Plan mode)</span>"}, {"p": "Qual critério de aceite é verificável?", "op": ["\"O comando deve ser intuitivo\"", "\"Dado prazo igual a hoje, quando rodo atrasadas, então a tarefa NÃO aparece\"", "\"Deve funcionar bem\""], "c": 1, "ex": "O formato dado/quando/então vira teste diretamente (próxima aula). <span class=\"t-dim\">(aula: Spec-Driven Development)</span>"}, {"p": "Por que fazer commit dos testes antes de pedir a implementação?", "op": ["Para o Claude rodar mais rápido", "Para qualquer alteração nos testes aparecer no <code>git diff</code>", "Porque o Git exige"], "c": 1, "ex": "Com os testes no histórico, <code>git diff HEAD -- tests/</code> mostra se alguém mexeu neles. <span class=\"t-dim\">(aula: TDD com o Claude)</span>"}, {"p": "Por que o <code>/code-review</code> encontra problemas que o próprio autor não viu?", "op": ["Porque usa sempre o modelo mais caro", "Porque roda num subagente com contexto próprio, sem a conversa que produziu o código", "Porque lê a internet"], "c": 1, "ex": "Sem a conversa, ele não é influenciado pelo raciocínio do autor e olha só para o resultado. <span class=\"t-dim\">(aula: Verificação e revisão)</span>"}]);
+</script>
+</body>
+</html>

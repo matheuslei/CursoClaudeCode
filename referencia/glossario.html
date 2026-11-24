@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossário</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/curso.css">
+</head>
+<body data-raiz="../" data-titulo="Referência › Glossário">
+<main>
+  <h1>Glossário</h1>
+  <p class="objetivo">Os termos do curso explicados em uma ou duas frases.</p>
+  <div class="busca"><input id="busca" type="search" placeholder="Buscar termo" aria-label="Buscar termo"></div>
+  <section class="bloco">
+  <dl class="glos">
+    <div data-busca><dt>Agente de IA</dt><dd>Um modelo de linguagem que, além de conversar, usa ferramentas (ler arquivos, rodar comandos, editar código) em ciclos até cumprir um objetivo.</dd></div>
+    <div data-busca><dt>Loop agêntico</dt><dd>O ciclo que o Claude repete: reunir contexto → agir → verificar o resultado → decidir o próximo passo.</dd></div>
+    <div data-busca><dt>Ferramenta (tool)</dt><dd>Uma ação que o Claude pode executar, como Read (ler arquivo), Edit (editar), Bash/PowerShell (rodar comando) ou WebFetch (ler página).</dd></div>
+    <div data-busca><dt>Janela de contexto</dt><dd>Tudo o que o modelo "enxerga" de uma vez: instruções, CLAUDE.md, mensagens, arquivos lidos e saídas de comandos. É medida em tokens e tem limite.</dd></div>
+    <div data-busca><dt>Token</dt><dd>Pedaço de texto que o modelo processa (aproximadamente ¾ de uma palavra em inglês; em português costuma ser um pouco menos). Custo e limites são medidos em tokens.</dd></div>
+    <div data-busca><dt>CLAUDE.md</dt><dd>Arquivo Markdown na raiz do projeto com instruções permanentes (comandos, padrões, regras). O Claude lê no início de toda sessão. Criado com <code>/init</code>.</dd></div>
+    <div data-busca><dt>Auto memory</dt><dd>Memória que o próprio Claude grava entre sessões com aprendizados sobre o projeto. Gerenciada com <code>/memory</code>.</dd></div>
+    <div data-busca><dt>Modo de permissão</dt><dd>Define o que o Claude pode fazer sem perguntar. Exemplos: Manual (pergunta antes de editar ou rodar), acceptEdits (edita sem perguntar), plan (só analisa e planeja), auto (um classificador decide o que é seguro).</dd></div>
+    <div data-busca><dt>Plan mode</dt><dd>Modo em que o Claude investiga e propõe um plano sem alterar arquivos. Você aprova antes da execução.</dd></div>
+    <div data-busca><dt>Checkpoint</dt><dd>Ponto salvo automaticamente antes das edições do Claude. Com <code>/rewind</code> (ou <kbd>Esc</kbd> <kbd>Esc</kbd>) você volta a ele.</dd></div>
+    <div data-busca><dt>Compactação</dt><dd>Resumir a conversa para liberar espaço no contexto (<code>/compact</code>). Acontece também automaticamente quando o contexto enche.</dd></div>
+    <div data-busca><dt>Esforço (effort)</dt><dd>Quanto o modelo "pensa" antes de responder: <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>. Mais esforço = respostas mais cuidadosas, porém mais lentas e caras.</dd></div>
+    <div data-busca><dt>Skill</dt><dd>Pacote de instruções reutilizáveis que o Claude carrega quando a tarefa pede (ex.: um fluxo de revisão do seu time). Vira um comando <code>/nome</code>.</dd></div>
+    <div data-busca><dt>Subagente</dt><dd>Um "ajudante" com contexto próprio que o Claude dispara para uma subtarefa (ex.: pesquisar no código) e que devolve só o resumo.</dd></div>
+    <div data-busca><dt>Hook</dt><dd>Comando que roda automaticamente antes ou depois de uma ação do Claude (ex.: formatar o código após cada edição).</dd></div>
+    <div data-busca><dt>MCP (Model Context Protocol)</dt><dd>Padrão aberto para conectar o Claude a ferramentas e dados externos (Jira, Google Drive, bancos de dados, APIs próprias).</dd></div>
+    <div data-busca><dt>Plugin</dt><dd>Pacote distribuível que junta skills, subagentes, hooks e servidores MCP para instalar de uma vez.</dd></div>
+    <div data-busca><dt>Segundo plano (background)</dt><dd>Trabalho que continua rodando enquanto você conversa: comandos e subagentes. Acompanhe com <code>/tasks</code>; mande com <kbd>Ctrl</kbd>+<kbd>B</kbd>.</dd></div>
+    <div data-busca><dt>Fork</dt><dd>Cópia da conversa num ponto, para seguir outro caminho sem perder o original (<code>/branch</code>, <code>/fork</code>, <code>/subtask</code>). Copia o histórico, não os arquivos.</dd></div>
+    <div data-busca><dt>Agent view</dt><dd>Tela que lista as sessões em segundo plano e o estado de cada uma (<code>claude agents</code>). Em research preview.</dd></div>
+    <div data-busca><dt>Agent teams (equipe de agentes)</dt><dd>Recurso experimental: uma sessão líder cria colegas que dividem uma lista de tarefas e trocam mensagens entre si.</dd></div>
+    <div data-busca><dt>/goal</dt><dd>Condição de término: o Claude segue turno a turno até um avaliador, que lê a conversa, confirmar que ela foi cumprida.</dd></div>
+    <div data-busca><dt>Plugin</dt><dd>Pasta com manifesto (<code>.claude-plugin/plugin.json</code>) que junta skills, subagentes, hooks e servidores MCP e instala tudo como uma unidade. As peças ganham o prefixo do plugin.</dd></div>
+    <div data-busca><dt>Marketplace</dt><dd>Catálogo (<code>.claude-plugin/marketplace.json</code>) que lista plugins e onde buscar cada um. Pode ser um repositório ou uma pasta local.</dd></div>
+    <div data-busca><dt>Eval (avaliação de plugin)</dt><dd>Casos de teste rodados com e sem o plugin para medir o que ele acrescenta (<code>claude plugin eval</code>).</dd></div>
+    <div data-busca><dt>Modo não interativo (-p)</dt><dd>Execução sem conversa: o Claude responde e termina. Usado em scripts e CI.</dd></div>
+    <div data-busca><dt>Bare mode</dt><dd>Início mínimo, sem hooks, skills, MCP nem CLAUDE.md; exige chave de API.</dd></div>
+    <div data-busca><dt>claude-code-action</dt><dd>A action oficial do Claude Code para o GitHub Actions.</dd></div>
+    <div data-busca><dt>GitHub Secrets</dt><dd>Cofre de segredos do repositório no GitHub. Chaves nunca vão no código.</dd></div>
+    <div data-busca><dt>Cron</dt><dd>Expressão de horário com 5 campos, usada em agendamentos.</dd></div>
+    <div data-busca><dt>Agent SDK</dt><dd>Biblioteca (<code>claude-agent-sdk</code> em Python) para construir agentes próprios com o mesmo loop do Claude Code.</dd></div>
+    <div data-busca><dt>query() e ClaudeSDKClient</dt><dd>No Agent SDK: <code>query()</code> roda um pedido e devolve mensagens; <code>ClaudeSDKClient</code> mantém uma conversa contínua.</dd></div>
+    <div data-busca><dt>Ferramenta própria (@tool)</dt><dd>Função Python exposta ao agente por um servidor MCP no próprio processo (<code>create_sdk_mcp_server</code>).</dd></div>
+    <div data-busca><dt>can_use_tool</dt><dd>Função do Agent SDK que decide, a cada chamada, se o agente pode usar uma ferramenta.</dd></div>
+    <div data-busca><dt>Worktree</dt><dd>Recurso do Git para ter várias cópias de trabalho do mesmo repositório em pastas diferentes; permite rodar sessões em paralelo sem conflito.</dd></div>
+    <div data-busca><dt>Repositório (repo)</dt><dd>Pasta de projeto controlada pelo Git, com todo o histórico de mudanças.</dd></div>
+    <div data-busca><dt>Commit</dt><dd>Uma "foto" salva das mudanças, com mensagem descritiva. É seu ponto de retorno seguro.</dd></div>
+    <div data-busca><dt>Branch</dt><dd>Linha paralela de desenvolvimento no Git. Permite experimentar sem mexer na versão principal.</dd></div>
+    <div data-busca><dt>Diff</dt><dd>A diferença entre duas versões de um arquivo: o que entrou e o que saiu.</dd></div>
+    <div data-busca><dt>PowerShell</dt><dd>O terminal e linguagem de comandos padrão do Windows moderno. O prompt começa com <code>PS C:\</code>.</dd></div>
+    <div data-busca><dt>PATH</dt><dd>Lista de pastas onde o sistema procura programas. Se <code>claude</code> "não é reconhecido", a pasta de instalação não está no PATH.</dd></div>
+    <div data-busca><dt>Spec-Driven Development (SDD)</dt><dd>Escrever a especificação (o quê, por quê, critérios de aceite) antes de pedir o código. Reduz retrabalho e mal-entendidos com a IA.</dd></div>
+    <div data-busca><dt>Prompt</dt><dd>A mensagem/instrução que você envia ao modelo.</dd></div>
+    <div data-busca><dt>Alucinação</dt><dd>Quando o modelo afirma algo plausível, mas falso. Por isso sempre verificamos (testes, execução, leitura do diff).</dd></div>
+  </dl>
+  </section>
+</main>
+<script src="../assets/curso.js"></script>
+<script>Curso.iniciarReferencia();</script>
+</body>
+</html>

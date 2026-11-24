@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificado do curso</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/curso.css">
+<style>
+  .cert{position:relative;margin:1.2rem 0;padding:2.6rem 2rem;border:2px solid var(--acc);border-radius:16px;background:var(--card);text-align:center;overflow:hidden}
+  .cert::before{content:"";position:absolute;inset:10px;border:1px solid var(--borda2);border-radius:10px;pointer-events:none}
+  .cert .selo-c{width:64px;height:64px;margin:0 auto .6rem}
+  .cert h2{margin:.2rem 0 1.2rem;font-size:1rem;letter-spacing:.18em;text-transform:uppercase;color:var(--txt2);font-weight:600}
+  .cert .nome{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;margin:.4rem 0;border-bottom:1px solid var(--borda2);display:inline-block;padding:0 1rem .2rem;min-width:60%}
+  .cert .curso{font-size:1.25rem;font-weight:600;color:var(--acc)}
+  .cert .det{color:var(--txt2);font-size:.92rem;margin-top:1.2rem}
+  .cert table{margin:1rem auto 0;font-size:.85rem;border-collapse:collapse}
+  .cert td{padding:.15rem .6rem;text-align:left}
+  .falta li{margin:.15rem 0}
+  .barra-c{height:10px;background:var(--borda);border-radius:99px;overflow:hidden;margin:.6rem 0}
+  .barra-c>div{height:100%;background:var(--acc)}
+  @media print{body{background:#fff}.cert{border-color:#b5552f;break-inside:avoid}.so-tela{display:none!important}}
+</style>
+</head>
+<body data-raiz="">
+<main>
+  <header class="cab-aula so-tela">
+    <span class="selo">Fim da trilha</span>
+    <h1>Certificado do curso</h1>
+    <p class="objetivo">Conclua as aulas dos 11 módulos e o certificado aparece aqui. Ele é gerado no seu navegador, offline. É um marco de estudo pessoal, sem valor oficial e sem vínculo com a Anthropic.</p>
+  </header>
+  <div id="conteudo"></div>
+</main>
+<script src="assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Certificado");
+(function () {
+  var st = Curso.estado(), aulas = st.aulas || {}, alvo = document.getElementById("conteudo");
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  var total = 0, feitas = 0, min = 0, falta = [], linhas = "", ultima = 0;
+  Curso.CATALOGO.forEach(function (m) {
+    var mt = 0, mf = 0;
+    m.aulas.forEach(function (a) {
+      if (!a.arq) return;
+      total++; mt++; min += a.min || 0;
+      var x = aulas[a.id] || {};
+      if (x.ok) { feitas++; mf++; if (x.visto > ultima) ultima = x.visto; }
+      else falta.push('<li><a href="modulos/' + m.pasta + "/" + a.arq + '">Módulo ' + m.n + " · " + esc(a.titulo) + "</a></li>");
+    });
+    var q = aulas[m.id + "qf"] || {};
+    linhas += "<tr><td>" + m.n + ". " + esc(m.titulo) + "</td><td>" + mf + "/" + mt + " aulas</td><td>" + (q.quizTotal ? "quiz final " + q.quiz + "/" + q.quizTotal : '<span class="t-dim">quiz final —</span>') + "</td></tr>";
+  });
+  var pct = total ? Math.round(feitas / total * 100) : 0;
+  if (feitas < total) {
+    alvo.innerHTML = '<section class="bloco"><h2>Falta pouco?</h2><p>Você concluiu <strong>' + feitas + " de " + total + "</strong> aulas (" + pct + "%).</p>" +
+      '<div class="barra-c"><div style="width:' + pct + '%"></div></div>' +
+      "<p>Marque cada aula como concluída no fim da página dela. Aulas que faltam:</p><ul class=\"falta\">" + falta.slice(0, 60).join("") + "</ul>" +
+      '<details class="gabarito"><summary>Resumo por módulo</summary><table class="tab"><tbody>' + linhas + "</tbody></table></details></section>";
+    return;
+  }
+  var nome = st.nomeCert || "";
+  var data = new Date(ultima || Date.now()).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  alvo.innerHTML =
+    '<section class="bloco so-tela"><label for="nomeCert"><strong>Seu nome no certificado</strong></label><br>' +
+    '<input id="nomeCert" type="text" maxlength="60" autocomplete="name" style="font:inherit;padding:.4em .6em;border-radius:8px;border:1px solid var(--borda2);background:var(--bg);color:var(--txt);width:min(100%,28rem)" value="' + esc(nome) + '"> ' +
+    '<button type="button" class="primario" id="imprimir">🖨 Imprimir ou salvar em PDF</button>' +
+    '<p class="t-dim" style="font-size:.85rem">O nome fica só neste navegador. Use <kbd>Ctrl</kbd>+<kbd>P</kbd> e escolha "Salvar como PDF".</p></section>' +
+    '<div class="cert"><img class="selo-c" src="assets/favicon.svg" alt=""><h2>Certificado de conclusão</h2>' +
+    "<p>Certificamos que</p><div class=\"nome\" id=\"nomeTxt\">" + (esc(nome) || "&nbsp;") + "</div>" +
+    "<p>concluiu o curso de estudo pessoal</p><p class=\"curso\">Claude Code: do zero ao avançado</p>" +
+    '<p class="det">' + total + " aulas em 11 módulos · cerca de " + Math.round(min / 60) + " horas · concluído em " + esc(data) + "</p>" +
+    '<table><tbody>' + linhas + "</tbody></table>" +
+    '<p class="det">Material de estudo pessoal, offline, sem valor oficial e sem vínculo com a Anthropic.</p></div>';
+  var inp = document.getElementById("nomeCert");
+  inp.oninput = function () { document.getElementById("nomeTxt").textContent = inp.value || " "; Curso.estado().nomeCert = inp.value; Curso.salvarEstado(); };
+  document.getElementById("imprimir").onclick = function () { window.print(); };
+})();
+</script>
+</body>
+</html>

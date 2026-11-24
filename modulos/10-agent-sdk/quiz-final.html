@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 10</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m10qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 10 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Agent SDK</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 10</a>
+    <a class="prox" href="../../certificado.html"><small>Fim do curso →</small>Ver o certificado</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 10 · Agent SDK › Quiz final");
+Curso.quiz("quiz", [{"p": "Você pôs <code>allowed_tools=[\"Read\"]</code>. O Claude ainda pode tentar usar o Bash?", "op": ["Não, só o Read existe", "Sim: allowed_tools só pré-aprova; o Bash segue o modo de permissão", "Só se o Bash estiver no system_prompt"], "c": 1, "ex": "Para remover o Bash do agente, use <code>disallowed_tools=[\"Bash\"]</code> ou a opção <code>tools</code>. <span class=\"t-dim\">(aula: O loop do agente)</span>"}, {"p": "Você registrou <code>mcp_servers={\"tf\": servidor}</code>. Qual o nome completo de <code>listar_tarefas</code>?", "op": ["<code>mcp__taskflow__listar_tarefas</code>", "<code>mcp__tf__listar_tarefas</code>", "<code>tf.listar_tarefas</code>"], "c": 1, "ex": "O nome usa a <strong>chave</strong> de <code>mcp_servers</code>, não o <code>name</code> do servidor. <span class=\"t-dim\">(aula: Ferramentas próprias)</span>"}, {"p": "Uma ferramenta está em <code>allowed_tools</code>. Seu <code>can_use_tool</code> é chamado para ela?", "op": ["Sim, sempre", "Não: chamadas aprovadas antes pulam o callback", "Só no modo plan"], "c": 1, "ex": "Para checar chamadas já aprovadas, use um hook <code>PreToolUse</code>. <span class=\"t-dim\">(aula: Permissões e hooks no SDK)</span>"}, {"p": "Qual campo inclui o gasto dos subagentes?", "op": ["<code>usage</code>", "<code>total_cost_usd</code>", "<code>num_turns</code>"], "c": 1, "ex": "<code>total_cost_usd</code> e <code>model_usage</code> incluem os subagentes; <code>usage</code> conta só o loop principal. <span class=\"t-dim\">(aula: Subagentes, custo e o agente TaskFlow)</span>"}, {"p": "Qual mensagem marca o fim do loop e traz o custo estimado?", "op": ["<code>AssistantMessage</code>", "<code>SystemMessage</code>", "<code>ResultMessage</code>"], "c": 2, "ex": "A <code>ResultMessage</code> traz <code>subtype</code>, <code>result</code>, <code>num_turns</code>, <code>total_cost_usd</code> e <code>session_id</code>. <span class=\"t-dim\">(aula: O loop do agente)</span>"}, {"p": "O que o handler de uma ferramenta deve devolver?", "op": ["Uma string simples", "Um dicionário com a lista <code>content</code> (e opcionalmente <code>is_error</code>)", "Nada; o SDK descobre sozinho"], "c": 1, "ex": "Ex.: <code>{\"content\": [{\"type\": \"text\", \"text\": \"...\"}]}</code>. <span class=\"t-dim\">(aula: Ferramentas próprias)</span>"}, {"p": "Em <code>permission_mode=\"default\"</code>, sem <code>can_use_tool</code>, o que acontece com uma chamada que precisa de aprovação e não casa com regra?", "op": ["Roda normalmente", "É negada", "O SDK pergunta no terminal sozinho"], "c": 1, "ex": "Sem callback, não há quem aprove: a chamada é negada. <span class=\"t-dim\">(aula: Permissões e hooks no SDK)</span>"}, {"p": "O que o subagente recebe do agente principal?", "op": ["Todo o histórico da conversa", "Só o pedido escrito na chamada da ferramenta Agent, além das próprias instruções", "Nada; ele adivinha"], "c": 1, "ex": "Inclua no pedido os caminhos e decisões de que ele precisa. <span class=\"t-dim\">(aula: Subagentes, custo e o agente TaskFlow)</span>"}, {"p": "O agente parou com <code>subtype</code> <code>error_max_turns</code>. O que aconteceu?", "op": ["A chave de API expirou", "Bateu no limite de turnos antes de terminar", "Uma ferramenta deu erro"], "c": 1, "ex": "Nesse caso não há <code>result</code>; e a <code>query()</code> levanta uma exceção depois de entregar a mensagem. <span class=\"t-dim\">(aula: O loop do agente)</span>"}, {"p": "Como fazer o Claude usar <em>só</em> as ferramentas do TaskFlow, sem Bash nem Edit?", "op": ["<code>tools=[]</code>", "<code>allowed_tools=[\"mcp__taskflow__*\"]</code> sozinho", "<code>readOnlyHint=True</code>"], "c": 0, "ex": "<code>tools=[]</code> tira as embutidas do contexto; <code>allowed_tools</code> só pré-aprova. <span class=\"t-dim\">(aula: Ferramentas próprias)</span>"}]);
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 6</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m6qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 6 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: MCP e integrações</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 6</a>
+    <a class="prox" href="../07-subagentes/01-subagentes.html"><small>Próximo módulo →</small>Módulo 7: Subagentes e paralelismo</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 6 · MCP e integrações › Quiz final");
+Curso.quiz("quiz", [{"p": "Por que remover servidores MCP que você não usa?", "op": ["Porque eles param de funcionar sozinhos", "Porque nomes de ferramentas e instruções ocupam contexto em toda sessão, e cada servidor é um risco a mais", "Porque o Claude só aceita 2 servidores"], "c": 1, "ex": "Mesmo com o tool search reduzindo o custo, cada servidor ocupa espaço e amplia a superfície de risco. <span class=\"t-dim\">(aula: O que é MCP)</span>"}, {"p": "Você quer que todos que clonarem o projeto tenham o mesmo servidor. Qual escopo?", "op": ["<code>local</code>", "<code>user</code>", "<code>project</code> (grava no <code>.mcp.json</code>)"], "c": 2, "ex": "O <code>.mcp.json</code> vai para o Git. Cada pessoa ainda precisa aprovar o servidor na primeira vez. <span class=\"t-dim\">(aula: Instalar e autenticar um servidor)</span>"}, {"p": "Por que não usar <code>print()</code> num servidor stdio?", "op": ["Porque deixa lento", "Porque a saída padrão é o canal do protocolo e o print corrompe a comunicação", "Porque o Python proíbe"], "c": 1, "ex": "No transporte stdio, stdout é exclusivo das mensagens MCP. <span class=\"t-dim\">(aula: Criar um MCP em Python)</span>"}, {"p": "O que o <code>/desktop</code> faz no terminal?", "op": ["Abre a área de trabalho do Windows", "Continua a sessão atual do CLI no app Desktop", "Instala o app Desktop"], "c": 1, "ex": "Requer Windows x64 ou macOS e uma assinatura Claude. <span class=\"t-dim\">(aula: VS Code e app Desktop)</span>"}, {"p": "Você quer que o Claude use um script Python que roda no seu computador. Qual transporte?", "op": ["<code>http</code>", "<code>stdio</code>", "<code>sse</code>"], "c": 1, "ex": "Processos locais iniciados pelo Claude Code usam <code>stdio</code>, o transporte padrão. <span class=\"t-dim\">(aula: O que é MCP)</span>"}, {"p": "Em <code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code>, para que serve o <code>--</code>?", "op": ["É um comentário", "Separa as opções do Claude Code do comando que inicia o servidor", "Desliga as permissões"], "c": 1, "ex": "Tudo depois do <code>--</code> é repassado sem alteração como comando do servidor. <span class=\"t-dim\">(aula: Instalar e autenticar um servidor)</span>"}, {"p": "De onde o Claude tira a descrição de uma ferramenta criada com <code>@mcp.tool()</code>?", "op": ["Do nome do arquivo", "Da docstring da função", "Do README"], "c": 1, "ex": "A docstring vira a descrição. Os tipos dos parâmetros também são publicados. Capriche nos dois. <span class=\"t-dim\">(aula: Criar um MCP em Python)</span>"}, {"p": "Você instalou só a extensão do VS Code. <code>claude</code> no terminal integrado diz que não existe. Por quê?", "op": ["A extensão não coloca o CLI no PATH; é preciso a instalação standalone", "O VS Code bloqueia terminais", "Precisa reiniciar o computador"], "c": 0, "ex": "Extensão e CLI são instalações separadas, mas usam as mesmas configurações. <span class=\"t-dim\">(aula: VS Code e app Desktop)</span>"}, {"p": "Qual o principal risco de um servidor que busca conteúdo da web?", "op": ["Ficar lento", "Prompt injection: o conteúdo externo pode trazer instruções maliciosas", "Gastar muita memória RAM"], "c": 1, "ex": "A documentação alerta especificamente para isso. Conecte só servidores confiáveis. <span class=\"t-dim\">(aula: O que é MCP)</span>"}, {"p": "<code>claude mcp list</code> mostra <code>! Needs authentication</code>. O que fazer?", "op": ["Remover e desistir", "Abrir <code>/mcp</code> → Authenticate, ou rodar <code>claude mcp login &lt;nome&gt;</code>", "Colar sua senha no prompt"], "c": 1, "ex": "O login OAuth acontece no navegador. Nunca cole senhas ou tokens no prompt. <span class=\"t-dim\">(aula: Instalar e autenticar um servidor)</span>"}]);
+</script>
+</body>
+</html>

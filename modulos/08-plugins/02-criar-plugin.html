@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criar o plugin do TaskFlow</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m8a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 8 · Aula 2</span><span class="selo cinza">Avançado</span><span class="selo cinza">~35 min</span>
+    <h1>Criar o plugin do TaskFlow</h1>
+    <p class="objetivo">Objetivo: juntar a skill, o hook, o servidor MCP e o subagente do TaskFlow num plugin, validar, testar numa sessão sem instalar e entender os nomes com prefixo.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Até aqui, as peças do TaskFlow moram em <code>.claude/</code> do projeto e no <code>settings.json</code>. Elas só valem naquele projeto. Como plugin, você carrega tudo em qualquer projeto com uma opção na linha de comando, e depois instala por nome (aula 4).</p>
+    <div class="caixa"><strong>O que muda</strong>Duas coisas: <strong>onde</strong> os arquivos ficam (na pasta do plugin) e <strong>como</strong> eles se chamam (com o prefixo <code>taskflow:</code>).</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: de peças soltas a plugin</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Estrutura e regras</h2>
+    <div class="cod"><span class="rot">marketplace-taskflow/plugins/taskflow/</span><code>.claude-plugin/
+  plugin.json             ← o manifesto (só ele fica aqui dentro!)
+skills/
+  revisar-taskflow/SKILL.md
+  nova-funcionalidade/SKILL.md
+  padroes-taskflow/SKILL.md
+agents/
+  revisor-taskflow.md
+hooks/
+  hooks.json              ← o mesmo formato do "hooks" do settings.json
+scripts/
+  checar.py
+servidor/
+  servidor_mcp.py
+.mcp.json                 ← servidores MCP do plugin
+README.md</code></div>
+    <div class="caixa erro"><strong>O erro mais comum</strong>Só o <code>plugin.json</code> vai dentro de <code>.claude-plugin/</code>. Pastas como <code>skills/</code> colocadas ali dentro <strong>não carregam</strong>. E um <code>CLAUDE.md</code> na raiz do plugin também não carrega: instruções vão como skill.</div>
+
+    <h3>O manifesto</h3>
+    <div class="cod"><span class="rot">.claude-plugin/plugin.json</span><code>{
+  "name": "taskflow",
+  "description": "Skills, revisor, hook de sintaxe e servidor MCP do projeto de treino TaskFlow",
+  "version": "1.0.0",
+  "author": { "name": "Aluno do curso" }
+}</code></div>
+    <p>Só <code>name</code> é obrigatório (sem espaços). Ele vira o prefixo de tudo.</p>
+
+    <h3>Caminhos: use as variáveis</h3>
+    <p>Você não sabe onde o plugin será instalado. Por isso, hook e servidor apontam para os próprios arquivos com <code>${CLAUDE_PLUGIN_ROOT}</code> e para o projeto com <code>${CLAUDE_PROJECT_DIR}</code>.</p>
+    <div class="cod"><span class="rot">hooks/hooks.json</span><code>{
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Edit|Write",
+        "hooks": [ { "type": "command",
+                     "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/checar.py\"" } ] }
+    ]
+  }
+}</code></div>
+    <div class="cod"><span class="rot">.mcp.json</span><code>{
+  "mcpServers": {
+    "tarefas": {
+      "command": "python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/servidor/servidor_mcp.py"],
+      "env": { "TASKFLOW_DIR": "${CLAUDE_PROJECT_DIR}" }
+    }
+  }
+}</code></div>
+    <div class="caixa dica"><strong>Por que mexer no checar.py e no servidor?</strong>No Módulo 5, o <code>checar.py</code> achava o projeto pela própria posição (<code>.claude/hooks/</code>). No plugin ele mora em outra pasta, então passa a ler a variável <code>CLAUDE_PROJECT_DIR</code>, que todo hook recebe. O servidor MCP faz o mesmo com <code>TASKFLOW_DIR</code> para achar o <code>tarefas.py</code>.</div>
+
+    <h3>Nomes com prefixo</h3>
+    <table class="tab">
+      <thead><tr><th>Peça</th><th>Solta</th><th>No plugin</th></tr></thead>
+      <tbody>
+        <tr><td>Skill</td><td><code>/revisar-taskflow</code></td><td><code>/taskflow:revisar-taskflow</code></td></tr>
+        <tr><td>Subagente</td><td><code>revisor-taskflow</code></td><td><code>taskflow:revisor-taskflow</code> (<code>@agent-taskflow:revisor-taskflow</code>)</td></tr>
+        <tr><td>Servidor MCP</td><td><code>taskflow</code></td><td><code>plugin:taskflow:tarefas</code> no <code>/mcp</code></td></tr>
+        <tr><td>Hook</td><td colspan="2">Sem prefixo. Se a cópia solta continuar no <code>settings.json</code>, ele roda <strong>duas vezes</strong>.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>O ciclo de desenvolvimento</h3>
+    <div class="cod"><span class="rot">PowerShell</span><code>claude plugin validate .\marketplace-taskflow\plugins\taskflow    # confere manifesto e frontmatter
+claude --plugin-dir .\marketplace-taskflow\plugins\taskflow      # carrega só nesta sessão
+claude --plugin-dir .\marketplace-taskflow\plugins\taskflow plugin details taskflow   # inventário e custo</code></div>
+    <p>Dentro da sessão: <code>/reload-plugins</code> aplica o que você editou; <code>/plugin</code> → aba <strong>Errors</strong> mostra o que falhou; <code>/mcp</code> mostra se o servidor conectou.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: validar e carregar</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: onde vai cada peça?</h2>
+    <p>Para cada arquivo, responda a pasta certa dentro do plugin: <code>manifesto</code> (.claude-plugin/), <code>skills</code>, <code>agents</code>, <code>hooks</code> ou <code>raiz</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: o plugin taskflow</h2>
+    <p>Na pasta de treino (<a href="../../projeto-taskflow/etapa-08/README.md">README da etapa 08</a>, passos 1 e 2), com o ambiente virtual ativado.</p>
+    <ol>
+      <li>Crie as pastas: <code>New-Item -ItemType Directory -Force marketplace-taskflow\plugins\taskflow\.claude-plugin</code>.</li>
+      <li>Escreva o <code>plugin.json</code> do bloco 3.</li>
+      <li>Copie as peças: <code>.claude\skills</code> e <code>.claude\agents</code> para dentro do plugin; o <code>checar.py</code> para <code>scripts\</code>; o <code>servidor_mcp.py</code> para <code>servidor\</code>.</li>
+      <li>Crie <code>hooks\hooks.json</code> e <code>.mcp.json</code> como no bloco 3, e ajuste o <code>checar.py</code> e o servidor para lerem a pasta do projeto pelas variáveis. (Peça ao Claude: <em>"ajuste estes dois scripts para achar o projeto por CLAUDE_PROJECT_DIR e TASKFLOW_DIR"</em>.)</li>
+      <li>Rode <code>claude plugin validate .\marketplace-taskflow\plugins\taskflow</code> até aparecer <code>✔ Validation passed</code>.</li>
+      <li>Para evitar o hook duplicado, apague o bloco <code>"hooks"</code> de <code>.claude\settings.json</code> e as pastas soltas <code>.claude\skills</code>, <code>.claude\agents</code> e <code>.claude\hooks</code> da pasta de treino.</li>
+      <li>Abra <code>claude --plugin-dir .\marketplace-taskflow\plugins\taskflow</code>. Digite <code>/taskflow:</code> e veja as skills; peça <em>"use o subagente taskflow:revisor-taskflow para revisar o tarefas.py"</em>. <strong>Opcional</strong>, se você instalou o pacote <code>mcp</code> (passo 2 do README; exige Python 3.11 ou mais novo): rode <code>/mcp</code> e veja o servidor <code>plugin:taskflow:tarefas</code>. Sem o pacote, ele aparece com erro de conexão, e tudo bem: a aula se conclui com skills, subagente e hook.</li>
+      <li>Edite a description de uma skill, rode <code>/reload-plugins</code> e confira que a mudança valeu.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>O plugin completo está em <code>projeto-taskflow/etapa-08/gabarito/marketplace-taskflow/plugins/taskflow/</code>. Ele tem uma skill a mais, <code>padroes-taskflow</code>, que o Claude pode usar sozinho e que a aula 3 usa na avaliação.</p>
+      <p>Saída real de <code>claude --plugin-dir ... plugin details taskflow</code> com o gabarito (Claude Code 2.1.327, 19/11/2026):</p>
+      <div class="cod"><span class="rot">saída</span><code>Component inventory
+  Skills (3)  nova-funcionalidade, padroes-taskflow, revisar-taskflow
+  Agents (1)  revisor-taskflow
+  Hooks (1)  PostToolUse  (harness-only — no model context cost)
+  MCP servers (1)  tarefas
+Projected token cost
+  Always-on:   ~292 tok   added to every session</code></div>
+      <p>O <code>claude plugin validate</code> também mostra avisos sobre README, licença e ícone. Eles valem para enviar ao diretório da Anthropic; para o seu uso, não impedem nada.</p>
+      <p><strong>Servidor MCP não conectou?</strong> Esse passo é opcional. Confira no <code>/mcp</code>. O motivo mais comum é abrir o Claude sem o ambiente virtual ativado, ou sem o pacote <code>mcp</code> instalado: o <code>python</code> encontrado não tem o pacote. Se o <code>pip</code> for bloqueado no computador da empresa, siga sem o servidor e, se precisar dele, peça a instalação à TI.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Peças dentro de .claude-plugin/</h4><p>Só o <code>plugin.json</code> vai ali. O resto fica na raiz do plugin.</p></div>
+      <div class="mini"><h4>Caminho fixo</h4><p>Use <code>${CLAUDE_PLUGIN_ROOT}</code>; o plugin instalado fica em outra pasta.</p></div>
+      <div class="mini"><h4>Hook duplicado</h4><p>Hooks não têm prefixo: remova a cópia do <code>settings.json</code>.</p></div>
+      <div class="mini"><h4>--plugin-dir na pasta errada</h4><p>Aponte para a pasta do plugin (a que tem <code>.claude-plugin/plugin.json</code>), não para a do marketplace.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/plugins/create">Criar um plugin</a> e <a href="https://code.claude.com/docs/en/plugins/components">Componentes</a> (em inglês): configurações do usuário (<code>userConfig</code>), executáveis em <code>bin/</code>, monitores.</li>
+      <li><code>claude plugin init &lt;nome&gt;</code> cria o esqueleto de um plugin em <code>~/.claude/skills/</code> que carrega em toda sessão.</li>
+      <li>Próxima aula: medir se o plugin muda mesmo o comportamento do Claude.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Create a Claude Code plugin" e "Add components to a plugin"; gabarito validado com Claude Code 2.1.327).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Criar um plugin em 1 minuto", cenas: [
+  { fala: "Nesta aula, as peças soltas do TaskFlow viram um único plugin.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 8 · AULA 2</span><p class="v-titulo" data-t="0.3">Criar o plugin do TaskFlow</p><p class="v-sub" data-t="1.2">de peças soltas a pacote</p>' },
+  { fala: "O plugin precisa de uma pasta ponto claude hífen plugin com o arquivo plugin ponto JSON. É o manifesto, e só o nome é obrigatório.",
+    html: '<p class="v-txt" data-t="0">.claude-plugin/plugin.json</p><div class="v-code" data-t="0.5"><div>{</div><div data-t="5.5">  <span class="a">"name":</span> "taskflow",</div><div data-t="6.5">  <span class="d">"description": "…", "version": "1.0.0"</span></div><div>}</div></div>' },
+  { fala: "As peças ficam na raiz do plugin: skills, agents, a pasta hooks, e o arquivo ponto mcp ponto JSON.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="2"><span class="v-ic">📘</span><b>skills/</b></div><div class="v-caixa" data-t="2.8"><span class="v-ic">🤖</span><b>agents/</b></div><div class="v-caixa" data-t="3.6"><span class="v-ic">🪝</span><b>hooks/hooks.json</b></div><div class="v-caixa" data-t="4.6"><span class="v-ic">🔌</span><b>.mcp.json</b></div></div>' },
+  { fala: "Para testar sem instalar, use claude hífen hífen plugin hífen dir. Editou? Rode barra reload hífen plugins.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span><span class="v-digita" style="--n:31">claude --plugin-dir .\\taskflow</span></div><div data-t="5.3"><span class="u">&gt; </span>/reload-plugins</div><div data-t="6"><span class="o">Reloaded: …</span></div></div>' },
+  { fala: "No plugin, tudo ganha o prefixo do nome. A skill vira barra taskflow, dois pontos, revisar hífen taskflow.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><b>/revisar-taskflow</b>solta</div><span class="v-seta">→</span><div class="v-caixa acc"><b>/taskflow:revisar-taskflow</b>no plugin</div></div>' },
+  { fala: "Antes de usar, valide com claude plugin validate. Ele aponta o campo errado e mostra o que o plugin fornece.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span>claude plugin validate .\\taskflow</div><div data-t="3.5"><span class="d">❯ skills: taskflow:revisar-taskflow …</span></div><div data-t="5"><span class="o">✔ Validation passed</span></div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📁", rt: "Peças soltas (.claude/)" }, { ic: "🧳", rt: "Pasta do plugin" }, { ic: "✔", rt: "claude plugin validate" }, { ic: "✻", rt: "Sessão com --plugin-dir" }],
+  passos: [
+    { ativos: [0], setas: [], titulo: "Ponto de partida", texto: "Skills e subagente em <code>.claude/</code>, hook no <code>settings.json</code>, servidor MCP registrado com <code>claude mcp add</code>." },
+    { ativos: [0, 1], setas: [0], titulo: "Mover para o plugin", texto: "Cada peça vai para a pasta padrão do plugin, com o manifesto em <code>.claude-plugin/plugin.json</code>. Hook e servidor passam a usar <code>${CLAUDE_PLUGIN_ROOT}</code>." },
+    { ativos: [1, 2], setas: [1], titulo: "Validar", texto: "A validação confere manifesto e frontmatter e lista o que o plugin fornece." },
+    { ativos: [2, 3], setas: [2], titulo: "Carregar e testar", texto: "<code>claude --plugin-dir</code> carrega só naquela sessão, sem instalar. Edite e rode <code>/reload-plugins</code>." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Validar e carregar o plugin (saída real resumida)", altura: 330,
+  passos: [
+    { t: "cmd", x: "claude plugin validate .\\marketplace-taskflow\\plugins\\taskflow", leg: "Conferir antes de usar" },
+    { t: "out", x: "Provides:\n  ❯ hooks: PostToolUse Edit|Write command …\n  ❯ mcpServers: tarefas stdio python […]\n  ❯ skills: taskflow:nova-funcionalidade · taskflow:padroes-taskflow · taskflow:revisar-taskflow\n  ❯ agents: taskflow:revisor-taskflow\n✔ Validation passed", leg: "O que o plugin fornece" },
+    { t: "cmd", x: "claude --plugin-dir .\\marketplace-taskflow\\plugins\\taskflow", leg: "Sessão com o plugin" },
+    { t: "user", x: "/taskflow:", leg: "As skills aparecem com prefixo" },
+    { t: "user", x: "/mcp", leg: "Servidor do plugin" },
+    { t: "out", x: "plugin:taskflow:tarefas · connected", leg: "Conectado (com o ambiente virtual ativado)" }
+  ]
+});
+(function () {
+  var itens = [
+    ["plugin.json", "manifesto", "Só ele vai dentro de .claude-plugin/."],
+    ["revisar-taskflow/SKILL.md", "skills", "Cada skill numa pasta própria dentro de skills/."],
+    ["revisor-taskflow.md (subagente)", "agents", "Um arquivo Markdown por subagente em agents/."],
+    ["hooks.json", "hooks", "hooks/hooks.json, com a chave \"hooks\" no topo."],
+    [".mcp.json", "raiz", "O .mcp.json fica na raiz do plugin."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Arquivo ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: manifesto · skills · agents · hooks · raiz</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["manifesto", "skills", "agents", "hooks", "raiz"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  Curso.terminal("term", { titulo: "Onde vai cada peça? (simulação)", prompt: ">", intro: '<span class="t-dim">manifesto = .claude-plugin/ · skills · agents · hooks · raiz</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: manifesto, skills, agents, hooks ou raiz.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual campo do <code>plugin.json</code> é obrigatório?", op: ["<code>version</code>", "<code>name</code>", "<code>author</code>"], c: 1, ex: "Só o nome; ele vira o prefixo das peças." },
+  { p: "Você colocou <code>skills/</code> dentro de <code>.claude-plugin/</code>. O que acontece?", op: ["Funciona normalmente", "As skills não carregam", "O Claude move a pasta sozinho"], c: 1, ex: "Só o manifesto vai em .claude-plugin/." },
+  { p: "Como a skill <code>revisar-taskflow</code> se chama dentro do plugin <code>taskflow</code>?", op: ["<code>/revisar-taskflow</code>", "<code>/taskflow:revisar-taskflow</code>", "<code>/plugin:revisar</code>"], c: 1, ex: "Plugin e skill separados por dois pontos." },
+  { p: "Para que serve <code>${CLAUDE_PLUGIN_ROOT}</code>?", op: ["Apontar para a pasta do plugin, onde quer que ele esteja instalado", "Apontar para a pasta do projeto", "Guardar senhas"], c: 0, ex: "A pasta do projeto é ${CLAUDE_PROJECT_DIR}." },
+  { p: "Você editou uma skill com a sessão aberta. Como aplicar?", op: ["Reinstalar o Claude Code", "<code>/reload-plugins</code>", "Apagar o plugin.json"], c: 1, ex: "Recarrega os plugins sem reiniciar." }
+]);
+Curso.checklist("check", [
+  "Monto a estrutura do plugin com o manifesto no lugar certo",
+  "Uso <code>${CLAUDE_PLUGIN_ROOT}</code> e <code>${CLAUDE_PROJECT_DIR}</code> em hooks e servidores",
+  "Valido com <code>claude plugin validate</code> e carrego com <code>--plugin-dir</code>",
+  "Sei os nomes com prefixo de skill, subagente e servidor MCP",
+  "Evito o hook duplicado removendo a cópia solta"
+]);
+</script>
+</body>
+</html>

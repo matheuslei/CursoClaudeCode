@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TDD com o Claude</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Aula 4</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~25 min</span>
+    <h1>TDD com o Claude</h1>
+    <p class="objetivo">Objetivo: transformar os critérios de aceite da spec em testes que falham, e só então pedir a implementação, sem deixar o Claude "ajeitar" os testes para passar.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>TDD (<em>Test-Driven Development</em>) é escrever o teste antes do código. Com um agente de IA, ele ganha um papel extra: o teste vira a <strong>verificação objetiva</strong> que o Claude roda sozinho para saber se terminou, sem depender de "parece certo".</p>
+    <p>Os testes saem direto da spec da aula anterior: cada critério de aceite "dado / quando / então" vira um teste.</p>
+    <div class="caixa alerta"><strong>O risco específico com IA</strong>Se o teste falha, o caminho mais curto para "tudo verde" é mudar o teste, não o código. Por isso a regra desta aula: <strong>os testes são commitados antes, e o Claude não pode alterá-los</strong>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: vermelho, verde, refatorar</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>O roteiro com o Claude</h2>
+    <h3>1. Pedir só os testes</h3>
+    <div class="cod"><code>leia specs/prazo.md e escreva testes em tests/test_prazo.py, um para cada critério de aceite.
+use unittest. NÃO implemente nada ainda. rode os testes e confirme que falham pelo motivo certo</code></div>
+    <p>"Pelo motivo certo" importa: o teste deve falhar porque a função ainda não existe ou devolve o resultado errado, não por um erro de digitação no próprio teste.</p>
+    <h3>2. Revisar e commitar os testes</h3>
+    <p>Leia os testes. Eles correspondem aos critérios? Falta algum caso de borda? Ajuste e faça commit:</p>
+    <div class="cod"><code>! git add tests/test_prazo.py
+! git commit -m "Testes do prazo (vermelho)"</code></div>
+    <h3>3. Pedir a implementação, com os testes travados</h3>
+    <div class="cod"><code>implemente specs/prazo.md até python -m unittest passar.
+não altere nenhum arquivo em tests/. se achar que um teste está errado, pare e me pergunte</code></div>
+    <h3>4. Conferir que os testes não mudaram</h3>
+    <div class="cod"><code>! git diff --stat HEAD -- tests/</code></div>
+    <p>Sem saída significa que os testes ficaram intactos. Se aparecer algo, leia o que mudou antes de aceitar.</p>
+    <div class="caixa dica"><strong>Deixe a regra fixa no CLAUDE.md</strong>O <code>CLAUDE.md</code> da etapa-03 já traz: "Não altere testes existentes para fazê-los passar. Se um teste parecer errado, pergunte." Assim você não precisa repetir em todo pedido. No Módulo 4 você verá como <em>bloquear</em> edições em <code>tests/</code> com regras de permissão, em vez de só pedir.</div>
+    <h3>Datas em testes: injete o "hoje"</h3>
+    <p>Um teste que depende da data real passa hoje e falha amanhã. Peça que as funções recebam a data de referência como parâmetro (ex.: <code>atrasadas(hoje=None)</code>), usando a data real só quando nenhuma for passada. Assim o teste controla o tempo.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: o ciclo vermelho-verde</h2>
+    <p>Rode o ciclo na simulação. Atenção ao que acontece se você deixar o Claude mexer nos testes.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Continue do <code>specs/prazo.md</code> da aula anterior:</p>
+    <ol>
+      <li>Peça só os testes (pedido 1 acima) e confirme que falham com <code>! python -m unittest</code></li>
+      <li>Revise os testes contra os critérios de aceite e faça commit deles</li>
+      <li><code>/clear</code> e peça a implementação (pedido 3 acima)</li>
+      <li>Confirme que <code>tests/</code> não mudou e que tudo passa</li>
+      <li>Teste à mão: <code>! python tarefas.py adicionar "Pagar conta fictícia" --prazo 2026-01-10</code> e <code>! python tarefas.py atrasadas</code></li>
+      <li>Commit da implementação</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito (testes de exemplo)</summary>
+      <div class="cod"><span class="rot">tests/test_prazo.py (trecho)</span><code>import datetime as dt
+import tarefas
+from tests.test_tarefas import BaseTarefas
+
+
+class TestAtrasadas(BaseTarefas):
+    HOJE = dt.date(2026, 1, 11)
+
+    def test_prazo_vencido_aparece(self):
+        self.rodar(tarefas.adicionar, "A", "2026-01-10")
+        self.assertIn("A", self.rodar(tarefas.atrasadas, self.HOJE))
+
+    def test_prazo_hoje_nao_esta_atrasado(self):
+        self.rodar(tarefas.adicionar, "A", "2026-01-11")
+        self.assertNotIn("A", self.rodar(tarefas.atrasadas, self.HOJE))
+
+    def test_feita_nao_aparece(self):
+        self.rodar(tarefas.adicionar, "A", "2026-01-10")
+        self.rodar(tarefas.concluir, 1)
+        self.assertNotIn("A", self.rodar(tarefas.atrasadas, self.HOJE))
+
+    def test_data_invalida_nao_salva(self):
+        saida = self.rodar(tarefas.adicionar, "A", "2026-02-31")
+        self.assertIn("Data inválida", saida)
+        self.assertEqual(tarefas.carregar(), [])</code></div>
+      <p>Na implementação, <code>adicionar(titulo, prazo=None)</code> valida a data com <code>datetime.date.fromisoformat</code> e grava <code>"prazo"</code> só quando existir; <code>atrasadas(hoje=None)</code> usa <code>t.get("prazo")</code> para aceitar tarefas antigas. Suas assinaturas podem ser diferentes: o que vale é cada critério da spec ter um teste e todos passarem.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Testes e código juntos</h4><p>Pedidos no mesmo passo: os testes tendem a refletir o código escrito, não a spec.</p></div>
+      <div class="mini"><h4>Não ver o vermelho</h4><p>Teste que nunca falhou pode não testar nada. Confirme a falha antes.</p></div>
+      <div class="mini"><h4>Teste alterado em silêncio</h4><p>Commit dos testes antes + <code>git diff -- tests/</code> depois.</p></div>
+      <div class="mini"><h4>Depender da data de hoje</h4><p>Injete a data de referência; o teste deve passar em qualquer dia.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://docs.python.org/pt-br/3/library/unittest.html">unittest</a>: documentação do Python em português</li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a>: "Give Claude a check to run"</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">Common workflows</a>: "Work with tests"</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "TDD com o Claude em 1 minuto", cenas: [
+  { fala: "TDD com o Claude: o teste vem antes do código e vira a verificação objetiva de que o trabalho terminou.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 3 · AULA 4</span><p class=\"v-titulo\" data-t=\"0.3\">TDD com o Claude</p><p class=\"v-sub\" data-t=\"0.9\">Teste primeiro, código depois</p>" },
+  { fala: "O ciclo tem três cores. Vermelho: o teste falha. Verde: o código faz passar. Refatorar: melhorar sem quebrar.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa err\" data-t=\"0.8\"><span class=\"v-ic\">🔴</span><b>Vermelho</b>o teste falha</div><span class=\"v-seta\" data-t=\"2\">→</span><div class=\"v-caixa ok\" data-t=\"2.4\"><span class=\"v-ic\">🟢</span><b>Verde</b>o código passa</div><span class=\"v-seta\" data-t=\"3.8\">→</span><div class=\"v-caixa acc\" data-t=\"4.2\"><span class=\"v-ic\">♻</span><b>Refatorar</b>melhora sem quebrar</div></div>" },
+  { fala: "Os testes saem direto da spec: cada critério de aceite dado, quando, então vira um teste.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa\" data-t=\"0.3\"><span class=\"v-ic\">📝</span><b>Critério de aceite</b>dado / quando / então</div><span class=\"v-seta\" data-t=\"2.6\">→</span><div class=\"v-caixa ok\" data-t=\"3\"><span class=\"v-ic\">🧪</span><b>Teste</b>tests/test_prazo.py</div></div>" },
+  { fala: "Com IA, existe um risco específico: o caminho mais curto para tudo verde é mudar o teste, não o código. Por isso os testes são commitados antes e o Claude não pode alterá-los.",
+    html: "<div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">⚠</span><b>O atalho perigoso</b>mudar o teste em vez do código</div><div class=\"v-caixa ok\" data-t=\"5\" style=\"--fx:v-zoom\"><span class=\"v-ic\">🔒</span><b>Regra</b>testes commitados antes · o Claude não altera tests/</div>" },
+  { fala: "O roteiro: peça só os testes e confirme que falham pelo motivo certo. Revise e faça commit. Peça a implementação sem alterar os testes. E confira com git diff que eles ficaram intactos.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">1.</span> só os testes → <span class=\"w\">falham pelo motivo certo</span></div><div data-t=\"3.6\"><span class=\"a\">2.</span> revisar e <span class=\"o\">commitar</span> os testes</div><div data-t=\"5.2\"><span class=\"a\">3.</span> implementar <span class=\"w\">sem alterar tests/</span></div><div data-t=\"7.4\"><span class=\"a\">4.</span> <span class=\"u\">git diff --stat HEAD -- tests/</span> <span class=\"d\">→ vazio</span></div></div>" },
+  { fala: "Teste que depende da data real passa hoje e falha amanhã. Peça que as funções recebam a data de hoje como parâmetro, para o teste controlar o tempo.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"d\"># o teste controla o tempo</span>\n<span class=\"a\">def</span> atrasadas(<span class=\"o\">hoje=None</span>): …</div><p class=\"v-txt\" data-t=\"3.5\" style=\"text-align:center\">injete o \"hoje\" · data real só quando nenhuma for passada</p>" },
+  { fala: "Resumindo: teste primeiro, travado. Depois o código.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A regra</p><p class=\"v-titulo\" data-t=\"0.4\">Teste primeiro, travado. Depois o código.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📄", rt: "Critério da spec" }, { ic: "🔴", rt: "Teste falha" }, { ic: "🔒", rt: "Commit do teste" }, { ic: "🟢", rt: "Código passa" }, { ic: "♻", rt: "Refatorar" }],
+  passos: [
+    { ativos: [0], titulo: "Comece pelo critério", texto: "<em>Dado prazo igual a hoje, quando rodo atrasadas, então a tarefa NÃO aparece.</em> Isso já é quase um teste." },
+    { ativos: [1], setas: [0], titulo: "Vermelho: o teste falha", texto: "O Claude escreve o teste e roda. Ele <strong>deve falhar</strong>, porque o código ainda não existe. Um teste que passa antes do código provavelmente não testa nada." },
+    { ativos: [2], setas: [1], titulo: "Trave o teste", texto: "Você revisa e faz commit. A partir daqui, qualquer mudança nos testes aparece no <code>git diff</code>." },
+    { ativos: [3], setas: [2], titulo: "Verde: implementar até passar", texto: "O Claude escreve o código, roda os testes, lê as falhas e ajusta, sem tocar nos testes. O ciclo fecha sozinho porque existe uma verificação objetiva." },
+    { ativos: [4], setas: [3], titulo: "Refatorar com segurança", texto: "Com tudo verde, dá para limpar o código. Se algo quebrar, os testes avisam na hora." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: TDD (demonstração)", altura: 340,
+  passos: [
+    { t: "user", x: "leia specs/prazo.md e escreva testes em tests/test_prazo.py. NÃO implemente. confirme que falham", leg: "Só os testes" },
+    { t: "tool", x: "Read(specs/prazo.md)" },
+    { t: "tool", x: "Write(tests/test_prazo.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "AttributeError: module 'tarefas' has no attribute 'atrasadas'\nFAILED (errors=4)", leg: "Vermelho, pelo motivo certo: a função não existe" },
+    { t: "user", x: "! git commit -am \"Testes do prazo (vermelho)\"", leg: "Testes travados no Git" },
+    { t: "user", x: "/clear" },
+    { t: "user", x: "implemente specs/prazo.md até os testes passarem. não altere tests/", leg: "Implementação com restrição" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "FAIL: test_prazo_hoje_nao_esta_atrasado\nFAILED (failures=1)", leg: "O Claude lê a falha e corrige o código" },
+    { t: "claude", x: "Usei <= em vez de <. Corrigindo a comparação em atrasadas().", ms: 1200 },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "Ran 10 tests\nOK", leg: "Verde" },
+    { t: "user", x: "! git diff --stat HEAD -- tests/", leg: "Sem saída: os testes não foram tocados" }
+  ]
+});
+(function () {
+  var fase = 0, mexeu = false;
+  Curso.terminal("term", {
+    titulo: "Ciclo TDD (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Ordem sugerida: escrever testes → rodar testes → commit testes → implementar → rodar testes → conferir testes</span>',
+    metas: ["escrever testes", "rodar testes", "commit testes", "implementar", "conferir testes"],
+    comandos: {
+      "escrever testes": function () { fase = 1; mexeu = false; return '<span class="t-ok">●</span> Write(tests/test_prazo.py) <span class="t-dim">4 testes, um por critério</span>'; },
+      "rodar testes": function () {
+        if (fase === 0) return '<span class="t-dim">Ainda não há testes do prazo. Comece com escrever testes.</span>';
+        if (fase < 3) return '<span class="t-warn">FAILED (errors=4)</span>  <span class="t-dim">← vermelho: esperado, o código não existe</span>';
+        return mexeu ? '<span class="t-ok">Ran 10 tests · OK</span>  <span class="t-warn">(mas os testes foram alterados!)</span>' : '<span class="t-ok">Ran 10 tests · OK</span>  <span class="t-dim">← verde</span>';
+      },
+      "commit testes": function () { if (fase < 1) return '<span class="t-dim">Escreva os testes antes.</span>'; fase = 2; return '<span class="t-ok">[main 5d1e7aa] Testes do prazo (vermelho)</span>'; },
+      "implementar": function () {
+        if (fase < 2) return '<span class="t-warn">Você pulou o commit dos testes. Se o Claude alterar os testes, você não terá como perceber pelo git diff. Rode commit testes primeiro.</span>';
+        fase = 3; mexeu = false; return '<span class="t-ok">●</span> Update(tarefas.py)\n<span class="t-dim">(implementação concluída; tests/ não foi tocado)</span>';
+      },
+      "implementar sem restricao": function () { if (fase < 2) return '<span class="t-dim">Faça commit dos testes antes.</span>'; fase = 3; mexeu = true; return '<span class="t-ok">●</span> Update(tarefas.py)\n<span class="t-warn">●</span> Update(tests/test_prazo.py)  <span class="t-dim">"ajustei o teste de hoje para aceitar <="</span>'; },
+      "conferir testes": function () {
+        if (fase < 3) return '<span class="t-dim">Implemente antes de conferir.</span>';
+        return mexeu ? ' tests/test_prazo.py | 2 +-\n<span class="t-warn">O teste foi alterado: o critério "prazo hoje NÃO está atrasado" deixou de ser verificado. Rejeite: git restore tests/ e peça de novo com a restrição.</span>' : '<span class="t-dim">(sem saída)</span>  <span class="t-ok">Testes intactos. Pode commitar a implementação.</span>';
+      }
+    },
+    desconhecido: '<span class="t-dim">Comandos: escrever testes · rodar testes · commit testes · implementar · implementar sem restricao · conferir testes</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Na primeira rodada, logo depois de escrever os testes, o que você espera ver?", op: ["Todos passando", "Falhando, pelo motivo certo (a funcionalidade ainda não existe)", "Erro de sintaxe no teste"], c: 1, ex: "Ver o vermelho prova que o teste realmente detecta a ausência do comportamento." },
+  { p: "Por que fazer commit dos testes antes de pedir a implementação?", op: ["Para o Claude rodar mais rápido", "Para qualquer alteração nos testes aparecer no <code>git diff</code>", "Porque o Git exige"], c: 1, ex: "Com os testes no histórico, <code>git diff HEAD -- tests/</code> mostra se alguém mexeu neles." },
+  { p: "O Claude diz: \"ajustei o teste para refletir o comportamento atual\". O que fazer?", op: ["Aceitar, ele sabe o que faz", "Ler o diff do teste: se o teste representava a spec, desfazer e pedir para corrigir o código", "Apagar todos os testes"], c: 1, ex: "O teste é o contrato. Se ele mudou, o contrato mudou. Só aceite se a spec realmente estava errada." },
+  { p: "Como testar uma função que depende da data de hoje?", op: ["Rodar o teste só no dia certo", "Passar a data de referência como parâmetro (ex.: <code>atrasadas(hoje=...)</code>)", "Mudar o relógio do computador"], c: 1, ex: "Injetar a data torna o teste estável em qualquer dia." }
+]);
+Curso.checklist("check", [
+  "Peço os testes separados da implementação",
+  "Confirmo que os testes falham antes do código existir",
+  "Faço commit dos testes e confiro <code>git diff HEAD -- tests/</code> depois",
+  "Escrevo pedidos que proíbem alterar os testes",
+  "O comando <code>atrasadas</code> funciona e todos os testes passam"
+]);
+</script>
+</body>
+</html>

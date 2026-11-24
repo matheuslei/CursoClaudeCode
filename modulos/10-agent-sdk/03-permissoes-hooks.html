@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permissões e hooks no SDK</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m10a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 10 · Aula 3</span><span class="selo cinza">Expert</span><span class="selo cinza">~30 min</span>
+    <h1>Permissões e hooks no SDK</h1>
+    <p class="objetivo">Objetivo: controlar, em código, o que o agente faz sozinho, o que pergunta a você e o que é sempre bloqueado, usando regras, modos de permissão, o callback <code>can_use_tool</code> e hooks.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>No Módulo 4 você aprovava cada ação no terminal. Um agente do SDK muitas vezes roda <strong>sem ninguém olhando</strong>. Então as decisões de permissão precisam estar no código: o que é seguro rodar direto, o que precisa de um "sim" humano e o que nunca pode acontecer.</p>
+    <div class="grade">
+      <div class="mini"><h4>✅ Rodar direto</h4><p>Ler e listar: <code>allowed_tools</code>.</p></div>
+      <div class="mini"><h4>🙋 Perguntar</h4><p>Concluir tarefa: <code>can_use_tool</code>.</p></div>
+      <div class="mini"><h4>⛔ Bloquear sempre</h4><p>Remover: hook <code>PreToolUse</code> (ou regra de negação).</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: a ordem das decisões</h2>
+    <p>Quando o Claude pede uma ferramenta, o SDK confere a chamada nesta ordem. Cada etapa pode decidir, mandar para o seu callback ou passar adiante.</p>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Regras, modos, callback e hooks</h2>
+    <h3>Regras de permitir e negar</h3>
+    <table class="tab">
+      <thead><tr><th>Opção</th><th>Efeito</th></tr></thead>
+      <tbody>
+        <tr><td><code>allowed_tools=["Read", "Grep"]</code></td><td>Pré-aprovadas. As outras continuam existindo e caem no modo de permissão.</td></tr>
+        <tr><td><code>disallowed_tools=["Bash"]</code></td><td>Nome sozinho: o Bash some do agente.</td></tr>
+        <tr><td><code>disallowed_tools=["Bash(rm *)"]</code></td><td>Regra com escopo: o Bash fica, mas comandos que casam com <code>rm *</code> são negados em <strong>todos</strong> os modos.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Modos de permissão (<code>permission_mode</code>)</h3>
+    <table class="tab">
+      <thead><tr><th>Modo</th><th>Comportamento</th></tr></thead>
+      <tbody>
+        <tr><td><code>"default"</code></td><td>Sem aprovação automática pelo modo. O que precisa de aprovação e não casa com regra vai para o seu <code>can_use_tool</code>. <strong>Sem callback, é negado.</strong></td></tr>
+        <tr><td><code>"dontAsk"</code></td><td>Nunca pergunta: o que pediria aprovação é negado. Bom para agente sem ninguém para aprovar.</td></tr>
+        <tr><td><code>"acceptEdits"</code></td><td>Aprova edições de arquivo e comandos de sistema de arquivos (<code>mkdir</code>, <code>mv</code>, <code>cp</code>…) dentro da pasta de trabalho.</td></tr>
+        <tr><td><code>"plan"</code></td><td>O Claude explora e planeja; edições vão para o seu callback.</td></tr>
+        <tr><td><code>"auto"</code></td><td>Um classificador revisa ações como comandos e acessos à rede. Disponibilidade depende do modelo e do provedor.</td></tr>
+        <tr><td><code>"bypassPermissions"</code></td><td>Aprova quase tudo, <strong>inclusive ferramentas fora de <code>allowed_tools</code></strong>. Só em ambiente isolado (contêiner, CI).</td></tr>
+      </tbody>
+    </table>
+    <p>Com o <code>ClaudeSDKClient</code>, dá para trocar o modo no meio da sessão com <code>await cliente.set_permission_mode("acceptEdits")</code>.</p>
+
+    <h3>O callback <code>can_use_tool</code></h3>
+    <div class="cod"><span class="rot">agente_permissoes.py (trecho)</span><code>from claude_agent_sdk.types import PermissionResultAllow, PermissionResultDeny, ToolPermissionContext
+
+
+async def pode_usar(
+    tool_name: str, input_data: dict, context: ToolPermissionContext
+) -&gt; PermissionResultAllow | PermissionResultDeny:
+    print(f"[permissão] {tool_name} {input_data}")
+    if input("Permitir? (s/n): ").strip().lower() == "s":
+        return PermissionResultAllow(updated_input=input_data)   # roda (pode alterar a entrada)
+    return PermissionResultDeny(message="O usuário recusou esta ação.")  # o Claude lê o motivo</code></div>
+    <ul>
+      <li>Recebe o nome da ferramenta, a entrada e um contexto (com sugestões de regra).</li>
+      <li><code>PermissionResultAllow(updated_input=...)</code> deixa rodar; dá para devolver a entrada <strong>modificada</strong>.</li>
+      <li><code>PermissionResultDeny(message=...)</code> bloqueia; o Claude lê a mensagem e tenta outro caminho.</li>
+    </ul>
+    <div class="caixa alerta"><strong>Contorno do Python (está na doc)</strong>Com <code>query()</code>, o exemplo oficial passa o pedido como um <strong>gerador assíncrono</strong> de mensagens e registra um hook <code>PreToolUse</code> "vazio" que devolve <code>{"continue_": True}</code>, para manter o fluxo aberto enquanto o <code>can_use_tool</code> espera a resposta. O gabarito faz o mesmo.</div>
+    <div class="caixa erro"><strong>Aprovado antes nunca chega ao callback</strong>Uma chamada aprovada por regra (<code>allowed_tools</code>) ou pelo modo (<code>acceptEdits</code>, <code>bypassPermissions</code>) <strong>pula</strong> o <code>can_use_tool</code>. Checagem que precisa valer sempre vai num hook <code>PreToolUse</code>.</div>
+
+    <h3>Hooks: funções suas em pontos do loop</h3>
+    <div class="cod"><span class="rot">agente_permissoes.py (trecho)</span><code>from claude_agent_sdk.types import HookMatcher
+
+
+async def bloquear_remocao(input_data, tool_use_id, context):
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": input_data["hook_event_name"],
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "Política do TaskFlow: remover tarefas só pela CLI, à mão.",
+        }
+    }
+
+
+hooks = {
+    "PreToolUse": [HookMatcher(matcher="mcp__taskflow__remover_tarefa", hooks=[bloquear_remocao])],
+    "PostToolUse": [HookMatcher(matcher="^mcp__taskflow__", hooks=[auditar])],
+}</code></div>
+    <ul>
+      <li>Cada callback recebe <code>input_data</code> (com <code>tool_name</code>, <code>tool_input</code>, <code>hook_event_name</code>, <code>session_id</code>, <code>cwd</code>…), o <code>tool_use_id</code> e um <code>context</code>.</li>
+      <li>Devolver <code>{}</code> = "sem objeção". No <code>PreToolUse</code>, <code>permissionDecision</code> aceita <code>"allow"</code>, <code>"deny"</code>, <code>"ask"</code> ou <code>"defer"</code>; com vários hooks, o mais restritivo vence.</li>
+      <li>Um <code>deny</code> de hook vale <strong>até no <code>bypassPermissions</code></strong>. Um <code>allow</code> de hook não passa por cima das regras de negação.</li>
+      <li><code>matcher</code> casa com o <strong>nome da ferramenta</strong> (texto exato, lista com <code>|</code> ou expressão regular), nunca com caminho de arquivo. Sem matcher, roda para tudo. <code>timeout</code> em segundos é opcional.</li>
+      <li>Hooks rodam no seu programa: não ocupam contexto do Claude.</li>
+    </ul>
+    <table class="tab">
+      <thead><tr><th>Eventos de hook no SDK em Python</th></tr></thead>
+      <tbody>
+        <tr><td><code>PreToolUse</code>, <code>PostToolUse</code>, <code>PostToolUseFailure</code>, <code>UserPromptSubmit</code>, <code>Stop</code>, <code>SubagentStart</code>, <code>SubagentStop</code>, <code>PreCompact</code>, <code>Notification</code>, <code>PermissionRequest</code>. (<code>SessionStart</code> e <code>SessionEnd</code> existem só no TypeScript; no Python, só como hooks de comando no <code>settings.json</code>.)</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Windows: barras invertidas</strong>No Windows, o <code>file_path</code> que chega ao hook usa <code>\</code> (ex.: <code>C:\projeto\.env</code>). Se o seu hook procura caminhos, trate os dois tipos de barra.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: as três camadas em ação</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: quem decide?</h2>
+    <p>Para cada necessidade, responda qual mecanismo usar: <code>regra</code> (<code>allowed_tools</code>/<code>disallowed_tools</code>), <code>modo</code> (<code>permission_mode</code>), <code>callback</code> (<code>can_use_tool</code>) ou <code>hook</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: o agente com política</h2>
+    <p>Na pasta de treino, com o <code>agente_ferramentas.py</code> da aula 2 na raiz. <strong>Este exercício gasta</strong>: rode poucas vezes.</p>
+    <ol>
+      <li>Crie <code>agente_permissoes.py</code> importando as ferramentas da aula 2 e acrescente <code>remover_tarefa</code> (<code>numero: int</code>).</li>
+      <li>Use <code>permission_mode="default"</code>, <code>tools=[]</code> e <code>allowed_tools</code> só com listar e adicionar.</li>
+      <li>Escreva o <code>can_use_tool</code> que pergunta <em>s/n</em> no terminal (vai pegar o <code>concluir_tarefa</code>).</li>
+      <li>Escreva um hook <code>PreToolUse</code> que <strong>nega</strong> <code>mcp__taskflow__remover_tarefa</code> com um motivo, e um <code>PostToolUse</code> que anota cada ferramenta do TaskFlow em <code>auditoria.log</code> (JSON por linha).</li>
+      <li>Passe o pedido como gerador assíncrono e inclua o hook "vazio" do contorno.</li>
+      <li>Peça: <em>"Liste as tarefas, adicione a tarefa fictícia 'Testar o agente', conclua a tarefa 1 e depois remova a tarefa 2."</em> Responda <code>s</code> uma vez e <code>n</code> em outra execução. Abra o <code>auditoria.log</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>Arquivo completo em <code>projeto-taskflow/etapa-10/gabarito/agente_permissoes.py</code> (precisa do <code>agente_ferramentas.py</code> na mesma pasta).</p>
+      <div class="cod"><span class="rot">agente_permissoes.py</span><code>import asyncio
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, create_sdk_mcp_server, query, tool
+from claude_agent_sdk.types import (
+    HookMatcher,
+    PermissionResultAllow,
+    PermissionResultDeny,
+    ToolPermissionContext,
+)
+
+from agente_ferramentas import _texto, adicionar_tarefa, concluir_tarefa, listar_tarefas
+from tarefas import carregar, salvar
+
+LOG = Path(__file__).with_name("auditoria.log")
+
+
+@tool("remover_tarefa", "Remove a tarefa de número informado (começa em 1).", {"numero": int})
+async def remover_tarefa(args: dict[str, Any]) -&gt; dict[str, Any]:
+    tarefas = carregar()
+    numero = int(args.get("numero", 0))
+    if numero &lt; 1 or numero &gt; len(tarefas):
+        return _texto(f"Erro: a tarefa {numero} não existe.", erro=True)
+    removida = tarefas.pop(numero - 1)
+    salvar(tarefas)
+    return _texto(f"Tarefa {numero} removida: {removida['titulo']}")
+
+
+SERVIDOR = create_sdk_mcp_server(
+    name="taskflow",
+    version="1.0.0",
+    tools=[listar_tarefas, adicionar_tarefa, concluir_tarefa, remover_tarefa],
+)
+
+
+async def pode_usar(
+    tool_name: str, input_data: dict, context: ToolPermissionContext
+) -&gt; PermissionResultAllow | PermissionResultDeny:
+    print(f"\n[permissão] {tool_name} {input_data}")
+    resposta = input("Permitir? (s/n): ").strip().lower()
+    if resposta == "s":
+        return PermissionResultAllow(updated_input=input_data)
+    return PermissionResultDeny(message="O usuário recusou esta ação.")
+
+
+async def bloquear_remocao(input_data, tool_use_id, context):
+    return {
+        "hookSpecificOutput": {
+            "hookEventName": input_data["hook_event_name"],
+            "permissionDecision": "deny",
+            "permissionDecisionReason": "Política do TaskFlow: remover tarefas só pela CLI, à mão.",
+        }
+    }
+
+
+async def auditar(input_data, tool_use_id, context):
+    registro = {
+        "quando": datetime.now().isoformat(timespec="seconds"),
+        "ferramenta": input_data["tool_name"],
+        "entrada": input_data["tool_input"],
+    }
+    with LOG.open("a", encoding="utf-8") as arq:
+        arq.write(json.dumps(registro, ensure_ascii=False) + "\n")
+    return {}
+
+
+# Contorno exigido pela doc do SDK em Python para o can_use_tool com prompt em fluxo
+async def manter_fluxo(input_data, tool_use_id, context):
+    return {"continue_": True}
+
+
+async def pedido():
+    yield {
+        "type": "user",
+        "message": {
+            "role": "user",
+            "content": (
+                "Liste as tarefas, adicione a tarefa fictícia 'Testar o agente', "
+                "conclua a tarefa 1 e depois remova a tarefa 2."
+            ),
+        },
+    }
+
+
+OPCOES = ClaudeAgentOptions(
+    system_prompt="Você gerencia o TaskFlow. Responda em português do Brasil. Se algo for negado, explique.",
+    mcp_servers={"taskflow": SERVIDOR},
+    tools=[],
+    permission_mode="default",
+    allowed_tools=["mcp__taskflow__listar_tarefas", "mcp__taskflow__adicionar_tarefa"],
+    can_use_tool=pode_usar,
+    hooks={
+        "PreToolUse": [
+            HookMatcher(matcher="mcp__taskflow__remover_tarefa", hooks=[bloquear_remocao]),
+            HookMatcher(matcher=None, hooks=[manter_fluxo]),
+        ],
+        "PostToolUse": [HookMatcher(matcher="^mcp__taskflow__", hooks=[auditar])],
+    },
+    max_turns=12,
+    max_budget_usd=0.50,
+)
+
+
+async def main():
+    try:
+        async for mensagem in query(prompt=pedido(), options=OPCOES):
+            if isinstance(mensagem, ResultMessage):
+                if mensagem.subtype == "success":
+                    print(f"\n{mensagem.result}")
+                else:
+                    print(f"\nParou: {mensagem.subtype}")
+                if mensagem.total_cost_usd is not None:
+                    print(f"Custo estimado: US$ {mensagem.total_cost_usd:.4f}")
+    except Exception as erro:
+        print(f"A sessão terminou com erro: {erro}")
+    print(f"Auditoria em: {LOG.name}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></div>
+      <p><strong>Resultado esperado</strong> (ilustrativo): listar e adicionar rodam sem perguntar; aparece <code>[permissão] mcp__taskflow__concluir_tarefa {'numero': 1}</code> esperando o seu <code>s</code>; a remoção é negada com o motivo da política e o Claude explica isso na resposta final. O <code>auditoria.log</code> tem uma linha por ferramenta que <strong>rodou</strong> (a remoção negada não aparece).</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Checar só no callback</h4><p>Se a ferramenta está em <code>allowed_tools</code>, o <code>can_use_tool</code> nunca é chamado para ela. Use um hook <code>PreToolUse</code>.</p></div>
+      <div class="mini"><h4><code>default</code> sem callback</h4><p>Tudo que precisa de aprovação é negado, e o agente "não faz nada". Ou pré-aprove, ou passe o <code>can_use_tool</code>.</p></div>
+      <div class="mini"><h4>Matcher com caminho</h4><p><code>matcher</code> casa com o nome da ferramenta. Para filtrar por arquivo, olhe <code>tool_input["file_path"]</code> dentro do hook.</p></div>
+      <div class="mini"><h4><code>bypassPermissions</code> por comodidade</h4><p>Ele ignora <code>allowed_tools</code> e aprova o resto. Fora de ambiente isolado, é risco real.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/permissions">Configure permissions</a> (em inglês): a ordem completa de avaliação e os detalhes de cada modo.</li>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/user-input">Handle approvals and user input</a>: o <code>can_use_tool</code> e as perguntas do <code>AskUserQuestion</code>.</li>
+      <li><a href="https://code.claude.com/docs/en/agent-sdk/hooks">Hooks no SDK</a>: alterar a entrada com <code>updatedInput</code>, hooks assíncronos e <code>on_failure="block"</code>.</li>
+      <li>Próxima aula: subagentes, custo e o projeto final, o <strong>agente TaskFlow</strong>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Configure permissions", "Handle approvals and user input", "Intercept and control agent behavior with hooks" e "Agent SDK reference - Python").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Permissões e hooks em 1 minuto", cenas: [
+  { fala: "Nesta aula, você decide o que o seu agente faz sozinho, o que precisa da sua aprovação e o que é sempre bloqueado.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 10 · AULA 3</span><p class="v-titulo" data-t="0.3">Permissões e hooks</p><div class="v-grade" style="--cols:3"><div class="v-caixa ok" data-t="2"><span class="v-ic">✅</span><b>Sozinho</b>listar</div><div class="v-caixa warn" data-t="3.2"><span class="v-ic">🙋</span><b>Pergunta</b>concluir</div><div class="v-caixa err" data-t="4.6"><span class="v-ic">⛔</span><b>Bloqueia</b>remover</div></div>' },
+  { fala: "Cada chamada de ferramenta passa por etapas: hooks, regras de negação, regras de pergunta, modo de permissão, regras de permissão e, por último, o seu callback.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa acc" data-t="0.8"><b>1 · Hooks</b></div><div class="v-caixa err" data-t="2"><b>2 · Negar</b></div><div class="v-caixa warn" data-t="3.4"><b>3 · Perguntar</b></div><div class="v-caixa" data-t="4.8"><b>4 · Modo</b></div><div class="v-caixa ok" data-t="6.2"><b>5 · Permitir</b></div><div class="v-caixa acc" data-t="7.6"><b>6 · Callback</b></div></div>' },
+  { fala: "Os modos vão do default, que pergunta ao seu callback, ao dontAsk, que nega tudo o que precisaria perguntar. O bypassPermissions, só em ambiente isolado.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.5"><span class="v-ic">🙋</span><b>default</b>chama o callback</div><div class="v-caixa warn" data-t="3.5"><span class="v-ic">🤐</span><b>dontAsk</b>nega o que perguntaria</div><div class="v-caixa err" data-t="7"><span class="v-ic">⚠</span><b>bypassPermissions</b>só isolado</div></div>' },
+  { fala: "O callback can sublinhado use sublinhado tool recebe o nome da ferramenta e a entrada, e devolve PermissionResultAllow ou PermissionResultDeny, com uma mensagem para o Claude.",
+    html: '<div class="v-code" data-t="0.2"><div><span class="a">async def</span> pode_usar(tool_name, input_data, context):</div><div data-t="4">    <span class="a">if</span> resposta == <span class="o">"s"</span>:</div><div data-t="5.5">        <span class="a">return</span> <span class="o">PermissionResultAllow</span>(updated_input=input_data)</div><div data-t="7.5">    <span class="a">return</span> <span class="w">PermissionResultDeny</span>(message=<span class="o">"Recusado"</span>)</div></div>' },
+  { fala: "Já o hook PreToolUse roda antes das chamadas, até das aprovadas por regra. Ele pode negar com um motivo, e essa negação vale até no modo bypass.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa acc"><span class="v-ic">🪝</span><b>PreToolUse</b>antes de rodar</div><span class="v-seta">→</span><div class="v-caixa err"><span class="v-ic">⛔</span><b>deny</b>+ motivo</div></div><p class="v-txt" data-t="6.5">vale até no bypassPermissions</p>' },
+  { fala: "Com o hook PostToolUse você registra o que rodou, numa trilha de auditoria. Os hooks rodam no seu programa e não ocupam o contexto do Claude.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa ok"><span class="v-ic">🛠</span><b>Ferramenta rodou</b>adicionar_tarefa</div><span class="v-seta">→</span><div class="v-caixa acc"><span class="v-ic">📒</span><b>PostToolUse</b>auditoria.log</div></div><p class="v-txt" data-t="5.5">no seu programa · sem gastar contexto</p>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🪝", rt: "1 Hooks" }, { ic: "⛔", rt: "2 Regras de negar" }, { ic: "❓", rt: "3 Regras de perguntar" }, { ic: "🎚", rt: "4 Modo" }, { ic: "✅", rt: "5 Regras de permitir" }, { ic: "🙋", rt: "6 can_use_tool" }],
+  passos: [
+    { ativos: [0], setas: [], titulo: "1. Hooks", texto: "O <code>PreToolUse</code> roda primeiro. Pode <strong>negar</strong> na hora ou passar adiante. Um <code>allow</code> de hook não pula as etapas 2 e 3." },
+    { ativos: [1], setas: [0], titulo: "2. Regras de negar", texto: "Se casa com <code>disallowed_tools</code> (ou uma regra <em>deny</em> de settings carregado), é negado, até no <code>bypassPermissions</code>. O callback nem é chamado." },
+    { ativos: [2], setas: [1], titulo: "3. Regras de perguntar", texto: "Regras <em>ask</em> do <code>settings.json</code> e ferramentas que exigem interação (como <code>AskUserQuestion</code>) vão direto para o seu callback." },
+    { ativos: [3], setas: [2], titulo: "4. Modo de permissão", texto: "<code>bypassPermissions</code> aprova; <code>acceptEdits</code> aprova edições na pasta de trabalho; em <code>default</code> e <code>dontAsk</code> segue para as regras de permitir." },
+    { ativos: [4], setas: [3], titulo: "5. Regras de permitir", texto: "Se casa com <code>allowed_tools</code> (ou settings), é aprovado. Leitura dentro da pasta de trabalho também é resolvida aqui, sem regra." },
+    { ativos: [5], setas: [4], titulo: "6. Seu callback", texto: "Se nada decidiu, o SDK chama o <code>can_use_tool</code>. No <code>dontAsk</code>, esta etapa é pulada e a chamada é negada. Em <code>default</code> sem callback, também é negada." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Rodando agente_permissoes.py (ilustrativo)", altura: 320, prompt: "PS C:\\treino-agente>",
+  passos: [
+    { t: "cmd", x: ".\\.venv\\Scripts\\python.exe agente_permissoes.py", leg: "Pedido: listar, adicionar, concluir a 1 e remover a 2 (dados fictícios)" },
+    { t: "nota", x: "listar_tarefas e adicionar_tarefa: pré-aprovadas em allowed_tools, rodam direto", leg: "Etapa 5: regra de permitir" },
+    { t: "perm", x: '<span class="t-b">[permissão]</span> mcp__taskflow__concluir_tarefa {\'numero\': 1}\nPermitir? (s/n): <span class="t-user">s</span>', ms: 1800, leg: "Etapa 6: nada aprovou, então o can_use_tool pergunta no terminal" },
+    { t: "nota", x: "remover_tarefa: negado pelo hook PreToolUse (\"Política do TaskFlow…\")", leg: "Etapa 1: o hook nega antes de tudo, com um motivo que o Claude lê" },
+    { t: "out", x: "Listei, adicionei 'Testar o agente' e concluí a tarefa 1.\nNão consegui remover a tarefa 2: a política do TaskFlow\nsó permite remover pela CLI, à mão.\nCusto estimado: US$ 0.0180\nAuditoria em: auditoria.log", ms: 1600, leg: "O Claude explica a negação; o custo é estimado (valores ilustrativos)" }
+  ]
+});
+(function () {
+  var itens = [
+    ["O agente pode listar tarefas sem nunca perguntar", "regra", "allowed_tools pré-aprova: rodam sem passar pelo callback."],
+    ["Perguntar a você no terminal antes de concluir uma tarefa", "callback", "can_use_tool é chamado para o que nenhuma etapa anterior decidiu."],
+    ["Bloquear remover_tarefa sempre, com um motivo próprio que o Claude lê, mesmo se alguém ligar o bypass", "hook", "Um PreToolUse com permissionDecision deny e permissionDecisionReason vale até no bypassPermissions."],
+    ["Agente rodando de madrugada, sem ninguém para aprovar: negar tudo que precisaria de aprovação", "modo", "permission_mode=\"dontAsk\" transforma cada pergunta em negação."],
+    ["Registrar num arquivo toda ferramenta que rodou", "hook", "PostToolUse roda depois de cada ferramenta, no seu programa."],
+    ["Tirar o Bash do agente por completo", "regra", "disallowed_tools=[\"Bash\"] remove a ferramenta."],
+    ["Aprovar edições de arquivo sem perguntar durante um protótipo numa pasta isolada", "modo", "permission_mode=\"acceptEdits\" aprova edições dentro da pasta de trabalho."]
+  ], i = -1, pts = 0, ops = ["regra", "modo", "callback", "hook"];
+  function mostra() { return i < itens.length ? '<span class="t-b">Caso ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: ' + ops.join(" · ") + "</span>" : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ops.forEach(function (o) { cmds[o] = function () { return resp(o); }; });
+  Curso.terminal("term", { titulo: "Quem decide? (simulação)", prompt: ">", intro: '<span class="t-dim">regra = allowed/disallowed_tools · modo = permission_mode · callback = can_use_tool · hook = PreToolUse/PostToolUse</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: regra, modo, callback ou hook.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual etapa o SDK confere <strong>primeiro</strong> quando o Claude pede uma ferramenta?", op: ["O <code>can_use_tool</code>", "Os hooks", "As regras de permitir"], c: 1, ex: "Ordem: hooks, regras de negar, regras de perguntar, modo, regras de permitir e, por último, o callback." },
+  { p: "Em <code>permission_mode=\"default\"</code>, sem <code>can_use_tool</code>, o que acontece com uma chamada que precisa de aprovação e não casa com regra?", op: ["Roda normalmente", "É negada", "O SDK pergunta no terminal sozinho"], c: 1, ex: "Sem callback, não há quem aprove: a chamada é negada." },
+  { p: "Uma ferramenta está em <code>allowed_tools</code>. Seu <code>can_use_tool</code> é chamado para ela?", op: ["Sim, sempre", "Não: chamadas aprovadas antes pulam o callback", "Só no modo plan"], c: 1, ex: "Para checar chamadas já aprovadas, use um hook <code>PreToolUse</code>." },
+  { p: "Como um hook <code>PreToolUse</code> bloqueia uma chamada?", op: ["Devolvendo <code>{}</code>", "Levantando qualquer exceção", "Devolvendo <code>hookSpecificOutput</code> com <code>permissionDecision: \"deny\"</code> e um motivo"], c: 2, ex: "<code>{}</code> significa \"sem objeção\". O motivo em <code>permissionDecisionReason</code> é lido pelo Claude." },
+  { p: "Por que evitar <code>bypassPermissions</code> no seu computador?", op: ["Porque é mais lento", "Porque aprova quase tudo, inclusive ferramentas fora de <code>allowed_tools</code>", "Porque desliga os hooks"], c: 1, ex: "Hooks e regras de negação ainda valem, mas o resto é aprovado. Use só em ambiente isolado." }
+]);
+Curso.checklist("check", [
+  "Explico a ordem: hooks, negar, perguntar, modo, permitir, callback",
+  "Escolho o <code>permission_mode</code> certo para cada situação",
+  "Escrevo um <code>can_use_tool</code> que devolve <code>PermissionResultAllow</code> ou <code>PermissionResultDeny</code>",
+  "Bloqueio uma ferramenta com um hook <code>PreToolUse</code> e registro chamadas com <code>PostToolUse</code>",
+  "Sei por que uma ferramenta pré-aprovada nunca chega ao callback"
+]);
+</script>
+</body>
+</html>

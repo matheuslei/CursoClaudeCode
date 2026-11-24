@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 1</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m1qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 1 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Primeiros passos</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 1</a>
+    <a class="prox" href="../02-contexto/01-janela-contexto.html"><small>Próximo módulo →</small>Módulo 2: Contexto é tudo</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 1 · Primeiros passos › Quiz final");
+Curso.quiz("quiz", [{"p": "Instalou pelo WinGet. Como fica a atualização?", "op": ["É automática", "Manual: <code>winget upgrade Anthropic.ClaudeCode</code>", "Não existe atualização"], "c": 1, "ex": "Só a instalação nativa se atualiza sozinha. Pelo WinGet, atualize de vez em quando. <span class=\"t-dim\">(aula: Instalação no Windows)</span>"}, {"p": "O que a tecla <kbd>Shift</kbd>+<kbd>Tab</kbd> faz no Claude Code?", "op": ["Volta para a mensagem anterior", "Alterna o modo de permissão da sessão", "Sai do Claude Code"], "c": 1, "ex": "Ela alterna entre modos como Manual, aceitar edições e plan. Veremos todos no Módulo 4. <span class=\"t-dim\">(aula: Primeira sessão com o TaskFlow)</span>"}, {"p": "O Claude fez 3 edições num caminho que você não queria. Como voltar?", "op": ["<code>/rewind</code> (ou Esc Esc com o campo vazio)", "<code>/status</code>", "<code>/model</code>"], "c": 0, "ex": "O rewind restaura a conversa e/ou o código para antes daquele ponto. O Git continua sendo a rede de segurança definitiva. <span class=\"t-dim\">(aula: Comandos com barra (/))</span>"}, {"p": "Qual pedido é melhor?", "op": ["\"melhora o tarefas.py\"", "\"Em @tarefas.py, adicione o comando remover &lt;numero&gt;, sem bibliotecas novas. Pronto quando remover 2 funcionar e número inválido der mensagem clara; rode e mostre.\""], "c": 1, "ex": "Tem o quê, onde, restrição e critério de pronto. O Claude sabe exatamente o que entregar e como provar. <span class=\"t-dim\">(aula: Atalhos, ! shell, @ menções e bons prompts)</span>"}, {"p": "Acabou de instalar e <code>claude</code> \"não é reconhecido\". Qual a primeira coisa a tentar?", "op": ["Reinstalar o Windows", "Fechar e abrir um terminal novo", "Comprar outro plano"], "c": 1, "ex": "O terminal antigo não conhece o PATH atualizado. Um terminal novo resolve na maioria dos casos. <span class=\"t-dim\">(aula: Instalação no Windows)</span>"}, {"p": "O Claude pede para editar um arquivo. O que você deve fazer antes de aprovar?", "op": ["Aprovar rápido para não atrasar", "Ler o diff mostrado no pedido de permissão", "Fechar o terminal"], "c": 1, "ex": "O pedido mostra exatamente o que vai mudar. Ler o diff é sua revisão em tempo real. <span class=\"t-dim\">(aula: Primeira sessão com o TaskFlow)</span>"}, {"p": "A conversa ficou longa, mas você está no meio da MESMA tarefa. Qual comando?", "op": ["<code>/compact</code>", "<code>/clear</code>", "<code>/exit</code>"], "c": 0, "ex": "<code>/compact</code> resume a conversa para liberar espaço e mantém o fio da tarefa. <span class=\"t-dim\">(aula: Comandos com barra (/))</span>"}, {"p": "O que <code>! python -m pytest</code> faz dentro do Claude Code?", "op": ["Pede ao Claude para escrever testes", "Roda o comando direto, adiciona a saída ao contexto e o Claude comenta o resultado", "Abre o PowerShell em outra janela"], "c": 1, "ex": "Shell mode: execução direta, sem pedido de permissão, e o Claude analisa a saída. <span class=\"t-dim\">(aula: Atalhos, ! shell, @ menções e bons prompts)</span>"}, {"p": "Em qual pasta o Claude Code trabalha?", "op": ["Sempre em C:\\", "Na pasta onde você rodou <code>claude</code>", "Na pasta Documentos"], "c": 1, "ex": "Por isso, sempre faça <code>cd</code> para o projeto antes de abrir o Claude. <span class=\"t-dim\">(aula: Instalação no Windows)</span>"}, {"p": "Você não gostou da edição proposta. Qual a melhor resposta?", "op": ["Aceitar e corrigir depois na mão", "Escolher \"No\" e dizer o que prefere", "Fechar e abrir de novo"], "c": 1, "ex": "Recusar com instrução (\"No, use um dicionário em vez de lista\") ensina o Claude o que você quer na hora. <span class=\"t-dim\">(aula: Primeira sessão com o TaskFlow)</span>"}]);
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criar um MCP em Python</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m6a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 6 · Aula 3</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~35 min</span>
+    <h1>Criar um MCP em Python</h1>
+    <p class="objetivo">Objetivo: escrever um servidor MCP próprio com o SDK oficial em Python, que expõe as tarefas do TaskFlow como ferramentas, e conectá-lo ao Claude Code.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Servidores prontos cobrem serviços populares. Mas os sistemas mais úteis para você costumam ser <strong>os seus</strong>: um script interno, uma planilha, uma API do time. Com cerca de 40 linhas de Python você ensina o Claude a usá-los do jeito certo, com regras e validações que <em>você</em> define.</p>
+    <div class="caixa"><strong>Por que não deixar o Claude rodar o script direto?</strong>Pode, com <code>python tarefas.py listar</code>. Mas uma ferramenta MCP tem nome, descrição e parâmetros tipados. O Claude entende quando usar e o que passar, e você controla exatamente o que é permitido (aqui, só listar e adicionar; nada de apagar).</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: de função Python a ferramenta</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Passo a passo</h2>
+    <div class="caixa alerta"><strong>Antes de instalar</strong>Esta aula exige instalar um pacote Python (<code>mcp</code>) com o <code>pip</code>. Na máquina de trabalho, <strong>confirme com a TI</strong> se você pode instalar pacotes. O SDK atual (v2) exige <strong>Python 3.11 ou superior</strong>: confira com <code>python --version</code>.</div>
+    <h3>1. Preparar o projeto</h3>
+    <p>Use a pasta <code>projeto-taskflow\etapa-06</code> do curso (já tem o servidor pronto, para conferir) ou adicione o servidor ao seu <code>taskflow</code>. Crie um ambiente virtual e instale o SDK:</p>
+    <div class="cod"><code>cd ~\estudos-claude\taskflow
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install "mcp[cli]"</code></div>
+    <p>Chamar o <code>python.exe</code> de dentro do <code>.venv</code> evita ter que "ativar" o ambiente, o que costuma ser bloqueado pela política de scripts do PowerShell em máquinas corporativas. Adicione <code>.venv/</code> ao <code>.gitignore</code>.</p>
+    <h3>2. Escrever o servidor: <code>servidor_mcp.py</code></h3>
+    <div class="cod"><code>from mcp.server import MCPServer
+
+from tarefas import carregar, salvar
+
+mcp = MCPServer("taskflow")
+
+
+@mcp.tool()
+def listar_tarefas() -&gt; str:
+    """Lista todas as tarefas do TaskFlow com número e status ([x] feita, [ ] pendente)."""
+    tarefas = carregar()
+    if not tarefas:
+        return "Nenhuma tarefa cadastrada."
+    linhas = []
+    for i, t in enumerate(tarefas, start=1):
+        marca = "x" if t.get("feita") else " "
+        linhas.append(f"{i}. [{marca}] {t['titulo']}")
+    return "\n".join(linhas)
+
+
+@mcp.tool()
+def adicionar_tarefa(titulo: str) -&gt; str:
+    """Adiciona uma nova tarefa pendente ao TaskFlow. Use títulos curtos e fictícios."""
+    titulo = titulo.strip()
+    if not titulo:
+        return "Erro: o título não pode ser vazio."
+    tarefas = carregar()
+    tarefas.append({"titulo": titulo, "feita": False})
+    salvar(tarefas)
+    return f"Tarefa {len(tarefas)} adicionada: {titulo}"
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></div>
+    <ul>
+      <li><code>MCPServer("taskflow")</code> cria o servidor.</li>
+      <li><code>@mcp.tool()</code> transforma a função em ferramenta. A <strong>docstring vira a descrição</strong> que o Claude lê para decidir quando usar, e os <strong>tipos</strong> (<code>titulo: str</code>) viram os parâmetros.</li>
+      <li><code>mcp.run(transport="stdio")</code> conversa com o Claude Code pela entrada e saída padrão.</li>
+    </ul>
+    <div class="caixa erro"><strong>Nunca use <code>print()</code> num servidor stdio</strong>A saída padrão é o canal do protocolo. Um <code>print</code> ali dentro corrompe a comunicação e o servidor "quebra" sem motivo aparente. Devolva strings nas ferramentas.</div>
+    <div class="caixa"><strong>Nota de versão</strong>No SDK v1.x, a classe se chamava <code>FastMCP</code> (<code>from mcp.server.fastmcp import FastMCP</code>). Na v2, a atual, ela virou <code>MCPServer</code>, e o import antigo gera <code>ModuleNotFoundError</code>. Tutoriais antigos na internet ainda usam <code>FastMCP</code>.</div>
+    <h3>3. Conectar ao Claude Code</h3>
+    <div class="cod"><code>claude mcp add taskflow -- "$PWD\.venv\Scripts\python.exe" "$PWD\servidor_mcp.py"
+claude mcp list</code></div>
+    <p>O PowerShell troca <code>$PWD</code> pela pasta atual, então o comando fica salvo com caminhos completos e funciona de qualquer lugar. Para testar as ferramentas sem o Claude, o SDK traz um inspetor: <code>.\.venv\Scripts\mcp.exe dev servidor_mcp.py</code> (pode exigir Node.js).</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: monte o servidor</h2>
+    <p>Neste terminal você "monta" o servidor peça por peça. Digite os comandos na ordem certa; se errar a ordem, a simulação explica. Comece com <code>ajuda</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>Crie o <code>servidor_mcp.py</code> no seu TaskFlow, instale o SDK e conecte com <code>claude mcp add</code></li>
+      <li>No <code>claude</code>, peça: <code>liste minhas tarefas usando o servidor taskflow</code> e depois <code>adicione a tarefa "Revisar Módulo 6" pelo taskflow</code></li>
+      <li>Confira fora do Claude: <code>python tarefas.py listar</code></li>
+      <li><strong>Desafio:</strong> peça ao Claude para adicionar ao servidor a ferramenta <code>concluir_tarefa(numero: int)</code>, com validação de número inválido. Lembre: depois de mudar o servidor, reinicie a sessão (ou use <code>/mcp</code> para reconectar)</li>
+      <li>Faça commit (sem a pasta <code>.venv</code>!)</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito do desafio</summary>
+      <div class="cod"><code>@mcp.tool()
+def concluir_tarefa(numero: int) -&gt; str:
+    """Marca como feita a tarefa de número indicado (1 = primeira da lista)."""
+    tarefas = carregar()
+    if numero &lt; 1 or numero &gt; len(tarefas):
+        return f"Erro: a tarefa {numero} não existe. Há {len(tarefas)} tarefas."
+    tarefas[numero - 1]["feita"] = True
+    salvar(tarefas)
+    return f"Tarefa {numero} concluída."</code></div>
+      <p>Pontos para conferir: a validação devolve uma <strong>mensagem</strong> (não um <code>print</code> nem uma exceção sem tratamento), e a docstring explica que a numeração começa em 1. É isso que guia o Claude a passar o número certo.</p>
+      <p>No <code>.gitignore</code>: <code>.venv/</code> e <code>tarefas.json</code> (dados locais).</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4><code>ModuleNotFoundError: mcp</code></h4><p>O servidor está rodando com um Python que não tem o SDK. Use o caminho do <code>.venv\Scripts\python.exe</code> no <code>claude mcp add</code>.</p></div>
+      <div class="mini"><h4>Import de <code>FastMCP</code> falha</h4><p>Tutorial da v1. Na v2 use <code>from mcp.server import MCPServer</code>.</p></div>
+      <div class="mini"><h4>Servidor conecta e cai</h4><p>Quase sempre um <code>print()</code> ou um erro no início. Rode <code>python servidor_mcp.py</code> direto para ver a mensagem.</p></div>
+      <div class="mini"><h4>Docstring vaga</h4><p>"Faz coisas com tarefas" não ajuda. Diga o que a ferramenta faz, o formato dos parâmetros e o que devolve.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://py.sdk.modelcontextprotocol.io/">Documentação do SDK Python do MCP</a> (inclui o guia de migração v1 → v2)</li>
+      <li><a href="https://github.com/modelcontextprotocol/python-sdk">Repositório do SDK Python</a></li>
+      <li><a href="https://modelcontextprotocol.io/quickstart/server">Construir um servidor MCP</a>, guia oficial do protocolo</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (SDK Python MCP v2 e MCP quickstart do Claude Code). O código foi verificado sintaticamente; a API do SDK pode mudar entre versões.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Criar um MCP em Python em 1 minuto", cenas: [
+  { fala: "Com cerca de quarenta linhas de Python, você ensina o Claude a usar os seus próprios sistemas.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 6 · AULA 3</span><p class=\"v-titulo\" data-t=\"0.3\">Criar um MCP em Python</p><p class=\"v-sub\" data-t=\"0.9\">Suas ferramentas, suas regras</p>" },
+  { fala: "Por que não rodar o script direto? Porque uma ferramenta MCP tem nome, descrição e parâmetros tipados. E você controla o que é permitido: aqui, só listar e adicionar.",
+    html: "<div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">📜</span><b>Rodar o script</b>funciona, mas sem regras</div><div class=\"v-caixa acc\" data-t=\"2.8\"><span class=\"v-ic\">🛠</span><b>Ferramenta MCP</b>nome, descrição e parâmetros; só o que você permite</div></div>" },
+  { fala: "Crie um ambiente virtual e instale o pacote mcp. O SDK atual exige Python 3.11 ou superior. Na máquina de trabalho, confirme com a TI antes de instalar.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">python</span> -m venv .venv</div><div data-t=\"1.6\"><span class=\"a\">.\\.venv\\Scripts\\python.exe</span> -m pip install <span class=\"u\">\"mcp[cli]\"</span></div></div><div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa warn\" data-t=\"3.8\"><span class=\"v-ic\">🐍</span><b>Python 3.11+</b>exigido pelo SDK v2</div><div class=\"v-caixa warn\" data-t=\"5.4\"><span class=\"v-ic\">🏢</span><b>TI</b>confirme antes de instalar</div></div>" },
+  { fala: "O código é simples. Você cria o servidor, marca cada função com o decorador tool, e roda com transporte stdio. A docstring vira a descrição que o Claude lê.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">from</span> mcp.server <span class=\"a\">import</span> MCPServer</div><div data-t=\"1.6\">mcp = MCPServer(<span class=\"u\">\"taskflow\"</span>)</div><div data-t=\"2.8\"><span class=\"w\">@mcp.tool()</span></div><div data-t=\"3.4\"><span class=\"a\">def</span> listar_tarefas() -&gt; str: <span class=\"d\">\"\"\"docstring = descrição\"\"\"</span></div><div data-t=\"5.2\">mcp.run(transport=<span class=\"u\">\"stdio\"</span>)</div></div>" },
+  { fala: "Um cuidado importante: nunca use print num servidor stdio. A saída padrão é o canal do protocolo, e um print ali corrompe a comunicação. Devolva textos nas ferramentas.",
+    html: "<p class=\"v-titulo v-risca\" data-t=\"0.3\" style=\"align-self:flex-start\">print()</p><div class=\"v-caixa err\" data-t=\"2.6\"><span class=\"v-ic\">📡</span><b>Saída padrão = canal do protocolo</b>um print corrompe a comunicação</div><p class=\"v-txt\" data-t=\"5.6\" style=\"color:#7cc48a\">✔ devolva strings nas ferramentas</p>" },
+  { fala: "Para conectar, registre o servidor com claude mcp add, apontando o python do ambiente virtual e o arquivo do servidor. Depois confira com claude mcp list.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">claude mcp add</span> taskflow <span class=\"w\">--</span> <span class=\"u\">\"$PWD\\.venv\\Scripts\\python.exe\"</span></div><div data-t=\"1.2\">    <span class=\"u\">\"$PWD\\servidor_mcp.py\"</span></div><div data-t=\"4.2\"><span class=\"a\">claude mcp list</span>  <span class=\"o\">✔</span></div></div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🐍", rt: "Função Python" }, { ic: "🏷", rt: "@mcp.tool()" }, { ic: "📡", rt: "stdio" }, { ic: "✻", rt: "Claude Code" }],
+  passos: [
+    { ativos: [0], titulo: "Você escreve uma função comum", texto: "<code>def adicionar_tarefa(titulo: str) -&gt; str:</code> com docstring. Ela reaproveita o <code>carregar()</code> e o <code>salvar()</code> que o TaskFlow já tem." },
+    { ativos: [0, 1], setas: [0], titulo: "O decorador vira ferramenta", texto: "<code>@mcp.tool()</code> lê o <strong>nome</strong>, a <strong>docstring</strong> (descrição) e os <strong>tipos</strong> (parâmetros) e publica isso como uma ferramenta MCP." },
+    { ativos: [1, 2], setas: [1], titulo: "O servidor fala por stdio", texto: "<code>mcp.run(transport=\"stdio\")</code>: o Claude Code inicia o processo e troca mensagens pela entrada e saída padrão. Por isso nada de <code>print()</code>." },
+    { ativos: [2, 3], setas: [2], titulo: "O Claude descobre e usa", texto: "Ao iniciar a sessão, o Claude Code lista as ferramentas do servidor. Quando você pede <em>\"adicione a tarefa X\"</em>, ele chama <code>adicionar_tarefa</code> com <code>titulo=\"X\"</code>, passando pela permissão como qualquer ferramenta." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell + Claude Code (demonstração)", prompt: "PS C:\\Users\\ana\\estudos-claude\\taskflow>", altura: 300,
+  passos: [
+    { t: "cmd", x: ".\\.venv\\Scripts\\python.exe -m pip install \"mcp[cli]\"", leg: "Instalar o SDK no ambiente virtual" },
+    { t: "html", x: '<span class="t-dim">Successfully installed mcp-2.x …</span>' },
+    { t: "cmd", x: "claude mcp add taskflow -- \"$PWD\\.venv\\Scripts\\python.exe\" \"$PWD\\servidor_mcp.py\"", leg: "Registrar o servidor stdio com caminhos completos" },
+    { t: "html", x: "Added stdio MCP server taskflow with command: C:\\Users\\ana\\…\\python.exe C:\\Users\\ana\\…\\servidor_mcp.py to local config" },
+    { t: "cmd", x: "claude mcp list" },
+    { t: "html", x: 'taskflow: …\\python.exe …\\servidor_mcp.py - <span class="t-ok">✔ Connected</span>' },
+    { t: "cmd", x: "claude" },
+    { t: "user", x: "adicione a tarefa \"Revisar Módulo 6\" pelo taskflow e depois liste tudo", leg: "O Claude escolhe as ferramentas certas" },
+    { t: "tool", x: "taskflow - adicionar_tarefa (MCP)(titulo: \"Revisar Módulo 6\")" },
+    { t: "out", x: "Tarefa 3 adicionada: Revisar Módulo 6" },
+    { t: "tool", x: "taskflow - listar_tarefas (MCP)" },
+    { t: "out", x: "1. [x] Estudar o Módulo 1\n2. [ ] Estudar o Módulo 2\n3. [ ] Revisar Módulo 6" },
+    { t: "claude", x: "Adicionei a tarefa 3. Você tem 3 tarefas, 1 concluída." }
+  ]
+});
+(function () {
+  var passos = [
+    ["import", "from mcp.server import MCPServer", "Importa a classe do SDK v2."],
+    ["criar", 'mcp = MCPServer("taskflow")', "Cria o servidor com o nome taskflow."],
+    ["ferramenta", "@mcp.tool()\ndef listar_tarefas() -> str: ...", "Publica a função como ferramenta; a docstring vira a descrição."],
+    ["rodar", 'mcp.run(transport="stdio")', "Inicia a conversa por stdio com o Claude Code."],
+    ["conectar", 'claude mcp add taskflow -- "$PWD\\.venv\\Scripts\\python.exe" "$PWD\\servidor_mcp.py"', "Registra o servidor no Claude Code (no PowerShell)."]
+  ], feito = 0, codigo = [];
+  function prox() { return feito < passos.length ? '<span class="t-dim">Próxima peça? (' + passos.map(function (p) { return p[0]; }).join(" · ") + ")</span>" : '<span class="t-ok">Servidor montado e conectado!</span> Digite <span class="t-b">ver</span> para o código ou <span class="t-b">reiniciar</span>.'; }
+  function peca(nome) {
+    var idx = passos.map(function (p) { return p[0]; }).indexOf(nome);
+    if (idx < feito) return '<span class="t-dim">Essa peça já está no lugar.</span>\n' + prox();
+    if (idx > feito) return '<span class="t-warn">Ainda não: falta "' + passos[feito][0] + '" antes.</span> ' + ({ 0: "Sem o import, MCPServer não existe.", 1: "Sem criar o servidor, não há onde registrar ferramentas.", 2: "Um servidor sem ferramentas não oferece nada ao Claude.", 3: "Sem mcp.run, o processo inicia e termina na hora." })[feito] + "\n" + prox();
+    feito++; codigo.push(passos[idx][1]);
+    return '<span class="t-ok">✓ ' + passos[idx][2] + "</span>\n" + '<span class="t-dim">' + passos[idx][1].replace(/</g, "&lt;") + "</span>\n\n" + prox();
+  }
+  var cmds = {
+    "ajuda": "Monte o servidor digitando as peças na ordem:\n  import · criar · ferramenta · rodar · conectar\n" + '<span class="t-dim">Extras: ver (mostra o código) · print (o que acontece?) · reiniciar</span>',
+    "ver": function () { return codigo.length ? '<span class="t-dim">' + codigo.join("\n").replace(/</g, "&lt;") + "</span>" : '<span class="t-dim">(vazio)</span>'; },
+    "print": '<span class="t-warn">print("debug") num servidor stdio escreve na saída padrão, que é o canal do protocolo: a comunicação corrompe e o servidor cai.</span>\n<span class="t-dim">Devolva strings nas ferramentas em vez de imprimir.</span>',
+    "reiniciar": function () { feito = 0; codigo = []; return '<span class="t-dim">Recomeçando.</span>\n' + prox(); }
+  };
+  passos.forEach(function (p) { cmds[p[0]] = function () { return peca(p[0]); }; });
+  Curso.terminal("term", { titulo: "Montador de servidor MCP (simulação)", prompt: ">", intro: '<span class="t-dim">Digite ajuda para começar.</span>', metas: ["import", "criar", "ferramenta", "rodar", "conectar", "print"], comandos: cmds, desconhecido: '<span class="t-dim">Peças: import · criar · ferramenta · rodar · conectar (ou ajuda)</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "No SDK Python v2, qual import cria um servidor MCP?", op: ["<code>from mcp.server.fastmcp import FastMCP</code>", "<code>from mcp.server import MCPServer</code>", "<code>import claude_mcp</code>"], c: 1, ex: "Na v2, <code>FastMCP</code> virou <code>MCPServer</code>. O import antigo gera <code>ModuleNotFoundError</code>." },
+  { p: "De onde o Claude tira a descrição de uma ferramenta criada com <code>@mcp.tool()</code>?", op: ["Do nome do arquivo", "Da docstring da função", "Do README"], c: 1, ex: "A docstring vira a descrição. Os tipos dos parâmetros também são publicados. Capriche nos dois." },
+  { p: "Por que não usar <code>print()</code> num servidor stdio?", op: ["Porque deixa lento", "Porque a saída padrão é o canal do protocolo e o print corrompe a comunicação", "Porque o Python proíbe"], c: 1, ex: "No transporte stdio, stdout é exclusivo das mensagens MCP." },
+  { p: "O servidor dá <code>ModuleNotFoundError: No module named 'mcp'</code> ao ser iniciado pelo Claude Code, mas você instalou o pacote. Causa provável?", op: ["O Claude Code está usando outro Python, sem o pacote", "O pacote mcp não existe", "Falta reiniciar o Windows"], c: 0, ex: "Registre o servidor com o caminho completo do <code>.venv\\Scripts\\python.exe</code> onde o SDK foi instalado." },
+  { p: "Qual a vantagem de expor só <code>listar_tarefas</code> e <code>adicionar_tarefa</code>, sem uma ferramenta de apagar?", op: ["Nenhuma", "Você limita o que o Claude pode fazer naquele sistema: menos risco", "Fica mais rápido de instalar"], c: 1, ex: "Um servidor próprio é também uma fronteira de segurança: só existe o que você decidiu expor." }
+]);
+Curso.checklist("check", [
+  "Instalei o SDK num ambiente virtual (com aval da TI, se for máquina de trabalho)",
+  "Escrevi ferramentas com <code>@mcp.tool()</code>, docstrings claras e tipos",
+  "Sei por que não usar <code>print()</code> num servidor stdio",
+  "Conectei o servidor com <code>claude mcp add</code> e o Claude usou as ferramentas",
+  "Adicionei a ferramenta <code>concluir_tarefa</code> e fiz commit sem a <code>.venv</code>"
+]);
+</script>
+</body>
+</html>

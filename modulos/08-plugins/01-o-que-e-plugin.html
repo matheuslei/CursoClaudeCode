@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O que é um plugin</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m8a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 8 · Aula 1</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>O que é um plugin, instalar e gerenciar</h1>
+    <p class="objetivo">Objetivo: saber o que um plugin carrega, quando vale usar um em vez das peças soltas, e instalar, desativar e remover plugins com segurança, conferindo o custo de contexto antes.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Nos módulos 5, 6 e 7 você criou várias peças para o TaskFlow: skills, um hook, um servidor MCP e um subagente. Elas funcionam, mas estão espalhadas em pastas e configurações diferentes. Levar tudo para outro projeto, ou para um colega, dá trabalho.</p>
+    <p>Um <strong>plugin</strong> é uma pasta que junta essas peças e instala tudo como uma unidade, com um comando e com atualizações.</p>
+    <div class="caixa"><strong>Analogia</strong>As peças soltas são ferramentas avulsas na bancada. O plugin é a maleta: as mesmas ferramentas, organizadas, com etiqueta e fáceis de levar.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: do marketplace à sua sessão</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>O essencial</h2>
+    <h3>O que um plugin pode trazer</h3>
+    <div class="grade">
+      <div class="mini"><h4>📘 Skills</h4><p>Instruções que o Claude carrega quando a tarefa pede, ou que você roda como comando.</p></div>
+      <div class="mini"><h4>🤖 Subagentes</h4><p>Ajudantes com contexto próprio (Módulo 7).</p></div>
+      <div class="mini"><h4>🪝 Hooks</h4><p>Comandos que rodam sozinhos em momentos do ciclo, como depois de cada edição.</p></div>
+      <div class="mini"><h4>🔌 Servidores MCP</h4><p>Ferramentas externas (Módulo 6).</p></div>
+    </div>
+    <p>Também pode trazer comandos no formato antigo, executáveis em <code>bin/</code>, estilos de resposta, temas, monitores e servidores de linguagem (LSP). Um plugin com hooks escritos em JavaScript se chama <em>mod</em>; fica fora deste curso.</p>
+
+    <h3>Plugin ou peças soltas?</h3>
+    <table class="tab">
+      <thead><tr><th>Situação</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>Uma skill só para você, num projeto</td><td>Peça solta em <code>.claude/skills/</code></td></tr>
+        <tr><td>Várias peças que andam juntas</td><td>Plugin</td></tr>
+        <tr><td>Levar o mesmo conjunto para vários projetos ou pessoas</td><td>Plugin</td></tr>
+        <tr><td>Versões e atualizações controladas</td><td>Plugin num marketplace</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Marketplaces</h3>
+    <p>Um <strong>marketplace</strong> é um catálogo: lista plugins e onde buscar cada um. Não é uma loja hospedada. O marketplace oficial, <code>claude-plugins-official</code>, é adicionado sozinho na primeira sessão interativa. Outros você adiciona com <code>/plugin marketplace add</code>.</p>
+    <table class="tab">
+      <thead><tr><th>Nível</th><th>Quais</th></tr></thead>
+      <tbody>
+        <tr><td>Oficial</td><td>Nomes reservados da Anthropic, como <code>claude-plugins-official</code></td></tr>
+        <tr><td>Comunidade</td><td><code>claude-community</code> e outros da Anthropic</td></tr>
+        <tr><td>Terceiros</td><td>Todos os outros, inclusive o do seu colega ou da sua empresa</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Instalar</h3>
+    <div class="cod"><span class="rot">dentro da sessão</span><code>/plugin                                              # gerenciador: abas Discover, Installed, Marketplaces, Errors
+/plugin install commit-commands@claude-plugins-official   # abre os detalhes desse plugin</code></div>
+    <p>O painel de detalhes mostra <strong>Will install</strong> (o que o plugin adiciona) e, para plugins do marketplace oficial, <strong>Context cost</strong>: quantos tokens ele soma a <em>cada</em> mensagem e quantos quando é usado. Depois você escolhe o escopo:</p>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Para quem</th><th>Onde fica registrado</th></tr></thead>
+      <tbody>
+        <tr><td>Usuário</td><td>Você, em todos os projetos</td><td><code>~/.claude/settings.json</code></td></tr>
+        <tr><td>Projeto</td><td>Todos que trabalham no repositório</td><td><code>.claude/settings.json</code></td></tr>
+        <tr><td>Local</td><td>Você, só neste repositório</td><td><code>.claude/settings.local.json</code></td></tr>
+      </tbody>
+    </table>
+    <p>Depois de instalar, digite <code>/</code>: as skills aparecem com o prefixo do plugin, como <code>/commit-commands:commit</code>.</p>
+
+    <h3>Gerenciar pela linha de comando</h3>
+    <div class="cod"><span class="rot">PowerShell</span><code>claude plugin list                        # o que está instalado, escopo e status
+claude plugin details commit-commands     # componentes e custo em tokens
+claude plugin disable commit-commands@claude-plugins-official
+claude plugin enable  commit-commands@claude-plugins-official
+claude plugin uninstall commit-commands@claude-plugins-official</code></div>
+
+    <h3>Segurança e custo</h3>
+    <div class="caixa alerta"><strong>Plugin roda código com as suas permissões</strong>Hooks, servidores MCP e executáveis de um plugin rodam no seu computador, <strong>fora</strong> do sandbox e sem passar pelas suas regras de permissão. Antes de instalar, leia os detalhes e, se puder, os arquivos <code>hooks/hooks.json</code>, <code>.mcp.json</code> e <code>bin/</code>. No computador da empresa, plugins de terceiros dependem do aval da segurança da informação.</div>
+    <div class="caixa dica"><strong>Todo plugin ativo ocupa contexto</strong>O nome e a descrição de cada skill e subagente entram em toda mensagem, mesmo que você não use. Na aba Installed, o grupo <strong>Not used recently</strong> mostra plugins que você pode desativar.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: instalando com cuidado</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual escopo?</h2>
+    <p>Para cada situação, responda <code>usuario</code>, <code>projeto</code> ou <code>local</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: avaliar, instalar e remover</h2>
+    <p>Prepare a pasta de treino do módulo (<a href="../../projeto-taskflow/etapa-08/README.md">README da etapa 08</a>, passo 1). Esta prática instala um plugin do marketplace oficial e é <strong>opcional</strong>: se a rede ou a política da empresa bloquear, faça só a simulação e os passos 1 e 2.</p>
+    <ol>
+      <li>Na pasta de treino, abra <code>claude</code> e rode <code>/plugin</code>. Passe pelas abas com <kbd>Tab</kbd>. Em <strong>Marketplaces</strong>, veja se <code>claude-plugins-official</code> está lá.</li>
+      <li>Rode <code>/plugin install commit-commands@claude-plugins-official</code>. Leia <strong>Will install</strong> e <strong>Context cost</strong>. Anote: quantos tokens por turno?</li>
+      <li>Escolha <strong>Install for you, in this repo only</strong> (escopo local).</li>
+      <li>Digite <code>/commit</code> e veja os comandos com o prefixo <code>commit-commands:</code>. Não precisa rodá-los.</li>
+      <li>Saia e, no PowerShell, rode <code>claude plugin list</code> e <code>claude plugin details commit-commands</code>.</li>
+      <li>Desative com <code>claude plugin disable commit-commands@claude-plugins-official</code>, confira na lista, e remova com <code>claude plugin uninstall commit-commands@claude-plugins-official --scope local</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o que observar</summary>
+      <ul>
+        <li><strong>Passo 2:</strong> o painel lista os comandos do plugin e duas estimativas: <em>Every turn</em> (sempre) e <em>When invoked</em> (quando usado). É isso que você compara antes de decidir.</li>
+        <li><strong>Passo 3:</strong> escopo local grava em <code>.claude/settings.local.json</code> da pasta de treino; nada muda nos seus outros projetos.</li>
+        <li><strong>Passo 6:</strong> desativar mantém instalado, mas tira do contexto; remover apaga de vez. O <code>--scope local</code> precisa bater com o escopo da instalação.</li>
+        <li>Se o <code>/plugin</code> não abrir ou o marketplace não aparecer, a política da organização pode estar bloqueando. Não contorne: fale com a TI.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Instalar sem ler</h4><p>O plugin roda código com as suas permissões. Leia o que ele instala antes.</p></div>
+      <div class="mini"><h4>Plugins demais ativos</h4><p>Cada um soma tokens a toda mensagem. Desative o que não usa.</p></div>
+      <div class="mini"><h4>Escopo errado</h4><p>Escopo de projeto liga o plugin para todo o time. Para testar, use local.</p></div>
+      <div class="mini"><h4>Confundir com o Claude Marketplace</h4><p>O site claude.com/marketplace é uma vitrine; não é um marketplace que você adiciona com <code>/plugin</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/plugins/overview">Visão geral de plugins</a> e <a href="https://code.claude.com/docs/en/plugins/install">Instalar e gerenciar</a> (em inglês).</li>
+      <li><a href="https://code.claude.com/docs/en/plugins/security">Segurança e confiança em plugins</a> (em inglês).</li>
+      <li>Mods e gestão de plugins para organizações: fora deste curso; veja a seção "Mods" e "Manage plugins for your organization" na documentação.</li>
+      <li>Próxima aula: transformar as peças do TaskFlow num plugin.</li>
+      <li><a href="https://academy.claude.com/courses/claude-code-in-action">Claude Code in Action</a> (Anthropic Academy, em inglês): lição sobre empacotar o setup do time num plugin.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Plugins overview", "Install and manage plugins" e "Plugin security and trust").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Plugins em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai entender o que é um plugin, e como instalar um sem levar surpresa junto.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 8 · AULA 1</span><p class="v-titulo" data-t="0.3">O que é um plugin</p><p class="v-sub" data-t="1.2">instalar sem surpresa</p>' },
+  { fala: "Um plugin é uma pasta que junta skills, subagentes, hooks e servidores MCP, e instala tudo de uma vez.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="1.5"><span class="v-ic">📘</span><b>Skills</b></div><div class="v-caixa" data-t="2.2"><span class="v-ic">🤖</span><b>Subagentes</b></div><div class="v-caixa" data-t="3"><span class="v-ic">🪝</span><b>Hooks</b></div><div class="v-caixa" data-t="3.6"><span class="v-ic">🔌</span><b>Servidores MCP</b></div></div><div class="v-caixa acc" data-t="5"><span class="v-ic">🧳</span><b>Um plugin</b>instala tudo junto</div>' },
+  { fala: "Os plugins vêm de marketplaces, que são catálogos. O oficial da Anthropic já vem adicionado. O comando barra plugin abre o gerenciador.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">📚</span><b>Marketplace</b>catálogo</div><span class="v-seta">→</span><div class="v-caixa acc"><span class="v-ic">🧳</span><b>Plugin</b></div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">✻</span><b>Sua sessão</b></div></div><div class="v-code" data-t="6.5"><span class="u">&gt; </span><span class="v-digita" style="--n:7">/plugin</span></div>' },
+  { fala: "Na instalação, você escolhe o escopo: só para você, para todo o projeto, ou só para você neste projeto.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="2"><span class="v-ic">🧑</span><b>Usuário</b>você, todos os projetos</div><div class="v-caixa" data-t="3.5"><span class="v-ic">👥</span><b>Projeto</b>todo o time</div><div class="v-caixa ok" data-t="5"><span class="v-ic">📍</span><b>Local</b>você, só aqui</div></div>' },
+  { fala: "Atenção: um plugin roda código com as suas permissões, e ocupa contexto em toda sessão. Leia os detalhes antes de instalar.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa err" data-t="0.5"><span class="v-ic">⚠</span><b>Roda código</b>com as suas permissões</div><div class="v-caixa warn" data-t="3.3"><span class="v-ic">🪙</span><b>Ocupa contexto</b>em toda sessão</div></div><div class="v-caixa ok" data-t="6"><span class="v-ic">🔎</span><b>Leia antes</b>Will install · Context cost</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📚", rt: "Marketplace (catálogo)" }, { ic: "🧳", rt: "Plugin" }, { ic: "⚙", rt: "Settings (escopo)" }, { ic: "✻", rt: "Sua sessão" }],
+  passos: [
+    { ativos: [0], setas: [], titulo: "O catálogo", texto: "Um marketplace lista plugins e onde buscar cada um. O oficial já vem adicionado; outros entram com <code>/plugin marketplace add</code>." },
+    { ativos: [0, 1], setas: [0], titulo: "Você escolhe e revisa", texto: "No <code>/plugin</code>, os detalhes mostram o que será instalado e o custo de contexto. Revise antes." },
+    { ativos: [1, 2], setas: [1], titulo: "Instalação com escopo", texto: "O plugin vai para <code>~/.claude/plugins/</code>, e o escopo escolhido registra o plugin como ativo num arquivo de settings." },
+    { ativos: [2, 3], setas: [2], titulo: "Carrega na sessão", texto: "Na próxima sessão (ou com <code>/reload-plugins</code>), as peças aparecem com o prefixo do plugin." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Instalando com cuidado (ilustrativo)", altura: 320,
+  passos: [
+    { t: "user", x: "/plugin install commit-commands@claude-plugins-official", leg: "Abre os detalhes, ainda não instala" },
+    { t: "out", x: "commit-commands · Will install: comandos de commit, push e pull request\nContext cost · Every turn: ~poucas centenas de tokens · When invoked: mais", leg: "O que entra e quanto custa (valores ilustrativos)" },
+    { t: "perm", x: '<span class="t-b">Choose scope</span>\n  Install for you (user scope)\n  Install for all collaborators on this repository (project scope)\n<span class="t-user">❯ Install for you, in this repo only (local scope)</span>', ms: 1800, leg: "Escopo local para testar" },
+    { t: "out", x: "Plugin is now active.", leg: "Pronto para usar" },
+    { t: "cmd", x: "claude plugin disable commit-commands@claude-plugins-official", leg: "No shell: desativa sem desinstalar" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Você quer um plugin de formatação em todos os seus projetos pessoais", "usuario", "Escopo de usuário: você, em todos os projetos desta máquina."],
+    ["O time inteiro deve ter o mesmo plugin de revisão neste repositório", "projeto", "Escopo de projeto: fica no .claude/settings.json, que vai para o repositório."],
+    ["Você quer testar um plugin novo só neste repositório, sem afetar ninguém", "local", "Escopo local: .claude/settings.local.json, só você e só aqui."],
+    ["Um plugin de anotações que só faz sentido para você neste projeto específico", "local", "Só você e só este projeto: local."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: usuario · projeto · local</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["usuario", "projeto", "local"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  cmds["usuário"] = cmds["usuario"];
+  Curso.terminal("term", { titulo: "Qual escopo? (simulação)", prompt: ">", intro: '<span class="t-dim">usuario · projeto · local</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: usuario, projeto ou local.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que é um plugin do Claude Code?", op: ["Uma extensão do VS Code", "Uma pasta que junta skills, subagentes, hooks e servidores MCP instalados como uma unidade", "Um modelo diferente do Claude"], c: 1, ex: "A extensão do VS Code é outra coisa; plugin é o pacote de peças do Claude Code." },
+  { p: "O que é um marketplace?", op: ["Uma loja que cobra pelos plugins", "Um catálogo que lista plugins e onde buscar cada um", "O site claude.com/marketplace"], c: 1, ex: "É um arquivo de catálogo num repositório ou pasta. O site é uma vitrine à parte." },
+  { p: "Você quer testar um plugin só neste repositório, sem afetar o time. Qual escopo?", op: ["Usuário", "Projeto", "Local"], c: 2, ex: "Local grava em .claude/settings.local.json." },
+  { p: "Por que conferir o \"Context cost\" antes de instalar?", op: ["Porque o plugin cobra por instalação", "Porque as descrições das peças entram em toda mensagem, mesmo sem uso", "Não faz diferença"], c: 1, ex: "Plugins ativos somam tokens a cada turno." },
+  { p: "Os hooks de um plugin passam pelas suas regras de permissão?", op: ["Sim, sempre", "Não: rodam com as suas permissões, fora do sandbox", "Só no modo plan"], c: 1, ex: "Por isso é preciso confiar no plugin antes de instalar." }
+]);
+Curso.checklist("check", [
+  "Explico o que um plugin pode trazer e quando vale usar um",
+  "Sei o que é um marketplace e os níveis oficial, comunidade e terceiros",
+  "Instalo pelo <code>/plugin</code> escolhendo o escopo certo",
+  "Confiro o custo de contexto e o que o plugin instala antes",
+  "Desativo e removo com <code>claude plugin disable</code> e <code>uninstall</code>"
+]);
+</script>
+</body>
+</html>

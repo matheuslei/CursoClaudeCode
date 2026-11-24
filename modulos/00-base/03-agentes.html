@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O que é um agente de IA</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m0a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 0 · Aula 3</span><span class="selo cinza">Zero</span><span class="selo cinza">~15 min</span>
+    <h1>O que é um agente de IA (e o Claude Code)</h1>
+    <p class="objetivo">Objetivo: entender a diferença entre um chat e um agente, como funciona o loop agêntico e por que contexto e permissões são os dois conceitos mais importantes do curso.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Num chat, você pergunta e copia a resposta. Num <strong>agente</strong>, você descreve um objetivo e ele <em>age</em>: lê seus arquivos, edita código, roda testes, corrige o que falhou e repete até terminar. Isso muda o seu papel: de "quem digita o código" para <strong>quem especifica, supervisiona e revisa</strong>.</p>
+    <div class="grade">
+      <div class="mini"><h4>Chat comum</h4><p>Você cola o código → ele sugere → você copia de volta → testa → cola o erro → repete.</p></div>
+      <div class="mini"><h4>Agente (Claude Code)</h4><p>Você pede "corrija o teste que falha" → ele lê, edita, roda o teste, ajusta e mostra o resultado.</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o loop agêntico</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>As peças do Claude Code</h2>
+    <div class="grade">
+      <div class="mini"><h4>🧠 Modelo</h4><p>O "cérebro" (Opus, Sonnet, Haiku, Fable). Troca com <code>/model</code>. Modelos maiores raciocinam melhor e custam mais.</p></div>
+      <div class="mini"><h4>🧰 Ferramentas</h4><p>Ler, buscar, editar arquivos, rodar comandos, acessar a web. Cada uso aparece na tela.</p></div>
+      <div class="mini"><h4>📚 Contexto</h4><p>Tudo o que o modelo enxerga: suas mensagens, arquivos lidos, saídas de comandos e o <code>CLAUDE.md</code>. Tem limite.</p></div>
+      <div class="mini"><h4>🔐 Permissões</h4><p>O que o Claude pode fazer sem perguntar. Você decide: aprovar cada ação ou liberar algumas.</p></div>
+    </div>
+    <h3>Onde o Claude Code roda</h3>
+    <p>É o mesmo motor em várias "superfícies": <strong>terminal (CLI)</strong>, <strong>VS Code/JetBrains</strong>, <strong>app desktop</strong> (aba Code), <strong>web</strong> (claude.ai/code) e até o celular. O <code>CLAUDE.md</code> e as configurações valem em todas. Neste curso usamos principalmente o terminal, porque é onde tudo aparece de forma explícita, e mostramos as outras quando fizer diferença.</p>
+    <div class="caixa alerta"><strong>A IA erra</strong>Modelos podem "alucinar": afirmar algo plausível, mas falso. Por isso o fluxo profissional sempre inclui <strong>verificação</strong>: rodar testes, ler o diff, executar o programa. Você continua responsável pelo resultado.</div>
+
+    <h3>Fluência em IA: as 4 competências</h3>
+    <p>Saber os comandos é metade do caminho. A outra metade é saber <strong>trabalhar junto</strong> com a IA. O framework de <em>AI Fluency</em>, criado por Rick Dakan e Joseph Feller em parceria com a Anthropic, organiza isso em quatro competências (os "4D"). Resumo com outras palavras:</p>
+    <table class="tab">
+      <thead><tr><th>Competência</th><th>A pergunta que ela faz</th><th>No Claude Code, aparece como…</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Delegação</strong> (Delegation)</td><td>O que eu peço à IA e o que eu faço eu mesmo?</td><td>Escolher o que delegar, o que revisar à mão e quando usar subagentes (Módulo 7).</td></tr>
+        <tr><td><strong>Descrição</strong> (Description)</td><td>Estou explicando o que quero com clareza?</td><td>Bons pedidos, <code>CLAUDE.md</code>, specs e critérios de pronto (Módulos 1 a 3).</td></tr>
+        <tr><td><strong>Discernimento</strong> (Discernment)</td><td>O resultado está certo e faz sentido?</td><td>Ler o diff, rodar os testes, desconfiar do "pronto" sem prova (Módulo 3).</td></tr>
+        <tr><td><strong>Diligência</strong> (Diligence)</td><td>Estou usando a IA de forma responsável?</td><td>Permissões, segredos, dados pessoais e dizer quando a IA ajudou (Módulo 4).</td></tr>
+      </tbody>
+    </table>
+    <p>Volte a esta tabela quando algo der errado: quase sempre o problema está numa dessas quatro.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o loop em ação</h2>
+    <p>Observe como o Claude alterna entre pensar, usar ferramentas e verificar. Os pontos coloridos indicam ferramentas sendo usadas.</p>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: classifique as ações</h2>
+    <p>No terminal abaixo, digite o número da etapa do loop (<code>1</code>=contexto, <code>2</code>=ação, <code>3</code>=verificação) para cada ação mostrada. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício de reflexão</h2>
+    <p>Sem usar o computador, escreva no seu <code>diario.md</code> (e faça commit!):</p>
+    <ol>
+      <li>Uma tarefa repetitiva do seu trabalho que um agente poderia fazer.</li>
+      <li>Quais <strong>ferramentas</strong> ele precisaria usar (ler planilha? rodar script?).</li>
+      <li>Como você <strong>verificaria</strong> que ele fez certo.</li>
+      <li>O que ele <strong>não</strong> deveria poder fazer sem perguntar.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver um exemplo de resposta</summary>
+      <p><strong>Tarefa:</strong> consolidar 12 planilhas mensais (com dados fictícios) num relatório.<br>
+      <strong>Ferramentas:</strong> ler arquivos, rodar um script Python, escrever o relatório.<br>
+      <strong>Verificação:</strong> conferir totais com uma soma manual de 2 meses; rodar o script duas vezes e comparar.<br>
+      <strong>Sem perguntar, nunca:</strong> apagar ou sobrescrever as planilhas originais; enviar e-mails; acessar pastas fora do projeto.</p>
+      <p>Repare: você acabou de escrever uma mini-especificação. É exatamente o que faremos no Módulo 3 (Spec-Driven Development).</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns de mentalidade</h2>
+    <div class="grade">
+      <div class="mini"><h4>"Ele sabe o que eu quero"</h4><p>Não sabe. Pedidos vagos geram resultados vagos. Seja específico.</p></div>
+      <div class="mini"><h4>"Se rodou, está certo"</h4><p>Rodar ≠ estar correto. Peça testes e verifique.</p></div>
+      <div class="mini"><h4>"Aprovar tudo é mais rápido"</h4><p>Até o dia em que algo é apagado. Permissões existem para você manter o controle.</p></div>
+      <div class="mini"><h4>"Conversa longa = melhor"</h4><p>Contexto cheio piora as respostas. Tarefa nova, conversa nova (<code>/clear</code>).</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code works</a>: o loop agêntico e as ferramentas</li>
+      <li><a href="https://code.claude.com/docs/en/overview">Visão geral oficial</a> e todas as superfícies</li>
+      <li><a href="https://academy.claude.com/">Anthropic Academy</a>: cursos gratuitos oficiais, em inglês. Para esta aula: <a href="https://academy.claude.com/courses/ai-fluency-framework-foundations">AI Fluency: Framework and foundations</a> (os 4D em detalhe), <a href="https://academy.claude.com/courses/ai-capabilities-and-limitations">AI capabilities and limitations</a> (por que a IA erra) e <a href="https://academy.claude.com/courses/claude-101">Claude 101</a>.</li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026; seção de fluência em IA conferida em 23/11/2026 (Anthropic Academy, "The 4D Framework").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "O loop agêntico em 1 minuto", cenas: [
+  { fala: "Em pouco mais de um minuto, você vai entender como o Claude Code trabalha por dentro.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 0 · AULA 3</span><p class="v-titulo" data-t="0.3">O loop agêntico</p><p class="v-sub" data-t="0.9">Como um agente de IA trabalha por dentro</p>' },
+  { fala: "Num chat comum, você pergunta, copia a resposta, testa e cola o erro de volta. Num agente, você dá o objetivo e ele age sozinho: lê, edita, roda e confere.",
+    html: '<div class="v-grade"><div class="v-caixa" data-t="0.3"><span class="v-ic">💬</span><b>Chat</b>você copia, cola, testa, cola o erro…</div><div class="v-caixa acc" data-t="4.5" style="--fx:v-zoom"><span class="v-ic">🤖</span><b>Agente</b>lê, edita, roda e confere sozinho</div></div>' },
+  { fala: "Tudo começa com um objetivo claro. Por exemplo: o teste de prazo está falhando, corrija.",
+    html: '<p class="v-txt" data-t="0">Tudo começa com um objetivo</p><div class="v-code" data-t="0.6"><span class="u">&gt; </span><span class="v-digita" style="--n:39">o teste de prazo está falhando, corrija</span></div>' },
+  { fala: "Aí começa o loop. Primeiro, ele reúne contexto. Depois, age. Em seguida, verifica o resultado. Se não deu certo, volta ao começo com a informação nova.",
+    html: '<div class="v-linha"><div class="v-caixa" data-t="0.8"><span class="v-ic">🔎</span><b>1. Contexto</b>lê e investiga</div><span class="v-seta" data-t="1.6">→</span><div class="v-caixa" data-t="2.2"><span class="v-ic">🛠</span><b>2. Ação</b>edita e roda</div><span class="v-seta" data-t="3">→</span><div class="v-caixa ok" data-t="3.6"><span class="v-ic">✅</span><b>3. Verificação</b>testa e confere</div></div><p class="v-txt" data-t="6" style="text-align:center;color:#e0875f">🔁 repete até cumprir o objetivo</p>' },
+  { fala: "Na prática, fica assim: ele roda os testes, lê o código, edita, roda os testes de novo, e só então diz que terminou.",
+    html: '<div class="v-code"><div data-t="0.3"><span class="o">●</span> Bash(python -m unittest)   <span class="w">1 falhou</span></div><div data-t="1.6"><span class="o">●</span> Read(tarefas.py)</div><div data-t="2.8"><span class="o">●</span> Update(tarefas.py)   <span class="d">+3 −2</span></div><div data-t="4.2"><span class="o">●</span> Bash(python -m unittest)   <span class="o">OK</span></div><div data-t="5.4"><span class="a">●</span> Pronto: os testes passam.</div></div>' },
+  { fala: "E você continua no controle: aperta Esc para interromper, aprova as permissões e exige verificação antes de aceitar.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">⎋</span><b>Esc</b>interrompe e redireciona</div><div class="v-caixa" data-t="1.6"><span class="v-ic">🔐</span><b>Permissões</b>você aprova as ações</div><div class="v-caixa" data-t="2.9"><span class="v-ic">🧪</span><b>Evidência</b>testes, diff, saída</div></div>' },
+  { fala: "Resumindo: o seu papel muda. Você especifica, supervisiona e revisa. Agora siga para o conceito passo a passo.",
+    html: '<p class="v-sub" data-t="0">Seu novo papel</p><p class="v-titulo" data-t="0.4">Especificar · Supervisionar · Revisar</p>' }
+] });
+
+Curso.passos("diag", {
+  seta: "⟶",
+  nos: [{ ic: "🎯", rt: "Seu pedido" }, { ic: "🔎", rt: "1. Reunir contexto" }, { ic: "🛠", rt: "2. Agir" }, { ic: "✅", rt: "3. Verificar" }],
+  passos: [
+    { ativos: [0], titulo: "Tudo começa com um objetivo", texto: "Você descreve o que quer: <em>\"os testes de data estão falhando, corrija\"</em>. Quanto mais claro o objetivo e o critério de pronto, melhor o resultado." },
+    { ativos: [1], setas: [0], titulo: "Reunir contexto", texto: "O Claude lê arquivos, busca no código, roda <code>git status</code>, consulta a documentação. Ele não vê seu projeto inteiro de uma vez: <strong>ele investiga</strong>, como um colega novo faria." },
+    { ativos: [2], setas: [1], titulo: "Agir", texto: "Com o contexto, ele edita arquivos e roda comandos. Dependendo do <strong>modo de permissão</strong>, pede sua aprovação antes." },
+    { ativos: [3], setas: [2], titulo: "Verificar", texto: "Roda os testes, executa o programa, confere a saída. Se falhou, <strong>volta para o passo 1</strong> com a informação nova." },
+    { ativos: [1, 2, 3], setas: [0, 1, 2], titulo: "O loop se repete", texto: "Contexto → ação → verificação, quantas vezes for preciso. Você pode interromper a qualquer momento (<kbd>Esc</kbd>) e corrigir o rumo. Esse ciclo é o \"agêntico\" de agente." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code (demonstração)", altura: 300,
+  inicio: '<span class="t-dim">╭──────────────────────────────╮\n│ ✻ Claude Code                │\n│   ~/estudos/taskflow         │\n╰──────────────────────────────╯</span>',
+  passos: [
+    { t: "user", x: "o teste test_prazo está falhando, corrija", leg: "Você dá o objetivo" },
+    { t: "claude", x: "Vou rodar os testes para ver a falha.", ms: 700 },
+    { t: "tool", x: "Bash(python -m pytest -q)", leg: "1. Contexto: rodar os testes" },
+    { t: "out", x: "FAILED test_tarefas.py::test_prazo - ValueError: invalid date '31/02'\n1 failed, 7 passed" },
+    { t: "tool", x: "Read(tarefas.py)", leg: "1. Contexto: ler o código" },
+    { t: "out", x: "Read 48 lines" },
+    { t: "claude", x: "O validador não rejeita datas impossíveis como 31/02. Vou usar datetime.strptime.", ms: 1300 },
+    { t: "tool", x: "Update(tarefas.py)", leg: "2. Ação: editar" },
+    { t: "out", x: "Updated tarefas.py with 3 additions and 2 removals" },
+    { t: "tool", x: "Bash(python -m pytest -q)", leg: "3. Verificação: rodar de novo" },
+    { t: "out", x: "8 passed in 0.12s" },
+    { t: "claude", x: "Pronto. Datas inválidas agora geram erro claro e os 8 testes passam.", leg: "Resultado verificado, não só \"achado\"" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Read(tarefas.py)", 1, "Ler arquivo é reunir contexto."],
+    ["Edit(tarefas.py)", 2, "Editar é agir."],
+    ["Bash(pytest)  ← depois de editar", 3, "Rodar testes após a mudança é verificar."],
+    ["Grep(\"def concluir\")", 1, "Buscar no código é reunir contexto."],
+    ["Bash(git status)  ← no início", 1, "No início, git status serve para entender o estado atual: contexto."],
+    ["Write(README.md)", 2, "Escrever arquivo é agir."]
+  ], i = -1, pontos = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Ação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Digite 1, 2 ou 3</span>' : '<span class="t-ok">Fim! Você acertou ' + pontos + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(n) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === n; if (ok) pontos++; var r = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Era ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return r + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Classificador do loop (simulação)", prompt: ">",
+    intro: '<span class="t-dim">1 = reunir contexto · 2 = agir · 3 = verificar</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pontos = 0; return mostra(); }, "1": function () { return resp(1); }, "2": function () { return resp(2); }, "3": function () { return resp(3); } }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual a principal diferença entre um chat de IA e um agente como o Claude Code?", op: ["O agente usa um modelo mais inteligente", "O agente usa ferramentas e age em ciclos até cumprir o objetivo", "O agente não precisa de instruções"], c: 1, ex: "O que define um agente é o loop com ferramentas: reunir contexto, agir, verificar e repetir." },
+  { p: "O Claude disse \"corrigi o bug\", mas não rodou nenhum teste. O que fazer?", op: ["Confiar, ele é muito bom", "Pedir para ele verificar (rodar testes ou o programa) e mostrar o resultado", "Desinstalar o Claude Code"], c: 1, ex: "Sem verificação, \"corrigi\" é só uma hipótese. Peça evidência: testes passando, saída do programa." },
+  { p: "O que é a \"janela de contexto\"?", op: ["A janela do terminal", "Tudo o que o modelo enxerga de uma vez: mensagens, arquivos lidos, saídas e instruções", "O histórico do Git"], c: 1, ex: "O contexto é limitado e afeta a qualidade. Vamos dominar isso no Módulo 2." },
+  { p: "Por que as permissões são importantes?", op: ["Porque deixam o Claude mais rápido", "Porque definem o que o Claude pode fazer sem você aprovar, mantendo você no controle", "Porque são exigidas pela lei"], c: 1, ex: "Você escolhe o equilíbrio entre autonomia e controle. Veremos os modos de permissão no Módulo 4." }
+]);
+Curso.checklist("check", [
+  "Explico a diferença entre chat e agente com minhas palavras",
+  "Descrevo as 3 etapas do loop: contexto, ação, verificação",
+  "Sei o que são modelo, ferramentas, contexto e permissões",
+  "Escrevi a reflexão no <code>diario.md</code> e fiz commit"
+]);
+</script>
+</body>
+</html>

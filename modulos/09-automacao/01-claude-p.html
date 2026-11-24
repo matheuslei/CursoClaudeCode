@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modo não interativo (claude -p)</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m9a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 9 · Aula 1</span><span class="selo cinza">Avançado</span><span class="selo cinza">~30 min</span>
+    <h1>Modo não interativo (claude -p)</h1>
+    <p class="objetivo">Objetivo: rodar o Claude Code dentro de scripts do PowerShell com <code>claude -p</code>, ler a resposta em JSON, limitar ferramentas e turnos, e saber quanto cada chamada custa.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Até aqui você conversou com o Claude: pediu, leu, aprovou. Mas muita tarefa se repete igual toda vez: revisar um arquivo antes do commit, explicar um log de erro, resumir o que mudou. Para isso existe o <strong>modo não interativo</strong>: o Claude recebe o pedido, trabalha e <strong>imprime a resposta</strong>, sem conversa. Assim ele cabe num script, num atalho ou num pipeline de CI.</p>
+    <div class="grade">
+      <div class="mini"><h4>🔁 Repetível</h4><p>O mesmo comando, com as mesmas regras, toda vez.</p></div>
+      <div class="mini"><h4>🧩 Encaixável</h4><p>Lê do pipe, escreve em arquivo, devolve JSON para o script decidir o próximo passo.</p></div>
+      <div class="mini"><h4>🪙 Mensurável</h4><p>A saída JSON traz o custo estimado de cada chamada.</p></div>
+    </div>
+    <div class="caixa alerta"><strong>Aviso de custo</strong>Cada <code>claude -p</code> consome o uso do seu plano (ou créditos da API), igual a uma conversa. Um <code>claude -p</code> dentro de um laço multiplica o gasto pelo número de voltas. Teste com uma chamada, meça e só então automatize.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o que acontece numa chamada</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>As flags que você mais vai usar</h2>
+    <p>Acrescente <code>-p</code> (ou <code>--print</code>) a qualquer comando <code>claude</code>. O processo termina com <strong>código 0</strong> quando dá certo e diferente de zero quando falha, então o script pode testar <code>$LASTEXITCODE</code>.</p>
+    <div class="cod"><span class="rot">PowerShell</span><code>claude -p "Quais funções de tarefas.py não têm docstring?"
+Get-Content erro.txt | claude -p "explique a causa deste erro em 3 linhas" &gt; explicacao.txt
+git diff | claude -p "aponte erros de digitação neste diff, um por linha"</code></div>
+    <table class="tab">
+      <thead><tr><th>Flag</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td><code>--output-format</code></td><td><code>text</code> (padrão), <code>json</code> (resultado + ID da sessão + metadados) ou <code>stream-json</code> (um JSON por linha, em tempo real; use com <code>--verbose</code>).</td></tr>
+        <tr><td><code>--json-schema</code></td><td>Com <code>--output-format json</code>, a resposta segue o esquema e vem no campo <code>structured_output</code>. Confira se o campo existe antes de usar.</td></tr>
+        <tr><td><code>--max-turns</code></td><td>Limita os turnos do agente (só no modo <code>-p</code>). Sem ele, não há limite.</td></tr>
+        <tr><td><code>--max-budget-usd</code></td><td>Para a execução quando o gasto <strong>estimado</strong> chega ao valor (só no modo <code>-p</code>). É estimativa local e pode passar um pouco do teto.</td></tr>
+        <tr><td><code>--allowedTools</code></td><td>Ferramentas que rodam sem pedir permissão, com a sintaxe de regras do Módulo 4: <code>"Read,Grep"</code>, <code>"Bash(git diff *)"</code>.</td></tr>
+        <tr><td><code>--permission-mode</code></td><td>Modo da sessão: <code>dontAsk</code> nega tudo que pediria aprovação (bom para CI travado), <code>acceptEdits</code> aceita edições.</td></tr>
+        <tr><td><code>--append-system-prompt</code></td><td>Acrescenta instruções ao prompt padrão, por exemplo "você é um revisor de segurança".</td></tr>
+        <tr><td><code>--continue</code> / <code>--resume &lt;id&gt;</code></td><td>Continua a última conversa ou uma sessão específica (o ID vem no JSON).</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Quem aprova as permissões?</h3>
+    <p>No <code>-p</code> não há ninguém para clicar em "Yes". A partir da v2.1.302, uma execução <code>-p</code> começa no modo Manual quando nada define o modo: o que precisaria de aprovação é <strong>negado</strong>, a não ser que esteja em <code>--allowedTools</code>, numa regra <code>allow</code> ou num hook. Leituras na pasta de trabalho não precisam de aprovação. Por isso, libere só o que a tarefa exige.</p>
+    <div class="caixa dica"><strong>No Windows</strong>No Windows, o Claude costuma rodar comandos pela ferramenta <code>PowerShell</code>, que tem regras próprias. Uma regra <code>Bash(python -m unittest *)</code> não libera o mesmo comando no PowerShell. Para scripts, prefira o padrão do pipe: <strong>o seu script</strong> roda os testes e manda o resultado para o Claude, que só precisa ler.</div>
+
+    <h3>JSON no PowerShell</h3>
+    <p>A documentação usa <code>jq</code>; no PowerShell, o <code>ConvertFrom-Json</code> já resolve, sem instalar nada:</p>
+    <div class="cod"><span class="rot">PowerShell</span><code>$r = claude -p "Resuma o README.md" --output-format json --max-turns 3 | ConvertFrom-Json
+$r.result           # o texto da resposta
+$r.session_id       # para continuar com --resume
+$r.total_cost_usd   # custo estimado (pode diferir da fatura)</code></div>
+
+    <h3>Outros pontos que valem saber</h3>
+    <ul>
+      <li><strong>Skills e comandos personalizados funcionam</strong> no <code>-p</code>: escreva <code>/nome-da-skill</code> no pedido. Comandos que só existem na interface, como <code>/login</code>, não.</li>
+      <li><strong>Pipe tem limite de 10 MB.</strong> Acima disso, salve em arquivo e cite o caminho no pedido.</li>
+      <li><strong><code>--bare</code></strong> pula hooks, skills, plugins, MCP, memória e <code>CLAUDE.md</code> para o resultado ser igual em qualquer máquina. Mas ele <strong>não usa o login da assinatura</strong>: exige <code>ANTHROPIC_API_KEY</code> no ambiente. A doc avisa que ele deve virar o padrão do <code>-p</code> numa versão futura. Neste curso, não usamos <code>--bare</code>.</li>
+      <li><strong><code>--permission-prompts none</code></strong> (v2.1.259 ou mais nova) avisa ao Claude que ninguém vai aprovar nada, para ele não ficar tentando de novo.</li>
+    </ul>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: um script de revisão</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual flag?</h2>
+    <p>Para cada necessidade, digite o nome da flag (com ou sem <code>--</code>). Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: o seu revisar.ps1</h2>
+    <p>Use a pasta de treino do Módulo 9. Se ainda não criou, siga o <a href="../../projeto-taskflow/etapa-09/README.md">README da etapa 09</a> (passo 1; o Git é opcional nesta aula).</p>
+    <div class="caixa alerta"><strong>Antes de começar</strong>Cada passo abaixo chama o Claude uma vez e consome o seu plano. Rode cada um <strong>uma vez</strong>, sempre com <code>--max-turns</code>. Só código de treino com dados fictícios: código ou dados da empresa só com aval da área de segurança da informação.</div>
+    <ol>
+      <li>No PowerShell, na pasta de treino: <code>claude -p "Quais funções de tarefas.py não têm docstring? Responda só com os nomes." --max-turns 3</code></li>
+      <li>Repita pedindo JSON e guarde numa variável: <code>$r = claude -p "Liste as funções de tarefas.py" --output-format json --max-turns 3 | ConvertFrom-Json</code>. Mostre <code>$r.result</code> e <code>$r.total_cost_usd</code>.</li>
+      <li>Crie <code>revisar.ps1</code> que: (a) roda <code>python -m unittest</code>; (b) junta o resultado e o conteúdo de um arquivo; (c) manda tudo pelo pipe para <code>claude -p</code> com <code>--output-format json</code> e <code>--max-turns</code>; (d) salva <code>result</code> num arquivo <code>revisao-*.md</code> e mostra o custo.</li>
+      <li>Rode <code>.\revisar.ps1 -Arquivo tarefas.py</code> e leia o relatório. Ele aponta as funções sem docstring?</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>Arquivo completo em <code>projeto-taskflow/etapa-09/gabarito/revisar.ps1</code>. O coração dele:</p>
+      <div class="cod"><span class="rot">revisar.ps1 (trecho)</span><code>param([string]$Arquivo = "", [int]$MaxTurnos = 3)
+$utf8 = New-Object System.Text.UTF8Encoding $false
+[Console]::OutputEncoding = $utf8; $OutputEncoding = $utf8   # acentos no pipe
+
+$testes = (python -m unittest 2&gt;&amp;1 | Out-String)              # 1. testes locais (sem custo)
+$codigo = Get-Content $Arquivo -Raw -Encoding UTF8               # 2. o que revisar
+$contexto = "Resultado dos testes:`n$testes`nCódigo ($Arquivo):`n$codigo"
+$pedido = "Revise o código recebido seguindo o CLAUDE.md. Não edite arquivos. " +
+          "Responda com Testes, Achados e Veredito."
+
+$bruto = $contexto | claude -p $pedido --output-format json `
+         --max-turns $MaxTurnos --allowedTools "Read,Grep,Glob"   # 3. chamada limitada
+if ($LASTEXITCODE -ne 0) { Write-Host ($bruto | Out-String); exit $LASTEXITCODE }
+
+$r = ($bruto | Out-String) | ConvertFrom-Json                   # 4. JSON -&gt; objeto
+Set-Content "revisao-$(Get-Date -Format 'yyyy-MM-dd-HHmm').md" $r.result -Encoding UTF8
+"Custo estimado: US$ {0:N4}" -f [double]$r.total_cost_usd</code></div>
+      <p><strong>Por que o script roda os testes, e não o Claude?</strong> Assim o Claude não precisa de permissão de shell (que no <code>-p</code> seria negada) e você gasta menos turnos. O pipe leva tudo pronto.</p>
+      <p><strong>Resultado esperado</strong> (ilustrativo): testes passaram (6); 🟡 <code>adicionar</code>, <code>listar</code>, <code>concluir</code>, <code>remover</code> e <code>main</code> sem docstring; veredito "ajustar antes".</p>
+      <p>Se o PowerShell bloquear o script, rode-o com <code>powershell -ExecutionPolicy Bypass -File .\revisar.ps1 -Arquivo tarefas.py</code> (vale só para essa execução) ou peça orientação à TI.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Laço sem limite</h4><p><code>foreach</code> com <code>claude -p</code> em 200 arquivos = 200 chamadas pagas. Teste com 1, use <code>--max-turns</code> e, com API, <code>--max-budget-usd</code>.</p></div>
+      <div class="mini"><h4>Esperar que ele peça permissão</h4><p>No <code>-p</code>, o que precisa de aprovação é negado. Libere com <code>--allowedTools</code> só o necessário, ou entregue os dados pelo pipe.</p></div>
+      <div class="mini"><h4>Ler JSON como texto</h4><p>Com <code>--output-format json</code>, a resposta está em <code>.result</code>. Use <code>ConvertFrom-Json</code> em vez de cortar texto.</p></div>
+      <div class="mini"><h4>Acentos quebrados</h4><p>O Windows PowerShell 5.1 manda texto pelo pipe em outra codificação. Ajuste <code>$OutputEncoding</code> e <code>[Console]::OutputEncoding</code> para UTF-8.</p></div>
+      <div class="mini"><h4>Chave no script</h4><p>Nunca escreva <code>ANTHROPIC_API_KEY</code> num arquivo. Se precisar dela, use variável de ambiente ou cofre de segredos.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/headless">Run Claude Code programmatically</a> (em inglês): pipes, JSON, streaming, <code>--bare</code> e permissões no modo <code>-p</code>.</li>
+      <li><a href="https://code.claude.com/docs/en/cli-reference">CLI reference</a>: todas as flags. Quem precisa de controle total em Python ou TypeScript usa o Agent SDK, tema do Módulo 10.</li>
+      <li>Próxima aula: <strong>revisão de código</strong> com <code>/code-review</code> e <code>/security-review</code>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Run Claude Code programmatically" e "CLI reference"; Claude Code v2.1.327).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "claude -p em 1 minuto", cenas: [
+  { fala: "Nesta aula, o Claude Code sai do chat e entra nos seus scripts: o modo não interativo, com claude hífen p.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 9 · AULA 1</span><p class="v-titulo" data-t="0.3">Modo não interativo</p><p class="v-sub" data-t="1.2">claude -p dentro dos seus scripts</p>' },
+  { fala: "Com hífen p, você manda o pedido, o Claude trabalha e imprime a resposta. Sem conversa e sem esperar você. O código de saída diz se deu certo.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">📝</span><b>Pedido</b>claude -p "..."</div><span class="v-seta">→</span><div class="v-caixa acc"><span class="v-ic">✻</span><b>Trabalha</b>sem conversa</div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">🖨</span><b>Imprime</b>e termina</div></div><div class="v-code" data-t="7.5"><span class="u">&gt; </span>$LASTEXITCODE <span class="d">· 0 = deu certo</span></div>' },
+  { fala: "Dá para usar pipe: o conteúdo de um arquivo ou de um git diff entra pela entrada padrão, e a resposta pode ir para um arquivo.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span><span class="v-digita" style="--n:42">git diff | claude -p "aponte erros" &gt; r.txt</span></div></div><div class="v-linha" data-t="4"><div class="v-caixa"><span class="v-ic">📄</span><b>Entrada</b>arquivo ou diff</div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">💾</span><b>Saída</b>r.txt</div></div>' },
+  { fala: "Com hífen hífen output format json, a resposta vem estruturada: o texto no campo result, o ID da sessão e o custo estimado. No PowerShell, o ConvertFrom Json lê tudo.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="d">{</span></div><div data-t="4"><span class="a">"result":</span> "Achados: ..."</div><div data-t="5.5"><span class="a">"session_id":</span> "a1b2..."</div><div data-t="6.8"><span class="a">"total_cost_usd":</span> 0.0123</div><div><span class="d">}</span></div></div><p class="v-txt" data-t="9">$r = ... | ConvertFrom-Json</p>' },
+  { fala: "Sem ninguém para aprovar, defina limites. Hífen hífen allowedTools libera só as ferramentas necessárias, e hífen hífen max turns limita quantos turnos o Claude pode usar.",
+    html: '<p class="v-titulo" data-t="0">Sem ninguém para aprovar</p><div class="v-grade" style="--cols:2"><div class="v-caixa acc" data-t="3"><span class="v-ic">🔓</span><b>--allowedTools</b>só o necessário</div><div class="v-caixa warn" data-t="7"><span class="v-ic">⏱</span><b>--max-turns</b>limite de turnos</div></div>' },
+  { fala: "Cuidado com o custo: cada chamada consome o seu plano. Um claude hífen p dentro de um laço multiplica esse gasto. Comece pequeno e meça.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="0.3"><p class="v-txt">1 chamada</p><div class="v-barra"><i style="--w:10%;--cor:#6ac08a;animation-delay:.6s"></i></div></div><div data-t="3.5"><p class="v-txt">laço com 50</p><div class="v-barra"><i style="--w:95%;--cor:#e07a6a;animation-delay:3.8s"></i></div></div></div><div class="v-caixa warn" data-t="6.5"><span class="v-ic">🪙</span><b>Comece pequeno</b>e meça o custo</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📜", rt: "Seu script" }, { ic: "✻", rt: "claude -p" }, { ic: "🔐", rt: "Permissões" }, { ic: "📦", rt: "Saída (text/json)" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "O script chama o Claude", texto: "O pedido vai como argumento, e dados extras podem entrar pelo <strong>pipe</strong> (entrada padrão, até 10 MB)." },
+    { ativos: [1, 2], setas: [1], titulo: "Cada ferramenta passa pelas permissões", texto: "Não há ninguém para aprovar. O que está em <code>--allowedTools</code> ou numa regra <code>allow</code> roda; o resto que precisaria de aprovação é <strong>negado</strong>." },
+    { ativos: [1], setas: [], titulo: "O agente trabalha até terminar ou bater o limite", texto: "Ele pode usar vários turnos. <code>--max-turns</code> e <code>--max-budget-usd</code> são os freios do modo <code>-p</code>." },
+    { ativos: [1, 3, 0], setas: [2], titulo: "Imprime e devolve o controle", texto: "A resposta sai em texto ou JSON (<code>result</code>, <code>session_id</code>, <code>total_cost_usd</code>). O código de saída diz ao script se deu certo." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "revisar.ps1 em ação (ilustrativo)", altura: 300,
+  passos: [
+    { t: "cmd", x: ".\\revisar.ps1 -Arquivo tarefas.py", leg: "O script roda os testes e monta o contexto" },
+    { t: "out", x: "Testes locais: PASSARAM\nEnviando para o Claude (máximo de 3 turnos). Isto consome uso do seu plano...", leg: "Os testes rodam no seu PC, sem custo" },
+    { t: "nota", x: "por dentro: $contexto | claude -p $pedido --output-format json --max-turns 3", leg: "A chamada não interativa, limitada" },
+    { t: "out", x: "**Testes**: passaram (6).\n**Achados**: 🟡 adicionar, listar, concluir, remover e main sem docstring.\n**Veredito**: ajustar antes.", leg: "O campo result do JSON" },
+    { t: "out", x: "Relatório salvo em revisao-2026-11-19-1015.md\nCusto estimado: US$ 0,0412", leg: "O custo vem no JSON (estimativa; valor ilustrativo)" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Quero que o meu script leia a resposta como objeto, com o custo junto", "json", "--output-format json devolve result, session_id e total_cost_usd."],
+    ["Não quero que o agente fique dando voltas: no máximo 3 turnos", "max-turns", "--max-turns limita os turnos do agente no modo -p."],
+    ["O Claude precisa ler arquivos sem pedir permissão, e nada mais", "allowedtools", "--allowedTools \"Read,Grep,Glob\" libera só leitura."],
+    ["Preciso de uma lista de nomes num formato fixo que o script valide", "json-schema", "--json-schema com --output-format json devolve o campo structured_output."],
+    ["Uso a API e quero que a execução pare se o gasto estimado passar de US$ 1", "max-budget-usd", "--max-budget-usd 1 para a execução pelo custo estimado (pode passar um pouco)."],
+    ["Quero ver os eventos chegando em tempo real, linha a linha", "stream-json", "--output-format stream-json (com --verbose) emite um JSON por evento."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Necessidade ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: json · stream-json · json-schema · max-turns · max-budget-usd · allowedTools</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["json", "stream-json", "json-schema", "max-turns", "max-budget-usd", "allowedtools"].forEach(function (f) {
+    cmds[f] = function () { return resp(f); };
+    cmds["--" + f] = function () { return resp(f); };
+  });
+  Curso.terminal("term", { titulo: "Qual flag? (simulação)", prompt: ">", intro: '<span class="t-dim">Digite o nome da flag que resolve cada necessidade.</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com uma das flags listadas (ex.: max-turns).</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que o <code>-p</code> muda numa chamada do <code>claude</code>?", op: ["Abre a sessão em modo planejamento", "Roda sem conversa: executa o pedido, imprime a resposta e termina", "Usa um modelo mais barato"], c: 1, ex: "<code>-p</code> (<code>--print</code>) é o modo não interativo, ideal para scripts e CI." },
+  { p: "Num <code>claude -p</code> sem <code>--allowedTools</code>, o Claude tenta rodar um comando que precisa de aprovação. O que acontece?", op: ["Ele espera você aprovar no terminal", "A chamada é negada, porque não há ninguém para aprovar", "O comando roda assim mesmo"], c: 1, ex: "No <code>-p</code> (modo Manual, a partir da v2.1.302), o que precisa de aprovação é negado, salvo regra, hook ou <code>--allowedTools</code>." },
+  { p: "Com <code>--output-format json</code>, em qual campo vem o texto da resposta?", op: ["<code>result</code>", "<code>message</code>", "<code>structured_output</code>"], c: 0, ex: "<code>result</code> traz o texto. <code>structured_output</code> só aparece com <code>--json-schema</code>." },
+  { p: "Por que não usar <code>--bare</code> com a sua assinatura do Claude?", op: ["Porque ele desliga o JSON", "Porque ele não lê o login da assinatura e exige <code>ANTHROPIC_API_KEY</code>", "Porque ele só funciona no Linux"], c: 1, ex: "O modo bare pula OAuth e o chaveiro do sistema; precisa de uma chave de API no ambiente." },
+  { p: "Você quer rodar <code>claude -p</code> para 30 arquivos. Qual é o primeiro passo responsável?", op: ["Rodar os 30 de uma vez para ganhar tempo", "Rodar com 1 arquivo, conferir o resultado e o custo, e só então ampliar com limites", "Usar <code>--dangerously-skip-permissions</code>"], c: 1, ex: "Cada chamada consome o plano. Meça com uma, limite turnos e custo, depois escale." }
+]);
+Curso.checklist("check", [
+  "Rodo <code>claude -p</code> com pipe de entrada e redirecionamento de saída",
+  "Leio a saída JSON no PowerShell com <code>ConvertFrom-Json</code>",
+  "Limito ferramentas com <code>--allowedTools</code> e turnos com <code>--max-turns</code>",
+  "Sei que no <code>-p</code> o que precisa de aprovação é negado",
+  "Estimo o custo antes de pôr <code>claude -p</code> num laço"
+]);
+</script>
+</body>
+</html>

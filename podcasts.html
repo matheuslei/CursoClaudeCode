@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podcasts do curso</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/curso.css">
+</head>
+<body data-raiz="">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Para ouvir</span>
+    <h1>Podcasts do curso</h1>
+    <p class="objetivo">Uma série de 11 episódios, um por módulo, para quem não tem tempo de ler a aula nem de ver o vídeo. Dá para ouvir no trânsito ou na academia, e cada episódio continua de onde você parou.</p>
+  </header>
+
+  <div class="caixa alerta">
+    <strong>🚧 Série em produção</strong>
+    Os episódios estão saindo aos poucos. Os marcados como "em produção" ainda não ficaram prontos.
+  </div>
+
+  <div class="stats" id="pod-stats"></div>
+
+  <div id="episodios"></div>
+
+  <div class="caixa">
+    <strong>Como os episódios são feitos</strong>
+    São conversas geradas por IA (NotebookLM, do Google) a partir do texto das aulas de cada módulo e conferidas antes de entrar aqui. Elas resumem e às vezes simplificam: na dúvida, vale o texto da aula. O podcast complementa o exercício real no Claude Code, mas não o substitui.
+  </div>
+  <p class="conferido">Material de estudo pessoal, sem vínculo oficial com a Anthropic.</p>
+</main>
+<script src="assets/curso.js"></script>
+<script>Curso.iniciarPodcasts();</script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subagentes customizados</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Aula 1</span><span class="selo cinza">Avançado</span><span class="selo cinza">~30 min</span>
+    <h1>Subagentes customizados</h1>
+    <p class="objetivo">Objetivo: saber quando vale delegar uma tarefa a um subagente e criar o seu próprio, um revisor do TaskFlow que você chama pelo nome e que devolve só o resumo do que encontrou.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>No Módulo 2 você viu que a <strong>janela de contexto</strong> é o recurso mais precioso da sessão. Toda vez que o Claude lê vinte arquivos para responder uma pergunta, essas leituras ficam na conversa e empurram o resto para fora.</p>
+    <p>Um <strong>subagente</strong> é um assistente que roda numa <strong>janela de contexto própria</strong>, com instruções e ferramentas próprias. Ele faz o trabalho pesado e devolve à conversa principal só o resultado. Você ganha duas coisas:</p>
+    <div class="grade">
+      <div class="mini"><h4>🧹 Contexto preservado</h4><p>As leituras e buscas do subagente não entram na sua conversa. Só o resumo volta.</p></div>
+      <div class="mini"><h4>🎯 Especialização</h4><p>Um revisor com regras fixas, só com ferramentas de leitura, faz sempre a mesma revisão, do mesmo jeito.</p></div>
+    </div>
+    <div class="caixa"><strong>Analogia</strong>É como pedir a um colega que leia um relatório de 80 páginas e te mande um parágrafo. Você não precisa ler as 80 páginas; só precisa do parágrafo.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como a delegação acontece</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Anatomia de um subagente</h2>
+    <p>Cada subagente é um <strong>arquivo Markdown</strong> com um cabeçalho YAML (frontmatter). O corpo do arquivo vira as instruções do subagente (o <em>prompt de sistema</em>).</p>
+    <div class="cod"><span class="rot">.claude/agents/revisor-taskflow.md</span><code>---
+name: revisor-taskflow
+description: Revisa mudanças no código do TaskFlow antes de juntar. Use depois de alterar
+  qualquer arquivo .py ou quando o usuário pedir uma revisão. Somente leitura.
+tools: Read, Grep, Glob, Bash
+model: inherit
+---
+
+Você é o revisor do TaskFlow. Rode `python -m unittest`, confira docstrings,
+dados fictícios e mensagens em português. Não edite arquivos.
+Responda com: Testes, Achados (por gravidade) e Veredito.</code></div>
+    <table class="tab">
+      <thead><tr><th>Campo</th><th>Obrigatório?</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>sim</td><td>Identificador do subagente (letras minúsculas e hífens).</td></tr>
+        <tr><td><code>description</code></td><td>sim</td><td><strong>Quando usar.</strong> É o que o Claude lê para decidir se delega sozinho. A parte mais importante do arquivo.</td></tr>
+        <tr><td><code>tools</code></td><td>não</td><td>Ferramentas permitidas, separadas por vírgula (ou lista YAML). <strong>Se omitir, herda todas</strong> as disponíveis para subagentes.</td></tr>
+        <tr><td><code>model</code></td><td>não</td><td><code>sonnet</code>, <code>opus</code>, <code>haiku</code>, <code>fable</code>, um ID completo ou <code>inherit</code> (o mesmo da conversa).</td></tr>
+      </tbody>
+    </table>
+    <p>Existem outros campos opcionais (<code>disallowedTools</code>, <code>permissionMode</code>, <code>maxTurns</code>, <code>skills</code>, <code>mcpServers</code>, <code>hooks</code>, <code>memory</code>, <code>isolation</code>…). Eles aparecem na referência oficial; nesta aula, os quatro acima bastam.</p>
+
+    <h3>Onde o arquivo fica</h3>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Pasta</th><th>Quando usar</th></tr></thead>
+      <tbody>
+        <tr><td>Projeto</td><td><code>.claude/agents/</code></td><td>Subagente do projeto, compartilhável com o time pelo Git.</td></tr>
+        <tr><td>Usuário</td><td><code>~/.claude/agents/</code></td><td>Seu, vale em todos os seus projetos.</td></tr>
+        <tr><td>Sessão</td><td><code>claude --agents '{...}'</code></td><td>Definido em JSON só para aquela sessão (testes rápidos).</td></tr>
+      </tbody>
+    </table>
+    <p>Se o mesmo nome existir em dois lugares, o de projeto vence o de usuário. Subagentes de plugins (Módulo 8) e os gerenciados pela organização também entram nessa ordem.</p>
+    <div class="caixa alerta"><strong>Reinicie depois do primeiro arquivo</strong>Editar um subagente existente vale em poucos segundos, sem reiniciar. Mas, ao criar o <strong>primeiro</strong> arquivo numa pasta <code>agents</code> nova, reinicie a sessão para o Claude Code carregá-lo.</div>
+    <div class="caixa dica"><strong>E o comando /agents?</strong>Na versão atual, <code>/agents</code> só mostra um lembrete: peça ao Claude para criar o subagente ou edite os arquivos de <code>.claude/agents/</code> e <code>~/.claude/agents/</code>. Em versões antigas (até a 2.1.197) ele abria um assistente com abas. Se o seu ainda abrir o assistente, atualize com <code>claude update</code>.</div>
+
+    <h3>Como acionar</h3>
+    <ul>
+      <li><strong>Pelo nome, em linguagem normal:</strong> <em>"use o subagente revisor-taskflow para revisar minhas mudanças"</em>.</li>
+      <li><strong>Por menção:</strong> digite <code>@</code> e escolha <code>revisor-taskflow (agent)</code> na lista, ou escreva <code>@agent-revisor-taskflow</code>.</li>
+      <li><strong>Automático:</strong> o Claude delega sozinho quando o pedido combina com a <code>description</code>. Frases como "use proactively" incentivam isso.</li>
+      <li><strong>Sessão inteira como o subagente:</strong> <code>claude --agent revisor-taskflow</code>.</li>
+    </ul>
+
+    <h3>Subagentes que já vêm prontos</h3>
+    <div class="grade">
+      <div class="mini"><h4>🔎 Explore</h4><p>Rápido e <strong>somente leitura</strong>, feito para buscar e analisar o código.</p></div>
+      <div class="mini"><h4>🗺 Plan</h4><p>Pesquisa o contexto no plan mode (Módulo 3) antes de apresentar o plano.</p></div>
+      <div class="mini"><h4>🧰 general-purpose</h4><p>Para tarefas com várias etapas que exigem explorar <em>e</em> agir.</p></div>
+    </div>
+
+    <h3>Quando NÃO delegar</h3>
+    <table class="tab">
+      <thead><tr><th>Situação</th><th>Por quê</th></tr></thead>
+      <tbody>
+        <tr><td>Mudança pequena e pontual</td><td>O subagente começa <strong>sem contexto</strong> e precisa se situar; fazer aqui é mais rápido.</td></tr>
+        <tr><td>Tarefa com muito vai e volta</td><td>Você precisa conversar e ajustar; o subagente só devolve o resultado final.</td></tr>
+        <tr><td>Pergunta sobre o que já está na conversa</td><td>A resposta já está no contexto. Use <code>/btw</code> para uma pergunta rápida paralela.</td></tr>
+        <tr><td>Muitos subagentes de uma vez</td><td>Cada um gasta <strong>os próprios tokens</strong> e os resultados detalhados também ocupam contexto quando voltam.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: delegando a revisão</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: delegar ou fazer aqui?</h2>
+    <p>Para cada situação, responda <code>delegar</code> (subagente) ou <code>aqui</code> (na conversa principal). Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: o revisor do TaskFlow</h2>
+    <p>Use a pasta de treino do Módulo 7. Se ainda não criou, siga o <a href="../../projeto-taskflow/etapa-07/README.md">README da etapa 07</a> (passo 1; o Git do passo 2 é opcional nesta aula).</p>
+    <ol>
+      <li>Na pasta de treino, abra <code>claude</code> e peça: <em>"crie um subagente de projeto chamado revisor-taskflow, somente leitura (Read, Grep, Glob, Bash), que rode os testes e revise docstrings, dados fictícios e mensagens em português, respondendo com Testes, Achados e Veredito"</em>. Ou crie o arquivo <code>.claude/agents/revisor-taskflow.md</code> à mão.</li>
+      <li>Leia o arquivo criado. A <code>description</code> diz <strong>quando</strong> usar? <code>tools</code> está restrito?</li>
+      <li>Como é o primeiro arquivo da pasta <code>agents</code>, <strong>saia e abra o <code>claude</code> de novo</strong>.</li>
+      <li>Peça: <em>"use o subagente revisor-taskflow para revisar o tarefas.py"</em> (ou <code>@agent-revisor-taskflow revise o tarefas.py</code>).</li>
+      <li>Observe: a chamada aparece com o nome do subagente, e na conversa volta só o relatório. Rode <code>/context</code> e compare com uma sessão em que você pediu a mesma revisão direto.</li>
+    </ol>
+    <div class="caixa dica"><strong>Dica</strong>O <code>tarefas.py</code> da etapa 07 tem funções sem docstring de propósito. Um bom revisor deve apontar isso.</div>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>Arquivo também disponível em <code>projeto-taskflow/etapa-07/gabarito/.claude/agents/revisor-taskflow.md</code>.</p>
+      <div class="cod"><span class="rot">.claude/agents/revisor-taskflow.md</span><code>---
+name: revisor-taskflow
+description: Revisa mudanças no código do TaskFlow antes de juntar (merge). Use depois de
+  implementar ou alterar qualquer arquivo .py do projeto, ou quando o usuário pedir uma
+  revisão. Somente leitura; não edita arquivos.
+tools: Read, Grep, Glob, Bash
+model: inherit
+---
+
+Você é o revisor do TaskFlow, uma CLI de tarefas em Python que usa só a biblioteca padrão.
+
+1. Descubra o que mudou (git status / git diff; sem Git, revise os arquivos citados).
+2. Rode python -m unittest e anote o resultado.
+3. Verifique: testes passam e funcionalidade nova tem teste; nomes em português e
+   docstring curta; só biblioteca padrão; números 1-based com _indice_valido;
+   só dados fictícios; mensagens em português.
+4. Não edite nenhum arquivo.
+
+Responda: **Testes**, **Achados** (🔴 Grave / 🟡 Ajustar / 🟢 Sugestão) e
+**Veredito** (pode juntar / ajustar antes).</code></div>
+      <p><strong>Resultado esperado</strong> (ilustrativo): testes passaram (6); 🟡 <code>adicionar</code>, <code>listar</code>, <code>concluir</code>, <code>remover</code> e <code>main</code> sem docstring; veredito "ajustar antes".</p>
+      <p><strong>Por que <code>Bash</code> se é somente leitura?</strong> Para rodar os testes e o <code>git diff</code>. A instrução "não edite" mais a ausência de <code>Edit</code>/<code>Write</code> em <code>tools</code> garantem que ele não altera arquivos; os comandos Bash continuam passando pelas suas permissões (Módulo 4).</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Description vaga</h4><p>"Ajuda com código" não diz quando usar: o Claude delega na hora errada ou nunca. Diga a situação: "use depois de alterar arquivos .py…".</p></div>
+      <div class="mini"><h4>Ferramentas demais</h4><p>Sem <code>tools</code>, o subagente herda todas, inclusive editar. Um revisor só precisa ler e testar.</p></div>
+      <div class="mini"><h4>Esperar que ele saiba da conversa</h4><p>Um subagente novo começa sem o seu histórico. Passe no pedido o que ele precisa saber.</p></div>
+      <div class="mini"><h4>Não reiniciar</h4><p>O primeiro arquivo numa pasta <code>agents</code> nova só carrega depois de reiniciar a sessão.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/sub-agents">Referência de subagentes</a> (em inglês): todos os campos do frontmatter, memória persistente, hooks e subagentes em segundo plano.</li>
+      <li>Próxima aula: mandar trabalho para <strong>segundo plano</strong> e fazer <strong>fork</strong> da conversa.</li>
+      <li><a href="https://academy.claude.com/courses/introduction-to-subagents">Introduction to subagents</a> (Anthropic Academy, gratuito, em inglês).</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Create custom subagents").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Subagentes em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai criar um ajudante especializado: um subagente que revisa o TaskFlow e devolve só o resumo.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 7 · AULA 1</span><p class="v-titulo" data-t="0.3">Subagentes customizados</p><p class="v-sub" data-t="1.2">um ajudante que devolve só o resumo</p>' },
+  { fala: "Quando o Claude lê dezenas de arquivos para responder, tudo isso ocupa a sua janela de contexto. Um subagente trabalha numa janela própria e devolve só o resultado.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="0.3"><p class="v-txt">Sem subagente</p><div class="v-barra"><i style="--w:85%;--cor:#e07a6a;animation-delay:.6s"></i></div></div><div data-t="5"><p class="v-txt">Com subagente</p><div class="v-barra"><i style="--w:25%;--cor:#6ac08a;animation-delay:5.3s"></i></div></div></div><div class="v-linha" data-t="6.5"><div class="v-caixa acc"><span class="v-ic">🤖</span><b>Janela própria</b>lê, busca, testa</div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">📝</span><b>Só o resumo</b>volta para você</div></div>' },
+  { fala: "Cada subagente é um arquivo Markdown na pasta ponto claude barra agents. No topo, o nome e a description, que diz quando usar. Tools limita as ferramentas. O resto do arquivo são as instruções.",
+    html: '<p class="v-txt" data-t="0">.claude/agents/revisor-taskflow.md</p><div class="v-code" data-t="0.4"><div><span class="d">---</span></div><div data-t="2.6"><span class="a">name:</span> revisor-taskflow</div><div data-t="3.6"><span class="a">description:</span> Revisa mudanças… Use depois de…</div><div data-t="6.5"><span class="a">tools:</span> Read, Grep, Glob, Bash</div><div><span class="d">---</span></div><div data-t="8.6"><span class="o">Você é o revisor do TaskFlow…</span></div></div>' },
+  { fala: "Você aciona pelo nome, num pedido normal, ou com arroba agent, hífen e o nome. O Claude também delega sozinho quando a description combina com o pedido.",
+    html: '<div class="v-code" data-t="0.3"><span class="u">&gt; </span><span class="v-digita" style="--n:33">@agent-revisor-taskflow revise isto</span></div><div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="3"><span class="v-ic">🗣</span><b>Pelo nome</b>"use o subagente revisor…"</div><div class="v-caixa acc" data-t="5.5"><span class="v-ic">✨</span><b>Automático</b>pela description</div></div>' },
+  { fala: "E alguns já vêm prontos: o Explore, que busca no código só lendo, o Plan, que pesquisa no modo de planejamento, e o general purpose, para tarefas com várias etapas.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">🔎</span><b>Explore</b>busca só lendo</div><div class="v-caixa" data-t="3"><span class="v-ic">🗺</span><b>Plan</b>pesquisa no plan mode</div><div class="v-caixa" data-t="5.8"><span class="v-ic">🧰</span><b>general-purpose</b>várias etapas</div></div>' },
+  { fala: "Mas nem tudo vale delegar. Mudança pequena e conversa de vai e volta ficam aqui. Cada subagente começa sem contexto e gasta os próprios tokens.",
+    html: '<p class="v-titulo" data-t="0">Nem tudo vale delegar</p><div class="v-grade" style="--cols:3"><div class="v-caixa warn" data-t="2"><span class="v-ic">✏</span><b>Mudança pequena</b>faça aqui</div><div class="v-caixa warn" data-t="3.6"><span class="v-ic">🔁</span><b>Vai e volta</b>faça aqui</div><div class="v-caixa err" data-t="5.6"><span class="v-ic">🪙</span><b>Custo</b>tokens próprios</div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você" }, { ic: "✻", rt: "Conversa principal" }, { ic: "🤖", rt: "Subagente (janela própria)" }, { ic: "📁", rt: "Arquivos e testes" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Você pede uma revisão", texto: "<em>\"Use o subagente revisor-taskflow para revisar o tarefas.py.\"</em> O pedido cita o subagente pelo nome." },
+    { ativos: [1, 2], setas: [1], titulo: "O Claude delega", texto: "A conversa principal inicia o subagente com uma <strong>janela de contexto nova</strong>, as instruções do arquivo e só as ferramentas de <code>tools</code>. Ele <strong>não</strong> recebe o seu histórico: só o pedido." },
+    { ativos: [2, 3], setas: [2], titulo: "O subagente trabalha isolado", texto: "Lê arquivos, roda <code>python -m unittest</code>, procura problemas. Toda essa leitura fica <strong>na janela dele</strong>. Pedidos de permissão continuam aparecendo para você." },
+    { ativos: [2, 1, 0], setas: [1, 0], titulo: "Volta só o relatório", texto: "Ao terminar, o subagente devolve o resultado final. A conversa principal recebe o resumo, não as leituras, e o Claude te responde a partir dele." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Delegando ao revisor-taskflow (ilustrativo)", altura: 300,
+  passos: [
+    { t: "user", x: "use o subagente revisor-taskflow para revisar o tarefas.py", leg: "Pedido citando o subagente pelo nome" },
+    { t: "tool", x: "revisor-taskflow(Revisar tarefas.py)\n  ⎿ Read(tarefas.py) · Bash(python -m unittest) · Grep(\"def \")", leg: "O trabalho acontece na janela do subagente" },
+    { t: "perm", x: '<span class="t-b">Bash command</span>  python -m unittest  (revisor-taskflow)\nDo you want to proceed?\n<span class="t-user">❯ 1. Yes</span>\n  2. No', ms: 1800, leg: "Permissões continuam valendo dentro do subagente" },
+    { t: "out", x: "Done (3 tool uses)", leg: "Na conversa principal, só o resumo da execução" },
+    { t: "claude", x: "Testes: passaram (6).\nAchados: 🟡 adicionar, listar, concluir, remover e main sem docstring.\nVeredito: ajustar antes.", leg: "O relatório no formato definido nas instruções" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Revisar 15 arquivos alterados e devolver só os problemas encontrados", "delegar", "Muita leitura que você não precisa ver: o subagente isola isso e devolve o resumo."],
+    ["Trocar o texto de uma mensagem de erro em tarefas.py", "aqui", "Mudança pequena e pontual. Delegar só adiciona espera e custo."],
+    ["Descobrir em quais arquivos a função carregar() é usada num projeto grande", "delegar", "Busca ampla somente leitura: é o trabalho típico do Explore."],
+    ["Ajustar o texto do README junto com você, frase por frase", "aqui", "Vai e volta constante: o subagente só devolve o resultado final."],
+    ["Rodar a mesma checklist de revisão antes de toda junção de código", "delegar", "Tarefa repetida com regras fixas: um subagente especializado (ou skill) garante o mesmo padrão."],
+    ["Perguntar o que o Claude quis dizer na resposta anterior", "aqui", "A resposta já está no contexto. Use a conversa (ou /btw)."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: delegar · aqui</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "delegar": function () { return resp("delegar"); }, "aqui": function () { return resp("aqui"); } };
+  Curso.terminal("term", { titulo: "Delegar ou fazer aqui? (simulação)", prompt: ">", intro: '<span class="t-dim">delegar = mandar para um subagente · aqui = fazer na conversa principal</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: delegar ou aqui.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual é a principal vantagem de um subagente para a sua conversa?", op: ["Ele é sempre mais rápido", "Ele trabalha numa janela de contexto própria e devolve só o resultado", "Ele ignora as permissões"], c: 1, ex: "As leituras e buscas ficam na janela do subagente; à conversa principal volta o resumo." },
+  { p: "Qual campo o Claude usa para decidir se delega sozinho?", op: ["<code>name</code>", "<code>tools</code>", "<code>description</code>"], c: 2, ex: "A <code>description</code> diz quando usar. Se for vaga, a delegação automática erra." },
+  { p: "Você não escreveu <code>tools</code> no frontmatter. O que acontece?", op: ["O subagente não pode usar nenhuma ferramenta", "Ele herda todas as ferramentas disponíveis para subagentes", "O arquivo é ignorado"], c: 1, ex: "Sem <code>tools</code>, herda tudo. Para um revisor, restrinja a leitura e testes." },
+  { p: "Onde fica um subagente que deve valer só neste projeto e ser compartilhado com o time?", op: ["<code>~/.claude/agents/</code>", "<code>.claude/agents/</code>", "No <code>CLAUDE.md</code>"], c: 1, ex: "<code>.claude/agents/</code> é o escopo de projeto; <code>~/.claude/agents/</code> é o seu, para todos os projetos." },
+  { p: "Você criou o primeiro arquivo em <code>.claude/agents/</code> e o subagente não aparece. Por quê?", op: ["Subagentes exigem plano pago extra", "O primeiro arquivo numa pasta agents nova só carrega depois de reiniciar a sessão", "Precisa rodar <code>/agents</code> para instalar"], c: 1, ex: "Edições seguintes valem em segundos, mas a primeira pasta nova pede reinício." }
+]);
+Curso.checklist("check", [
+  "Explico quando vale delegar e quando é melhor fazer na conversa",
+  "Escrevo um subagente com <code>name</code>, <code>description</code> clara e <code>tools</code> restrito",
+  "Sei a diferença entre <code>.claude/agents/</code> e <code>~/.claude/agents/</code>",
+  "Aciono um subagente pelo nome e por <code>@agent-</code>",
+  "Conheço os subagentes prontos: Explore, Plan e general-purpose"
+]);
+</script>
+</body>
+</html>

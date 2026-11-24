@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 10</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 10 · Revisão</p>
+    <h1>Agent SDK</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Agent SDK em uma frase</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">O motor do Claude Code (loop, ferramentas, contexto) como biblioteca, dentro do seu programa Python.</p>
+    <ul>
+      <li>Pacote <code>claude-agent-sdk</code> · Python 3.10+ · chave em <code>ANTHROPIC_API_KEY</code>, só no terminal</li>
+      <li>Login do claude.ai não serve: chave de API (ou Bedrock, Google Cloud, Foundry)</li>
+      <li>🪙 Cobrado por uso · na empresa, só com aval da segurança da informação</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>O loop</h2>
+    <div class="cod" style="max-width:900px"><code>async for m in query(prompt="...", options=ClaudeAgentOptions(...)):
+    ...  # SystemMessage → AssistantMessage → UserMessage → ResultMessage</code></div>
+    <ul>
+      <li>Turno = o Claude responde; se pediu ferramentas, o SDK roda e devolve</li>
+      <li><code>ResultMessage</code>: <code>subtype</code>, <code>result</code> (só no <code>success</code>), <code>num_turns</code>, <code>total_cost_usd</code>, <code>session_id</code></li>
+      <li>Conversa contínua: <code>ClaudeSDKClient</code> + <code>receive_response()</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Opções essenciais</h2>
+    <ul>
+      <li><code>system_prompt</code> · <code>cwd</code> · <code>model</code> (alias ou ID) · <code>effort</code></li>
+      <li><code>allowed_tools</code> pré-aprova · <code>disallowed_tools</code> / <code>tools</code> tiram</li>
+      <li>Travas: <code>max_turns</code> e <code>max_budget_usd</code></li>
+      <li>Streaming: <code>include_partial_messages=True</code> + <code>StreamEvent</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Ferramentas próprias</h2>
+    <div class="cod" style="max-width:900px"><code>@tool("adicionar_tarefa", "Adiciona uma tarefa…", {"titulo": str})
+async def adicionar_tarefa(args): return {"content": [{"type": "text", "text": "ok"}]}
+
+SERVIDOR = create_sdk_mcp_server(name="taskflow", version="1.0.0", tools=[adicionar_tarefa])
+ClaudeAgentOptions(mcp_servers={"taskflow": SERVIDOR}, allowed_tools=["mcp__taskflow__*"])</code></div>
+    <p>Nome completo <code>mcp__servidor__ferramenta</code> · erro previsto: <code>is_error</code> · servidor roda no seu processo</p>
+  </section>
+  <section class="slide">
+    <h2>Quem decide se a ferramenta roda</h2>
+    <ul>
+      <li>Ordem: <strong>hooks</strong> → negar → perguntar → <strong>modo</strong> → permitir → <strong><code>can_use_tool</code></strong></li>
+      <li>Modos: <code>default</code> · <code>dontAsk</code> · <code>acceptEdits</code> · <code>plan</code> · <code>auto</code> · <code>bypassPermissions</code> (só isolado)</li>
+      <li>Aprovado antes nunca chega ao callback</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Callback e hooks</h2>
+    <ul>
+      <li><code>can_use_tool</code> → <code>PermissionResultAllow(updated_input=...)</code> ou <code>PermissionResultDeny(message=...)</code></li>
+      <li><code>HookMatcher(matcher="...", hooks=[...])</code> · <code>PreToolUse</code> nega com <code>permissionDecision: "deny"</code> (vale até no bypass)</li>
+      <li><code>PostToolUse</code> para auditoria · hooks não gastam contexto</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Subagentes e custo</h2>
+    <ul>
+      <li><code>agents={"revisor": AgentDefinition(description, prompt, tools, model)}</code> + ferramenta <code>Agent</code></li>
+      <li><code>total_cost_usd</code>: <strong>estimativa</strong> local, inclui subagentes · fatura no console da conta</li>
+      <li><code>usage</code> não inclui subagentes · com o cliente, o custo já é acumulado</li>
+      <li>Retomar: <code>resume=session_id</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Fechou o módulo?</h2>
+    <ul>
+      <li>✓ Rodou o agente leitor com travas de turnos e gasto</li>
+      <li>✓ Deu ferramentas próprias ao TaskFlow</li>
+      <li>✓ Aplicou política com <code>can_use_tool</code> e hooks</li>
+      <li>✓ Montou o agente TaskFlow com subagente revisor</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <p class="capa-mod">Fim do curso</p>
+    <h1>🎉 Parabéns, você concluiu!</h1>
+    <p style="font-size:clamp(1.1rem,2.4vw,1.6rem)">Do primeiro comando no terminal ao seu próprio agente. Continue praticando com dados fictícios, de olho no custo e na doc oficial.</p>
+    <p><a href="../../index.html">← Voltar ao início do curso</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

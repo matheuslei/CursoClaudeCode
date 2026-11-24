@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 2</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Contexto é tudo</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 2</a>
+    <a class="prox" href="../03-fluxo/01-explorar-planejar.html"><small>Próximo módulo →</small>Módulo 3: Fluxo profissional</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 2 · Contexto é tudo › Quiz final");
+Curso.quiz("quiz", [{"p": "O que acontece quando a janela de contexto chega perto do limite?", "op": ["A sessão é encerrada", "O Claude Code compacta automaticamente, resumindo a conversa", "O Claude apaga arquivos do projeto"], "c": 1, "ex": "A compactação automática resume a conversa. CLAUDE.md e memória são reinjetados do disco. <span class=\"t-dim\">(aula: A janela de contexto)</span>"}, {"p": "Qual instrução é melhor para o CLAUDE.md?", "op": ["\"Teste bem as mudanças\"", "\"Rode <code>python -m unittest</code> antes de dizer que terminou\""], "c": 1, "ex": "Concreta e verificável. A doc oficial dá exatamente esse tipo de exemplo. <span class=\"t-dim\">(aula: /init e o CLAUDE.md)</span>"}, {"p": "Você diz \"adicione ao CLAUDE.md que os testes rodam com python -m unittest\". Onde a informação vai parar?", "op": ["Na memória automática", "No CLAUDE.md"], "c": 1, "ex": "Pedido explícito de CLAUDE.md vai para o CLAUDE.md. \"Lembre que…\" vai para a memória automática. <span class=\"t-dim\">(aula: Memória automática e /memory)</span>"}, {"p": "O Claude criou um arquivo rodando um script pelo terminal. O rewind desfaz isso?", "op": ["Sim, sempre", "Não necessariamente: arquivos alterados só por comandos não são rastreados; use o Git", "Só no Windows"], "c": 1, "ex": "Os checkpoints rastreiam as edições feitas pelas ferramentas de edição do Claude. Para o resto, Git. <span class=\"t-dim\">(aula: /clear, /compact e /rewind)</span>"}, {"p": "Por que baixar o <code>/effort</code> em tarefas simples economiza?", "op": ["Porque o raciocínio é cobrado como tokens de saída", "Porque desliga as ferramentas", "Não economiza"], "c": 0, "ex": "Menos raciocínio, menos tokens de saída. Em tarefas simples, a qualidade quase não muda. <span class=\"t-dim\">(aula: Custo, modelos e /usage)</span>"}, {"p": "O que mais costuma encher o contexto numa sessão de trabalho?", "op": ["As suas mensagens", "Arquivos lidos, saídas de comandos e respostas longas", "O nome do modelo"], "c": 1, "ex": "O trabalho (leituras, buscas, saídas) é o que pesa. Suas mensagens costumam ser pequenas. <span class=\"t-dim\">(aula: A janela de contexto)</span>"}, {"p": "Onde colocar uma preferência pessoal que vale para TODOS os seus projetos?", "op": ["<code>./CLAUDE.md</code>", "<code>~/.claude/CLAUDE.md</code>", "<code>./CLAUDE.local.md</code>"], "c": 1, "ex": "O arquivo do usuário vale em todos os projetos e não vai para o Git de nenhum deles. <span class=\"t-dim\">(aula: /init e o CLAUDE.md)</span>"}, {"p": "Onde a memória automática fica guardada?", "op": ["No repositório Git do projeto", "Em <code>~/.claude/projects/&lt;projeto&gt;/memory/</code>, na sua máquina", "Na nuvem, compartilhada com o time"], "c": 1, "ex": "É local da máquina. Não é versionada nem compartilhada. <span class=\"t-dim\">(aula: Memória automática e /memory)</span>"}, {"p": "Como abrir o menu de rewind pelo teclado?", "op": ["<kbd>Ctrl</kbd>+<kbd>Z</kbd>", "<kbd>Esc</kbd> <kbd>Esc</kbd> com o campo de digitação vazio", "<kbd>Shift</kbd>+<kbd>Tab</kbd>"], "c": 1, "ex": "Com texto no campo, <kbd>Esc</kbd> <kbd>Esc</kbd> limpa o rascunho; com o campo vazio, abre o rewind. <span class=\"t-dim\">(aula: /clear, /compact e /rewind)</span>"}, {"p": "O que o fast mode muda?", "op": ["Troca para um modelo menor", "Mesmo modelo e mesma qualidade, até 2,5x mais rápido, com preço por token maior", "Desliga o raciocínio"], "c": 1, "ex": "É o mesmo modelo, com outra configuração de API que prioriza velocidade. <span class=\"t-dim\">(aula: Custo, modelos e /usage)</span>"}]);
+</script>
+</body>
+</html>

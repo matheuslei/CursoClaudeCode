@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testar com claude plugin eval</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m8a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 8 · Aula 3</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>Medir se o plugin ajuda: claude plugin eval</h1>
+    <p class="objetivo">Objetivo: escrever um caso de avaliação, ler o relatório com e sem o plugin e decidir o que ajustar, sabendo quanto cada rodada custa.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>A validação da aula 2 diz que o plugin <strong>carrega</strong>. Ela não diz se o Claude <strong>usa</strong> a skill na hora certa, nem se o resultado fica melhor com ela. Uma description vaga, por exemplo, faz a skill nunca ser escolhida.</p>
+    <p>O <code>claude plugin eval</code> roda pedidos realistas com e sem o seu plugin e dá uma nota para cada lado. A diferença é o que o plugin realmente acrescenta.</p>
+    <div class="caixa alerta"><strong>Custa uso real</strong>Cada rodada é uma sessão de verdade com o modelo, contada no seu plano ou na conta da API. Por padrão, cada caso roda 3 vezes com o plugin e 3 sem, e graders do tipo juiz fazem chamadas extras. A prática real desta aula é opcional: a simulação basta para concluir.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como uma rodada funciona</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Casos, graders e relatório</h2>
+    <h3>Onde ficam</h3>
+    <div class="cod"><span class="rot">dentro do plugin</span><code>evals/
+  padroes-nova-funcao/
+    prompt.md              ← o pedido e os limites da rodada
+    graders/
+      docstring.md         ← uma verificação por arquivo
+      nome-em-portugues.md
+      skill-usada.md
+  results/                 ← criado a cada execução (relatório)</code></div>
+    <div class="cod"><span class="rot">evals/padroes-nova-funcao/prompt.md</span><code>---
+max_turns: 6
+allowed_tools: [Skill]
+---
+
+Estou num projeto chamado TaskFlow, uma lista de tarefas em Python. ...
+Escreva só a função que remove todas as tarefas já concluídas e devolve
+quantas foram removidas. Responda com o código.</code></div>
+    <p>O pedido é escrito como um usuário escreveria, <strong>sem citar a skill</strong>. Cada rodada começa numa pasta vazia, então tudo o que o Claude precisa saber vai no texto.</p>
+
+    <h3>Tipos de grader</h3>
+    <table class="tab">
+      <thead><tr><th>Tipo</th><th>Passa quando</th><th>Custo</th></tr></thead>
+      <tbody>
+        <tr><td><code>regex</code></td><td>Uma expressão regular aparece (ou não) na resposta, no histórico ou num arquivo</td><td>Grátis</td></tr>
+        <tr><td><code>tool_used</code></td><td>Uma ferramenta foi chamada, por exemplo a <code>Skill</code> com o nome da sua skill</td><td>Grátis</td></tr>
+        <tr><td><code>tool_order</code></td><td>Uma ferramenta foi chamada antes de outra</td><td>Grátis</td></tr>
+        <tr><td><code>file_exists</code></td><td>Um arquivo foi criado</td><td>Grátis</td></tr>
+        <tr><td><code>llm</code></td><td>Um modelo juiz vota PASS no seu critério (2 de 3 votos)</td><td>Chamadas extras</td></tr>
+        <tr><td><code>baseline</code></td><td>O juiz acha o resultado pelo menos tão bom quanto uma transcrição de referência</td><td>Chamadas extras</td></tr>
+      </tbody>
+    </table>
+    <div class="cod"><span class="rot">graders/skill-usada.md</span><code>---
+type: tool_used
+tool: Skill
+input_match: '"skill"\s*:\s*"(?:[\w-]+:)?padroes-taskflow"'
+---</code></div>
+    <p>Dica da documentação: em cada caso, um grader olha o <strong>resultado</strong> (resposta ou arquivo) e outro olha o <strong>caminho</strong> (a skill foi usada?). O grader "a skill foi usada" não entra na nota com/sem plugin, porque sem o plugin ele nunca passaria; aparece só como indicador.</p>
+
+    <h3>Rodar</h3>
+    <div class="cod"><span class="rot">PowerShell, na pasta do plugin</span><code>claude plugin eval init                     # o Claude conversa com você e escreve a suíte
+claude plugin eval .                        # roda todos os casos (3 com + 3 sem, por caso)
+claude plugin eval . --case padroes-nova-funcao --runs 1 --ablation none   # iterar barato
+claude plugin eval . --max-cost-usd 1 --no-publish   # teto de custo estimado; relatório só local</code></div>
+    <p>Na primeira vez, o comando pergunta se você confia na pasta do plugin. Requer Claude Code 2.1.269 ou mais novo.</p>
+
+    <h3>Ler o resultado</h3>
+    <div class="cod"><span class="rot">resumo (ilustrativo)</span><code>CASE                 WITH  W/OUT Δ      RUNS COST    NOTES
+padroes-nova-funcao  1.00  0.50  +0.50  6    $0.40</code></div>
+    <table class="tab">
+      <thead><tr><th>Coluna</th><th>Significa</th></tr></thead>
+      <tbody>
+        <tr><td><code>WITH</code> / <code>W/OUT</code></td><td>Nota de 0 a 1 com e sem o plugin (média das rodadas)</td></tr>
+        <tr><td><code>Δ</code></td><td>WITH menos W/OUT: o que o plugin acrescentou. Perto de zero = o plugin não fez diferença</td></tr>
+        <tr><td><code>COST</code></td><td>Estimativa pelo preço de tabela das chamadas</td></tr>
+        <tr><td><code>NOTES</code></td><td>A explicação do grader mais importante que falhou</td></tr>
+      </tbody>
+    </table>
+    <p>O relatório completo (<code>report.html</code>) fica em <code>evals/results/&lt;data&gt;/</code> e mostra o veredito e a explicação de cada grader em cada rodada.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: iterar a description</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: leia o relatório</h2>
+    <p>Para cada linha de resultado, responda <code>ajudou</code>, <code>atrapalhou</code> ou <code>igual</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício: a avaliação do plugin taskflow</h2>
+    <h3>Parte A (sem custo)</h3>
+    <ol>
+      <li>No seu plugin, crie <code>evals\padroes-nova-funcao\</code> com o <code>prompt.md</code> e os três graders do gabarito (abaixo). Se ainda não tem a skill <code>padroes-taskflow</code>, copie-a do gabarito.</li>
+      <li>Para cada grader, escreva numa frase o que ele verifica e se custa chamadas extras.</li>
+      <li>Responda: se <code>WITH</code> e <code>W/OUT</code> saírem iguais, o que você conclui?</li>
+    </ol>
+    <h3>Parte B (opcional, gasta uso do plano)</h3>
+    <ol>
+      <li>Na pasta do plugin: <code>claude plugin eval . --case padroes-nova-funcao --runs 1 --ablation none --max-cost-usd 1 --no-publish</code>. Responda <code>y</code> para confiar na pasta.</li>
+      <li>Abra o <code>report.html</code> indicado. A skill foi usada? Qual grader falhou?</li>
+      <li>Se a skill não foi usada, deixe a description mais específica e rode de novo. Só confirme com a rodada completa (<code>claude plugin eval .</code>) se quiser ver o <code>Δ</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>A suíte está em <code>projeto-taskflow/etapa-08/gabarito/marketplace-taskflow/plugins/taskflow/evals/</code>.</p>
+      <ul>
+        <li><code>docstring.md</code> (<code>regex</code>, grátis): a função tem docstring logo depois do <code>def</code>.</li>
+        <li><code>nome-em-portugues.md</code> (<code>llm</code>, chamadas extras): o juiz confere nomes em português.</li>
+        <li><code>skill-usada.md</code> (<code>tool_used</code>, grátis): a skill <code>padroes-taskflow</code> foi chamada. Indicador, fora da nota com/sem.</li>
+        <li><strong>WITH = W/OUT:</strong> o Claude já fazia aquilo sem o plugin; a skill não foi a responsável. Ou o caso é fácil demais, ou a skill não foi usada.</li>
+      </ul>
+      <p>Esta suíte <strong>não foi executada</strong> na preparação do curso (custo); as notas mostradas nas simulações são ilustrativas.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Pedido que cita a skill</h4><p>Assim você não testa se o Claude a escolheria sozinho. Escreva como um usuário.</p></div>
+      <div class="mini"><h4>Confiar em uma rodada</h4><p>O resultado varia. Use uma rodada para iterar e confirme com a rodada completa.</p></div>
+      <div class="mini"><h4>Juiz para tudo</h4><p>Graders <code>llm</code> custam e variam. Para texto longo ou formato, prefira <code>regex</code>.</p></div>
+      <div class="mini"><h4>Esquecer o custo</h4><p>Use <code>--max-cost-usd</code> e <code>--ablation none</code> enquanto ajusta.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/plugin-evals">Testar plugins com evals</a> (em inglês): mocks de servidores MCP, preparar a pasta da rodada, uso em CI.</li>
+      <li>A skill <code>skill-creator</code> tem uma comparação parecida, com outro formato de arquivo; as duas não leem os casos uma da outra.</li>
+      <li>Próxima aula: instalar o seu plugin por nome, a partir de um marketplace local.</li>
+      <li><a href="https://academy.claude.com/courses/introduction-to-evals">Introduction to evals</a> (Anthropic Academy, em inglês): a ideia de avaliação com casos de teste, vista pela API.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Test plugins with evals").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "plugin eval em 1 minuto", cenas: [
+  { fala: "Carregar não é funcionar. Nesta aula, você mede se o plugin muda mesmo o comportamento do Claude.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 8 · AULA 3</span><p class="v-titulo" data-t="0.3">claude plugin eval</p><p class="v-sub" data-t="1.5">carregar não é funcionar</p>' },
+  { fala: "Cada caso de avaliação tem um pedido e alguns graders: verificações de passa ou falha, como uma expressão regular ou um juiz.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">💬</span><b>Pedido</b>como um usuário</div><span class="v-seta">→</span><div class="v-caixa acc" data-t="2.5"><span class="v-ic">✅</span><b>Graders</b>passa ou falha</div></div><div class="v-grade" style="--cols:2"><div class="v-caixa ok" data-t="5"><b>regex</b>grátis</div><div class="v-caixa warn" data-t="6.2"><b>llm (juiz)</b>chamadas extras</div></div>' },
+  { fala: "O comando claude plugin eval roda cada caso com o plugin e sem ele. A diferença entre as notas é o que o plugin acrescentou.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="1.5"><p class="v-txt">WITH</p><div class="v-barra"><i style="--w:90%;--cor:#6ac08a;animation-delay:1.8s"></i></div></div><div data-t="3"><p class="v-txt">W/OUT</p><div class="v-barra"><i style="--w:45%;--cor:#e0b46a;animation-delay:3.3s"></i></div></div></div><div class="v-caixa acc" data-t="5.5"><span class="v-ic">Δ</span><b>+0.45</b>o que o plugin acrescentou</div>' },
+  { fala: "Cuidado com o custo: cada rodada é uma chamada real ao modelo. Para iterar, rode um caso só, uma vez, só com o plugin.",
+    html: '<div class="v-caixa err" data-t="0.3"><span class="v-ic">🪙</span><b>Cada rodada custa</b>3 com + 3 sem, por caso</div><div class="v-code" data-t="4.5"><span class="u">&gt; </span>claude plugin eval . --case x --runs 1 --ablation none</div>' },
+  { fala: "Diferença perto de zero e a skill não foi usada? Melhore a description da skill e rode de novo.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa warn"><b>Δ ≈ 0</b>skill não usada</div><span class="v-seta">→</span><div class="v-caixa acc"><b>description</b>mais específica</div><span class="v-seta">→</span><div class="v-caixa ok"><b>rodar de novo</b></div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📋", rt: "Caso (pedido + graders)" }, { ic: "🧳", rt: "Rodadas COM plugin" }, { ic: "∅", rt: "Rodadas SEM plugin" }, { ic: "📊", rt: "Relatório (Δ)" }],
+  passos: [
+    { ativos: [0], setas: [], titulo: "Um caso", texto: "Um pedido realista em <code>prompt.md</code> e verificações em <code>graders/</code>." },
+    { ativos: [0, 1], setas: [0], titulo: "Com o plugin", texto: "Cada rodada é uma sessão nova, isolada, numa pasta vazia, só com o seu plugin. Os graders dão a nota da rodada." },
+    { ativos: [0, 2], setas: [0, 1], titulo: "Sem o plugin", texto: "As mesmas rodadas sem plugin nenhum. Assim você sabe se o Claude já fazia aquilo sozinho." },
+    { ativos: [1, 2, 3], setas: [1, 2], titulo: "Comparar", texto: "<code>WITH</code> − <code>W/OUT</code> = <code>Δ</code>. Positivo: o plugin ajudou. Zero: não fez diferença. Negativo: atrapalhou." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Iterando a description (ilustrativo)", altura: 300,
+  passos: [
+    { t: "cmd", x: "claude plugin eval . --case padroes-nova-funcao --runs 1 --ablation none", leg: "Uma rodada, só com o plugin" },
+    { t: "out", x: "CASE                 SCORE  PASS%\npadroes-nova-funcao  0.50   0%\nNOTES: skill-usada failed: Skill padroes-taskflow was not invoked", leg: "A skill não foi escolhida" },
+    { t: "nota", x: "description antiga: \"Padrões do projeto.\" → nova: \"Padrões de código do TaskFlow (CLI de tarefas em Python). Use ao escrever ou alterar funções do TaskFlow.\"", leg: "Dizer quando usar" },
+    { t: "cmd", x: "claude plugin eval . --case padroes-nova-funcao --runs 1 --ablation none", leg: "De novo" },
+    { t: "out", x: "padroes-nova-funcao  1.00   100%", leg: "Agora a skill entra" },
+    { t: "cmd", x: "claude plugin eval .", leg: "Confirmar com 3 + 3 rodadas e ver o Δ" }
+  ]
+});
+(function () {
+  var itens = [
+    ["padroes-nova-funcao  WITH 1.00  W/OUT 0.33  Δ +0.67", "ajudou", "Com o plugin a nota sobe bastante: ele acrescenta."],
+    ["mensagem-commit      WITH 1.00  W/OUT 1.00  Δ  0.00", "igual", "O Claude já fazia isso sem o plugin; a nota alta não vem dele."],
+    ["resumo-tarefas       WITH 0.40  W/OUT 0.80  Δ -0.40", "atrapalhou", "Com o plugin piorou. Confira as instruções da skill e, se a skill foi usada, desconfie também do juiz."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Linha ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: ajudou · atrapalhou · igual</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Na verdade: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["ajudou", "atrapalhou", "igual"].forEach(function (c) { cmds[c] = function () { return resp(c); }; });
+  Curso.terminal("term", { titulo: "Leia o relatório (simulação)", prompt: ">", intro: '<span class="t-dim">Δ = WITH − W/OUT</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: ajudou, atrapalhou ou igual.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que o <code>claude plugin validate</code> NÃO verifica, e o <code>plugin eval</code> verifica?", op: ["Se o JSON é válido", "Se o plugin muda o comportamento do Claude", "Se o manifesto tem nome"], c: 1, ex: "Validate confere arquivos; eval mede comportamento." },
+  { p: "O que significa <code>Δ</code> perto de zero?", op: ["O plugin está quebrado", "Com e sem o plugin deram a mesma nota: ele não fez diferença", "A avaliação não rodou"], c: 1, ex: "O Claude já fazia aquilo, ou a skill não foi usada." },
+  { p: "Qual grader é grátis?", op: ["<code>llm</code>", "<code>regex</code>", "<code>baseline</code>"], c: 1, ex: "regex, tool_used, tool_order e file_exists não chamam modelo." },
+  { p: "Como iterar gastando menos?", op: ["<code>--case x --runs 1 --ablation none</code>", "Rodar 10 vezes seguidas", "Apagar os graders"], c: 0, ex: "Um caso, uma rodada, só com o plugin. Confirme depois com a rodada completa." },
+  { p: "Como escrever o pedido de um caso?", op: ["Citando o nome da skill", "Como um usuário escreveria, sem citar a skill", "Em inglês, sempre"], c: 1, ex: "Assim você mede se o Claude escolhe a skill sozinho." }
+]);
+Curso.checklist("check", [
+  "Explico a diferença entre validar e avaliar um plugin",
+  "Escrevo um caso com <code>prompt.md</code> e graders",
+  "Escolho graders grátis quando possível e sei quais custam",
+  "Leio <code>WITH</code>, <code>W/OUT</code> e <code>Δ</code> e decido o que ajustar",
+  "Itero barato com <code>--runs 1 --ablation none</code> e limito o custo"
+]);
+</script>
+</body>
+</html>

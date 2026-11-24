@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custo, modelos e /usage</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m2a5">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 2 · Aula 5</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~15 min</span>
+    <h1>Custo, modelos e /usage</h1>
+    <p class="objetivo">Objetivo: escolher modelo, esforço e velocidade de acordo com a tarefa, e acompanhar o consumo com <code>/usage</code> para não esgotar o limite do seu plano.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O Claude Code consome tokens. Numa assinatura (Pro, Max, Team, Enterprise), isso vira <strong>limite de uso</strong> que renova em janelas de tempo. Numa conta de API, vira <strong>dinheiro</strong>. Nos dois casos, as mesmas escolhas fazem diferença: modelo, esforço e tamanho do contexto.</p>
+    <div class="caixa"><strong>Uma referência da doc oficial</strong>Em implantações corporativas, a Anthropic relata custo médio em torno de US$ 13 por desenvolvedor por dia ativo, abaixo de US$ 30 por dia para 90% dos usuários. Varia muito com modelo, tamanho do projeto e hábitos.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: os 3 botões do custo</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Escolhas na prática</h2>
+    <h3>Modelos (aliases do /model)</h3>
+    <table class="tab">
+      <thead><tr><th>Alias</th><th>Quando usar</th></tr></thead>
+      <tbody>
+        <tr><td><code>sonnet</code></td><td>Tarefas de código do dia a dia. A doc diz que ele resolve bem a maioria das tarefas e custa menos que o Opus.</td></tr>
+        <tr><td><code>opus</code></td><td>Raciocínio complexo, decisões de arquitetura, problemas difíceis.</td></tr>
+        <tr><td><code>haiku</code></td><td>Tarefas simples e rápidas.</td></tr>
+        <tr><td><code>fable</code></td><td>As tarefas mais difíceis e longas.</td></tr>
+        <tr><td><code>opusplan</code></td><td>Opus no plan mode e Sonnet na execução.</td></tr>
+      </tbody>
+    </table>
+    <p>Troque com <code>/model</code> (no seletor, <kbd>Enter</kbd> salva como padrão), ou abra já escolhendo: <code>claude --model sonnet</code>.</p>
+    <h3>Esforço: /effort</h3>
+    <p>Níveis <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code> e <code>max</code> (os disponíveis variam por modelo). Mais esforço significa mais raciocínio, que é melhor em problemas difíceis, porém mais lento e mais caro, já que o raciocínio é cobrado como tokens de saída. Para tarefas simples, baixe o esforço.</p>
+    <h3>Velocidade: /fast</h3>
+    <p>O <strong>fast mode</strong> usa o <strong>mesmo modelo</strong> com uma configuração que responde até 2,5 vezes mais rápido, a um <strong>preço por token mais alto</strong>. Funciona só em alguns modelos (Opus e Fable). Nas assinaturas, é cobrado de <strong>créditos de uso extras</strong>, fora do limite incluído no plano. Ligue no começo da sessão (ligar no meio sai mais caro) e só quando a velocidade importar.</p>
+    <h3>/usage</h3>
+    <p>Em assinaturas, mostra as <strong>barras de uso do plano</strong> e um detalhamento do que mais consome (skills, subagentes, servidores MCP), com recomendações. Para contas de API, mostra o <strong>custo estimado da sessão</strong>. Os totais da sessão zeram no <code>/clear</code>.</p>
+    <div class="caixa dica"><strong>Hábitos que mais economizam (segundo a doc)</strong><code>/clear</code> entre tarefas · modelo adequado à tarefa · pedidos específicos (pedido vago faz o Claude varrer o projeto) · plan mode antes de tarefas complexas · <kbd>Esc</kbd> cedo quando errar o rumo · CLAUDE.md com menos de 200 linhas.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: monte a configuração certa</h2>
+    <p>Comece com <code>iniciar</code>. Para cada tarefa, responda com o modelo mais adequado: <code>haiku</code>, <code>sonnet</code> ou <code>opus</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, rode <code>/usage</code> e anote o que aparece (barras do plano ou custo da sessão).</li>
+      <li>Rode <code>/model</code> e veja quais modelos o seu plano oferece. Escolha <code>sonnet</code> só para esta sessão (no seletor, a tecla <kbd>s</kbd> troca sem salvar como padrão).</li>
+      <li>Rode <code>/effort low</code> e peça: <code>renomeie a variável t para tarefa no listar</code>.</li>
+      <li>Rode <code>/effort high</code> e peça: <code>analise se há algum caso em que tarefas.json pode ficar corrompido e proponha uma solução, sem implementar</code>.</li>
+      <li>Rode <code>/usage</code> de novo e compare. Anote no diário qual pedido pesou mais e por quê.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>A análise com esforço alto tende a consumir bem mais, porque há mais raciocínio e mais leitura. A renomeação simples com esforço baixo é barata. A lição: <strong>não use o máximo para tudo</strong>. Ajuste modelo e esforço ao tamanho do problema.</p>
+      <p>Os nomes, níveis e telas disponíveis dependem do seu plano e da versão. Se algo não aparecer, confira com <code>/help</code> e <code>/status</code>.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Opus + max para tudo</h4><p>Esgota o limite rápido sem ganho em tarefas simples.</p></div>
+      <div class="mini"><h4>Fast mode esquecido ligado</h4><p>Nas assinaturas, ele consome créditos extras. Desligue com <code>/fast</code>.</p></div>
+      <div class="mini"><h4>Sessão aberta o dia todo</h4><p>Cada mensagem reenvia o histórico. Limpe entre tarefas.</p></div>
+      <div class="mini"><h4>Trocar de modelo para fugir do limite</h4><p>Limites de sessão e semanais valem para todos os modelos. Veja no <code>/usage</code> quando renova.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/costs">Manage costs effectively</a></li>
+      <li><a href="https://code.claude.com/docs/en/model-config">Model configuration</a>: aliases, esforço, contexto de 1M</li>
+      <li><a href="https://code.claude.com/docs/en/fast-mode">Fast mode</a></li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Manage costs, Model configuration, Fast mode). Modelos e níveis mudam com frequência.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Custo e modelos em 1 minuto", cenas: [
+  { fala: "Toda sessão consome tokens. Na assinatura, isso vira limite de uso. Na API, vira dinheiro. Veja como controlar.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 2 · AULA 5</span><p class=\"v-titulo\" data-t=\"0.3\">Custo, modelos e /usage</p><p class=\"v-sub\" data-t=\"0.9\">Os três botões do custo</p>" },
+  { fala: "Três escolhas fazem a diferença: o modelo, o nível de esforço e o tamanho do contexto.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa \" data-t=\"0.3\"><span class=\"v-ic\">🧠</span><b>Modelo</b>/model</div><div class=\"v-caixa \" data-t=\"1.4\"><span class=\"v-ic\">🎚</span><b>Esforço</b>/effort</div><div class=\"v-caixa \" data-t=\"2.6\"><span class=\"v-ic\">📚</span><b>Contexto</b>/clear e /compact</div></div>" },
+  { fala: "Sonnet resolve bem a maioria das tarefas. Opus fica para raciocínio complexo. Haiku, para tarefas simples. E opusplan usa Opus no plano e Sonnet na execução.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">sonnet</span>    <span class=\"d\">→</span> dia a dia</div><div data-t=\"2.4\"><span class=\"u\">opus</span>      <span class=\"d\">→</span> raciocínio complexo</div><div data-t=\"4\"><span class=\"u\">haiku</span>     <span class=\"d\">→</span> tarefas simples</div><div data-t=\"5.6\"><span class=\"u\">opusplan</span>  <span class=\"d\">→</span> Opus planeja, Sonnet executa</div></div>" },
+  { fala: "Com /effort você ajusta o raciocínio. Mais esforço ajuda em problemas difíceis, mas é mais lento e mais caro. Para tarefas simples, baixe o esforço.",
+    html: "<div data-t=\"0.3\"><p class=\"v-txt\">low</p><div class=\"v-barra\"><i style=\"--w:20%;--cor:#7cc48a;animation-delay:.5s\"></i></div></div><div data-t=\"1.4\"><p class=\"v-txt\">high</p><div class=\"v-barra\"><i style=\"--w:60%;animation-delay:1.6s\"></i></div></div><div data-t=\"2.5\"><p class=\"v-txt\">max: mais lento e mais caro</p><div class=\"v-barra\"><i style=\"--w:95%;--cor:#ef8a8a;animation-delay:2.7s\"></i></div></div>" },
+  { fala: "O /usage mostra quanto do plano você já usou e o que mais consome. E o fast mode responde até duas vezes e meia mais rápido, mas com preço por token maior.",
+    html: "<div class=\"v-grade\" style=\"--cols:2\"><div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">📊</span><b>/usage</b>uso do plano e o que mais consome</div><div class=\"v-caixa warn\" data-t=\"4.2\"><span class=\"v-ic\">⚡</span><b>/fast</b>até 2,5x mais rápido, token mais caro</div></div>" },
+  { fala: "Os hábitos que mais economizam: /clear entre tarefas, pedidos específicos, plan mode antes do que é complexo, e Esc cedo quando errar o rumo.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"o\">✓</span> /clear entre tarefas</div><div data-t=\"1.8\"><span class=\"o\">✓</span> pedidos específicos</div><div data-t=\"3.2\"><span class=\"o\">✓</span> plan mode antes do complexo</div><div data-t=\"4.8\"><span class=\"o\">✓</span> Esc cedo quando errar o rumo</div></div>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧠", rt: "Modelo" }, { ic: "🎚", rt: "Esforço" }, { ic: "📚", rt: "Contexto" }],
+  seta: "×",
+  passos: [
+    { ativos: [0], titulo: "Modelo: o tamanho do cérebro", texto: "Haiku (simples) → Sonnet (dia a dia) → Opus (complexo) → Fable (mais difícil). Modelo maior custa mais por token." },
+    { ativos: [1], titulo: "Esforço: quanto ele pensa", texto: "<code>/effort low</code> a <code>max</code>. O raciocínio é cobrado como saída. Problema difícil, mais esforço. Renomear variável, pouco esforço." },
+    { ativos: [2], titulo: "Contexto: quanto ele carrega", texto: "Cada mensagem reenvia a conversa. Contexto enxuto (Aulas 2.1 a 2.4) é economia direta." },
+    { ativos: [0, 1, 2], setas: [0, 1], titulo: "O custo é a multiplicação", texto: "Modelo grande × esforço máximo × contexto lotado = limite esgotado rápido. Ajuste os três ao tamanho da tarefa. O <code>/fast</code> é um quarto botão: troca dinheiro por velocidade." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: ajustando custo (demonstração)", altura: 280,
+  passos: [
+    { t: "user", x: "/usage", leg: "Onde estou no limite?" },
+    { t: "html", x: '<span class="t-caixa">Plan usage\n  Session  ██████░░░░  58%  · renova em 2h\n  Weekly   ███░░░░░░░  31%\nTop usage: long context 40% · subagents 15%\n  Recommendation: run /clear between tasks</span>' },
+    { t: "user", x: "/model", leg: "Tarefa simples a seguir: modelo menor" },
+    { t: "html", x: '<span class="t-caixa">Select model\n  Default (recommended)\n<span class="t-user">❯ Sonnet</span>\n  Opus\n  Haiku\n<span class="t-dim">← → effort: medium</span></span>' },
+    { t: "user", x: "/effort low" },
+    { t: "html", x: '<span class="t-ok">Effort set to low.</span>' },
+    { t: "user", x: "renomeie a variável t para tarefa no listar", leg: "Tarefa simples, configuração enxuta" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "Updated tarefas.py with 2 additions and 2 removals" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Corrigir um erro de digitação numa mensagem do listar.", "haiku", "Tarefa trivial: modelo pequeno e rápido."],
+    ["Adicionar o comando editar com validação e testes.", "sonnet", "Código do dia a dia: Sonnet é o equilíbrio recomendado."],
+    ["Redesenhar o armazenamento para suportar vários usuários sem perder dados.", "opus", "Decisão de arquitetura com muitos riscos: Opus (talvez com esforço alto)."],
+    ["Explicar o que a função carregar faz.", "haiku", "Explicação simples: modelo pequeno basta (Sonnet também é aceitável)."],
+    ["Revisar um bug intermitente que só acontece às vezes ao salvar.", "opus", "Raciocínio difícil, multi-passo: vale o modelo maior."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Tarefa ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">haiku · sonnet · opus</span>' : '<span class="t-ok">Fim: ' + pts + "/" + itens.length + ".</span> Digite iniciar para repetir."; }
+  function r(m) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === m; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ Sugerido: ' + itens[i][1] + ". ") + itens[i][2] + "</span>\n\n"; i++; return s + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Escolha de modelo (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Não há resposta única perfeita: o objetivo é treinar o raciocínio custo × dificuldade.</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "haiku": function () { return r("haiku"); }, "sonnet": function () { return r("sonnet"); }, "opus": function () { return r("opus"); } },
+    padroes: [[/^\/model\s+(haiku|sonnet|opus)$/i, function (m) { return r(m[1].toLowerCase()); }]]
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Segundo a doc oficial, qual modelo resolve bem a maioria das tarefas de código com custo menor que o Opus?", op: ["Haiku", "Sonnet", "Fable"], c: 1, ex: "Sonnet para o dia a dia; Opus para raciocínio complexo e arquitetura." },
+  { p: "O que o fast mode muda?", op: ["Troca para um modelo menor", "Mesmo modelo e mesma qualidade, até 2,5x mais rápido, com preço por token maior", "Desliga o raciocínio"], c: 1, ex: "É o mesmo modelo, com outra configuração de API que prioriza velocidade." },
+  { p: "Por que baixar o <code>/effort</code> em tarefas simples economiza?", op: ["Porque o raciocínio é cobrado como tokens de saída", "Porque desliga as ferramentas", "Não economiza"], c: 0, ex: "Menos raciocínio, menos tokens de saída. Em tarefas simples, a qualidade quase não muda." },
+  { p: "Você atingiu o limite de sessão do plano. Trocar de modelo resolve?", op: ["Sim, cada modelo tem limite separado", "Em geral não: limites de sessão e semanais valem para todos os modelos; veja quando renova no <code>/usage</code>"], c: 1, ex: "A doc explica que os limites de sessão e semanais são compartilhados entre modelos." }
+]);
+Curso.checklist("check", [
+  "Escolho o modelo pelo tamanho da tarefa",
+  "Ajusto o esforço com <code>/effort</code>",
+  "Sei o que é o fast mode e quando (não) usar",
+  "Acompanho o consumo com <code>/usage</code>"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent view e /goal</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Aula 4</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>Agent view e /goal</h1>
+    <p class="objetivo">Objetivo: acompanhar várias sessões em segundo plano numa tela só e deixar o Claude trabalhando sozinho até cumprir uma condição que você consegue verificar.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Com segundo plano, fork e worktrees, você logo tem três ou quatro sessões rodando. Ficar trocando de terminal para saber qual terminou e qual está esperando resposta cansa. E, em tarefas longas, responder "continue" a cada turno também cansa.</p>
+    <div class="grade">
+      <div class="mini"><h4>🗂 Agent view</h4><p>Uma lista de todas as sessões em segundo plano: quem trabalha, quem espera você e quem terminou.</p></div>
+      <div class="mini"><h4>🎯 /goal</h4><p>Você define quando a tarefa acaba. O Claude segue turno após turno até um avaliador confirmar.</p></div>
+    </div>
+    <div class="caixa alerta"><strong>Recurso em prévia</strong>O agent view está em <em>research preview</em>: telas e atalhos podem mudar. Se algo desta aula não bater com a sua versão, confira a página oficial ou rode <code>claude update</code>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo do /goal</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como usar</h2>
+    <h3>Agent view</h3>
+    <table class="tab">
+      <thead><tr><th>Comando ou tecla</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude agents</code></td><td>Abre o agent view. <kbd>Esc</kbd> volta para o terminal.</td></tr>
+        <tr><td><code>claude --bg "pedido"</code></td><td>Cria uma sessão já em segundo plano. Com <code>--name "rótulo"</code>, ela ganha um nome.</td></tr>
+        <tr><td><code>/bg</code> (ou <code>/background</code>)</td><td>Manda a sessão aberta para segundo plano.</td></tr>
+        <tr><td><kbd>←</kbd> com o campo vazio</td><td>Manda a sessão para segundo plano e abre o agent view.</td></tr>
+        <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Escolhe uma sessão na lista.</td></tr>
+        <tr><td><kbd>Espaço</kbd></td><td>Espia a última saída ou a pergunta pendente e responde sem sair da lista.</td></tr>
+        <tr><td><kbd>Enter</kbd> ou <kbd>→</kbd></td><td>Entra na sessão para ver a conversa inteira. <kbd>←</kbd> com o campo vazio sai de novo, sem parar a sessão.</td></tr>
+        <tr><td><kbd>Ctrl+X</kbd></td><td>Para a sessão escolhida. Apertar de novo em até 2 segundos remove da lista.</td></tr>
+      </tbody>
+    </table>
+    <p class="conferido">Teclas conferidas em 19/11/2026; em prévia, podem mudar.</p>
+    <ul>
+      <li>As sessões continuam rodando mesmo se você fechar o terminal.</li>
+      <li>Num repositório Git, cada sessão em segundo plano cria um <strong>worktree</strong> próprio antes de editar arquivos (aula 3). Fora do Git, elas <strong>não</strong> ficam isoladas umas das outras.</li>
+      <li><strong>Remover</strong> uma sessão do agent view apaga também o worktree dela, com mudanças sem commit. Faça commit antes.</li>
+      <li>Se <code>claude agents</code> só imprimir a lista de subagentes e sair, a sua versão é antiga: rode <code>claude update</code>.</li>
+    </ul>
+
+    <h3>/goal</h3>
+    <table class="tab">
+      <thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>/goal &lt;condição&gt;</code></td><td>Define o objetivo e já começa a trabalhar. Só existe um objetivo por sessão; um novo substitui o anterior.</td></tr>
+        <tr><td><code>/goal</code></td><td>Mostra o objetivo atual: condição, tempo, turnos avaliados, tokens gastos e o último motivo do avaliador.</td></tr>
+        <tr><td><code>/goal clear</code></td><td>Cancela o objetivo antes do fim (também aceita <code>stop</code>, <code>off</code>, <code>cancel</code>…).</td></tr>
+      </tbody>
+    </table>
+    <p>Depois de cada turno, um <strong>modelo pequeno e rápido</strong> lê a conversa e responde: <strong>ainda não</strong> (o Claude continua), <strong>cumprido</strong> (o objetivo termina) ou <strong>impossível</strong> (o objetivo termina como falha).</p>
+    <div class="caixa alerta"><strong>O avaliador só lê a conversa</strong>Ele não roda comandos nem abre arquivos. Por isso a condição precisa de uma <strong>prova que apareça na conversa</strong>: "os testes passam e a saída aparece nesta conversa", e não só "o código está bom".</div>
+    <h3>Uma boa condição tem</h3>
+    <ul>
+      <li><strong>Um fim mensurável:</strong> testes passando, um arquivo criado, uma contagem.</li>
+      <li><strong>Como provar:</strong> "<code>python -m unittest</code> mostra OK".</li>
+      <li><strong>Restrições:</strong> "sem alterar os testes existentes".</li>
+      <li><strong>Um limite:</strong> "ou pare após 15 turnos". Sem limite, uma tarefa difícil pode gastar muito.</li>
+    </ul>
+    <div class="cod"><span class="rot">exemplo</span><code>/goal todas as funções de tarefas.py têm docstring curta, python -m unittest mostra OK
+nesta conversa, nenhum teste existente foi alterado, ou pare após 15 turnos</code></div>
+    <div class="caixa dica"><strong>Permissões continuam valendo</strong>O <code>/goal</code> não muda o modo de permissão. No modo manual, o Claude ainda pede para rodar os testes. Para deixar rodar sozinho, use um modo mais solto (Módulo 4) só na pasta de treino.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: um objetivo cumprido</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: a condição é boa?</h2>
+    <p>Para cada condição de <code>/goal</code>, responda <code>boa</code> ou <code>ruim</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: sessões em segundo plano e um objetivo</h2>
+    <p>Use a pasta de treino com Git (<a href="../../projeto-taskflow/etapa-07/README.md">README da etapa 07</a>).</p>
+    <h3>Parte A: agent view</h3>
+    <ol>
+      <li>No PowerShell, na pasta de treino: <code>claude --bg --name "testes" "rode python -m unittest e resuma o resultado em uma linha"</code>.</li>
+      <li>Crie uma segunda: <code>claude --bg --name "leitura" "liste as funções de tarefas.py que não têm docstring"</code>.</li>
+      <li>Rode <code>claude agents</code>. Veja as duas na lista e o estado de cada uma.</li>
+      <li>Escolha uma com <kbd>↑</kbd> <kbd>↓</kbd> e aperte <kbd>Espaço</kbd> para espiar a resposta. Se ela pedir permissão, responda por ali.</li>
+      <li>Entre numa delas com <kbd>Enter</kbd> e saia com <kbd>←</kbd> (campo vazio). Ao terminar, pare e remova as duas com <kbd>Ctrl+X</kbd>.</li>
+    </ol>
+    <h3>Parte B: /goal</h3>
+    <ol>
+      <li>Abra <code>claude</code> na pasta de treino.</li>
+      <li>Rode a condição do exemplo acima (docstrings + testes OK + limite de 15 turnos).</li>
+      <li>Acompanhe o indicador <code>◎ /goal active</code>. No meio, rode <code>/goal</code> para ver o status.</li>
+      <li>Quando o avaliador marcar como cumprido, rode <code>python -m unittest</code> você mesmo e confira as docstrings. Não confie só no avaliador.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o que observar</summary>
+      <ul>
+        <li><strong>Parte A:</strong> a sessão "testes" termina rápido com algo como "6 testes, OK". A "leitura" lista <code>adicionar</code>, <code>listar</code>, <code>concluir</code>, <code>remover</code> e <code>main</code>. Nenhuma das duas edita arquivos, então não precisam de worktree.</li>
+        <li><strong>Parte B:</strong> em geral o objetivo é cumprido em poucos turnos: o Claude adiciona as docstrings, roda os testes e a saída OK aparece na conversa. O avaliador lê essa saída e marca como cumprido. Se você tirar o trecho "nesta conversa", o avaliador pode ficar sem prova.</li>
+        <li>Para desfazer: <code>git checkout -- tarefas.py</code> na pasta de treino.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Condição sem prova</h4><p>"O código está bom" não aparece na conversa. Peça uma saída concreta, como o resultado dos testes.</p></div>
+      <div class="mini"><h4>Sem limite de turnos</h4><p>Uma condição difícil pode render muitos turnos e tokens. Inclua "ou pare após N turnos".</p></div>
+      <div class="mini"><h4>Remover sessão com trabalho</h4><p>Remover no agent view apaga o worktree da sessão. Faça commit antes.</p></div>
+      <div class="mini"><h4>Paralelo fora do Git</h4><p>Sem Git, sessões em segundo plano não ganham worktree e podem editar os mesmos arquivos.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/agent-view">Agent view</a> (em inglês): filtros, fixar sessões e como desligar o recurso.</li>
+      <li><a href="https://code.claude.com/docs/en/goal">/goal</a> (em inglês): como o avaliador funciona, erros que cancelam o objetivo e uso com <code>claude -p</code>.</li>
+      <li>Próxima aula: <strong>orquestração em escala</strong> e equipes de agentes.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Agent view" e "Keep Claude working toward a goal").</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Agent view e /goal em 1 minuto", cenas: [
+  { fala: "Nesta aula: acompanhar várias sessões numa tela só, e deixar o Claude trabalhando até cumprir um objetivo.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 7 · AULA 4</span><p class="v-titulo" data-t="0.3">Agent view e /goal</p><p class="v-sub" data-t="1.2">várias sessões, um objetivo</p>' },
+  { fala: "O comando claude agents abre o agent view: uma lista das sessões em segundo plano, mostrando quem trabalha, quem espera você e quem terminou.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span><span class="v-digita" style="--n:13">claude agents</span></div><div data-t="4"><span class="o">● testes</span>      <span class="d">trabalhando…</span></div><div data-t="5.5"><span class="w">● leitura</span>     <span class="d">espera você</span></div><div data-t="6.8"><span class="a">✓ revisão</span>     <span class="d">concluída</span></div></div>' },
+  { fala: "Para criar uma sessão em segundo plano, use claude hífen hífen bg com o pedido. Dentro de uma sessão aberta, barra bg manda ela para lá.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa acc" data-t="0.3"><span class="v-ic">🚀</span><b>claude --bg "pedido"</b>nova sessão em segundo plano</div><div class="v-caixa" data-t="4.6"><span class="v-ic">⤵</span><b>/bg</b>manda a sessão aberta</div></div>' },
+  { fala: "Já o barra goal define uma condição de término. Depois de cada turno, um modelo avaliador lê a conversa e decide se a condição foi cumprida.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa"><span class="v-ic">✻</span><b>Turno</b>o Claude trabalha</div><span class="v-seta">→</span><div class="v-caixa acc" data-t="3.5"><span class="v-ic">⚖</span><b>Avaliador</b>lê a conversa</div><span class="v-seta">→</span><div class="v-caixa ok" data-t="6"><span class="v-ic">🎯</span><b>Cumprido?</b>senão, outro turno</div></div>' },
+  { fala: "Escreva uma condição verificável, com prova na conversa e um limite de turnos. E barra goal clear cancela quando quiser.",
+    html: '<div class="v-code" data-t="0.3"><span class="u">&gt; </span><span class="v-digita" style="--n:44">/goal testes OK nesta conversa, ou pare após 15 turnos</span></div><div class="v-caixa warn" data-t="5.6"><span class="v-ic">⏹</span><b>/goal clear</b>cancela</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você: /goal" }, { ic: "✻", rt: "Claude trabalha um turno" }, { ic: "⚖", rt: "Avaliador lê a conversa" }, { ic: "🎯", rt: "Objetivo encerrado" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Você define a condição", texto: "<code>/goal ... ou pare após 15 turnos</code>. O trabalho começa na hora; você não precisa mandar outro pedido." },
+    { ativos: [1, 2], setas: [1], titulo: "Fim do turno: avaliação", texto: "Um modelo pequeno e rápido lê a conversa. Ele <strong>não</strong> roda comandos: só julga o que já apareceu." },
+    { ativos: [2, 1], setas: [1], titulo: "Ainda não? Outro turno", texto: "O motivo do avaliador vira orientação para o próximo turno, e o Claude continua sem você digitar \"continue\"." },
+    { ativos: [2, 3], setas: [2], titulo: "Cumprido ou impossível", texto: "O objetivo termina. Confira você mesmo o resultado: rode os testes e leia o código." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Um /goal no TaskFlow (ilustrativo)", altura: 320,
+  passos: [
+    { t: "user", x: "/goal todas as funções de tarefas.py têm docstring curta, python -m unittest mostra OK nesta conversa, ou pare após 15 turnos", leg: "Condição com prova e limite" },
+    { t: "tool", x: "Edit(tarefas.py) · 5 docstrings adicionadas", leg: "Turno 1" },
+    { t: "out", x: "◎ /goal active · avaliador: ainda não (os testes ainda não rodaram nesta conversa)", leg: "Falta a prova" },
+    { t: "tool", x: "Bash(python -m unittest)\n  ⎿ Ran 6 tests ... OK", leg: "Turno 2: a prova aparece" },
+    { t: "out", x: "✓ Goal achieved · 2 turnos", leg: "O avaliador confirma e encerra" },
+    { t: "claude", x: "Pronto: as 5 funções ganharam docstring e os 6 testes passam.", leg: "Agora confira você mesmo" }
+  ]
+});
+(function () {
+  var itens = [
+    ["o código fica melhor", "ruim", "Não há fim mensurável nem prova na conversa."],
+    ["python -m unittest mostra OK nesta conversa, ou pare após 10 turnos", "boa", "Fim mensurável, prova visível e limite de turnos."],
+    ["todos os testes passam", "ruim", "Quase lá: falta dizer que a saída deve aparecer na conversa e um limite. O avaliador não roda os testes sozinho."],
+    ["exportar.py existe, tem teste em tests/test_exportar.py, python -m unittest mostra OK nesta conversa, sem alterar tarefas.py, ou pare após 15 turnos", "boa", "Fim, prova, restrição e limite."],
+    ["termine tudo o que falta no projeto", "ruim", "Vago e sem limite: pode render muitos turnos e tokens."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Condição ' + (i + 1) + "/" + itens.length + ":</span> /goal " + itens[i][0] + '\n<span class="t-dim">Responda: boa · ruim</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Na verdade: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "boa": function () { return resp("boa"); }, "ruim": function () { return resp("ruim"); } };
+  Curso.terminal("term", { titulo: "A condição é boa? (simulação)", prompt: ">", intro: '<span class="t-dim">boa = verificável, com prova e limite · ruim = falta algo</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: boa ou ruim.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Para que serve o <code>claude agents</code>?", op: ["Listar os arquivos de subagentes", "Abrir o agent view, com todas as sessões em segundo plano", "Criar uma equipe de agentes"], c: 1, ex: "Mostra quem trabalha, quem espera você e quem terminou. Está em research preview." },
+  { p: "Como criar uma sessão que já começa em segundo plano?", op: ["<code>claude --bg \"pedido\"</code>", "<code>claude -w</code>", "<code>/tasks</code>"], c: 0, ex: "<code>--bg</code>; com <code>--name</code> ela ganha um rótulo." },
+  { p: "O que o avaliador do <code>/goal</code> usa para decidir?", op: ["Roda os testes por conta própria", "Lê a conversa", "Abre os arquivos alterados"], c: 1, ex: "Ele só julga o que apareceu na conversa. Por isso a condição precisa de uma prova visível." },
+  { p: "Qual condição é melhor?", op: ["<code>/goal deixe o código limpo</code>", "<code>/goal python -m unittest mostra OK nesta conversa, ou pare após 15 turnos</code>", "<code>/goal termine o projeto</code>"], c: 1, ex: "Fim mensurável, prova e limite." },
+  { p: "Remover uma sessão no agent view…", op: ["não afeta os arquivos", "apaga também o worktree dela, inclusive mudanças sem commit", "faz merge automático"], c: 1, ex: "Faça commit antes de remover." }
+]);
+Curso.checklist("check", [
+  "Abro o agent view e sei espiar, entrar e sair de uma sessão",
+  "Crio sessões em segundo plano com <code>claude --bg</code> e <code>/bg</code>",
+  "Escrevo uma condição de <code>/goal</code> com fim, prova na conversa e limite",
+  "Vejo o status com <code>/goal</code> e cancelo com <code>/goal clear</code>",
+  "Confiro o resultado eu mesmo depois que o objetivo termina"
+]);
+</script>
+</body>
+</html>

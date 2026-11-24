@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modos de permissão</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m4a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 4 · Aula 1</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Modos de permissão</h1>
+    <p class="objetivo">Objetivo: conhecer os seis modos de permissão, saber trocar entre eles e escolher o modo certo para cada situação.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O modo de permissão define <strong>o que o Claude pode fazer sem perguntar</strong>. Modo errado tem dois custos: perguntas demais (você aprova no automático e para de ler) ou perguntas de menos (algo é feito sem você ver). Escolher bem o modo é o equilíbrio entre <strong>velocidade e controle</strong>.</p>
+    <div class="caixa"><strong>Cenário</strong>Você vai só investigar um bug sem mexer em nada: use <code>plan</code>. Vai implementar algo que já planejou num projeto de estudo com Git: <code>acceptEdits</code> ou <code>auto</code> agilizam. Vai rodar num servidor de produção: nenhum modo "liberado".</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: do mais restrito ao mais liberado</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os modos em detalhe</h2>
+    <table class="tab">
+      <thead><tr><th>Modo (valor)</th><th>Roda sem perguntar</th><th>Quando usar</th></tr></thead>
+      <tbody>
+        <tr><td><code>default</code> (rótulo <strong>Manual</strong>)</td><td>Só leituras. Toda edição, comando ou acesso à rede pergunta.</td><td>Aprendendo; projeto sensível; quer ver cada passo</td></tr>
+        <tr><td><code>acceptEdits</code></td><td>Leituras, edições de arquivo e comandos comuns de arquivo (<code>mkdir</code>, <code>touch</code>, <code>mv</code>, <code>cp</code>, <code>rm</code>, <code>rmdir</code>, <code>sed</code>) <strong>dentro da pasta de trabalho</strong>. Caminhos protegidos ainda perguntam.</td><td>Implementar algo já combinado, com Git como rede</td></tr>
+        <tr><td><code>plan</code></td><td>Leituras (e comandos aprovados pelo classificador do auto mode, quando disponível). <strong>Edições ficam bloqueadas até você aprovar o plano.</strong></td><td>Investigar, planejar antes de mexer (Módulo 3)</td></tr>
+        <tr><td><code>auto</code></td><td>Tudo, com um classificador revisando cada ação em segundo plano</td><td>Menos interrupções com uma camada de segurança (próxima aula)</td></tr>
+        <tr><td><code>dontAsk</code></td><td>Só o que já está pré-aprovado por regras. O que perguntaria é <strong>negado</strong>.</td><td>CI e scripts (Módulo 9)</td></tr>
+        <tr><td><code>bypassPermissions</code></td><td>Tudo, sem perguntas nem checagens de segurança</td><td><strong>Só</strong> em ambientes isolados (container, VM, sem internet)</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa alerta"><strong>Regras deny valem em todos os modos</strong>Mesmo no <code>bypassPermissions</code>, uma regra <code>deny</code> continua bloqueando. Já as regras <code>allow</code> não fazem diferença nesse modo, porque tudo é permitido. Veremos regras na aula 4.3.</div>
+
+    <h3>Como trocar de modo</h3>
+    <p><strong>Durante a sessão:</strong> <kbd>Shift</kbd>+<kbd>Tab</kbd> (em alguns terminais Windows, <kbd>Alt</kbd>+<kbd>M</kbd>). Se você está em <code>auto</code>, o primeiro toque vai para <code>default</code>; depois o ciclo segue <code>default</code> → <code>acceptEdits</code> → <code>plan</code> (e outros modos, quando habilitados). A barra de status mostra o modo ativo.</p>
+    <p><strong>Ao abrir:</strong></p>
+    <div class="cod"><code>claude --permission-mode plan
+claude --permission-mode acceptEdits
+claude --permission-mode default</code></div>
+    <p><strong>Como padrão</strong>, no <code>settings.json</code> (Módulo 5 aprofunda):</p>
+    <div class="cod"><code>{
+  "permissions": {
+    "defaultMode": "default"
+  }
+}</code></div>
+    <div class="caixa"><strong>Modo inicial atual</strong>Segundo a documentação, a partir da versão 2.1.283 as sessões interativas no terminal e no VS Code começam em <code>auto</code> por padrão. Confira o modo na barra de status assim que abrir. Se preferir aprender aprovando cada passo, volte para <code>default</code> com <kbd>Shift</kbd>+<kbd>Tab</kbd> ou fixe o <code>defaultMode</code>.</div>
+    <div class="caixa erro"><strong><code>--dangerously-skip-permissions</code></strong>Equivale a <code>bypassPermissions</code>. A própria documentação recomenda usar só em containers, VMs ou dev containers <em>sem internet</em>, e avisa que não há proteção contra prompt injection. Numa máquina de trabalho, não use.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o mesmo pedido em três modos</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual modo?</h2>
+    <p>O terminal descreve situações. Responda com o nome do modo (<code>default</code>, <code>acceptEdits</code>, <code>plan</code>, <code>auto</code>, <code>dontAsk</code> ou <code>bypassPermissions</code>). Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow (com tudo commitado):</p>
+    <ol>
+      <li>Abra com <code>claude</code> e anote qual modo aparece na barra de status</li>
+      <li>Aperte <kbd>Shift</kbd>+<kbd>Tab</kbd> várias vezes e observe o ciclo de modos</li>
+      <li>Em <code>plan</code>, peça: <code>adicione o comando "editar &lt;numero&gt; &lt;novo titulo&gt;"</code>. Repare que ele investiga e propõe um plano, sem editar</li>
+      <li>Aprove o plano e escolha seguir com edições aprovadas automaticamente (ou troque para <code>acceptEdits</code>)</li>
+      <li>Revise com <code>! git diff</code> e faça commit</li>
+      <li>Saia e reabra com <code>claude --permission-mode plan</code> para confirmar que começa em plan</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <ul>
+        <li>Passo 1: em versões recentes deve aparecer o auto mode; em versões ou planos onde ele não está disponível, Manual.</li>
+        <li>Passo 3: em plan, ele lê o <code>tarefas.py</code>, propõe onde criar a função <code>editar</code> e o novo subcomando no <code>argparse</code>, e <strong>pede aprovação do plano</strong> antes de qualquer edição.</li>
+        <li>Passo 5: o diff deve mostrar só a função nova e o registro do subcomando. Se aparecer algo a mais, peça para desfazer.</li>
+        <li>Passo 6: a barra de status já mostra plan ao abrir.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Ficar em Manual e aprovar tudo sem ler</h4><p>Se você aprova no automático, a proteção virou teatro. Use regras (aula 4.3) para liberar o que é seguro e leia o resto.</p></div>
+      <div class="mini"><h4>acceptEdits sem Git</h4><p>Edições sem pergunta só são tranquilas se você consegue desfazer. Commit antes.</p></div>
+      <div class="mini"><h4>"Plan mode não editou nada!"</h4><p>É o objetivo. Ele só edita depois que você aprova o plano.</p></div>
+      <div class="mini"><h4>bypass "só para testar"</h4><p>Fora de um ambiente isolado, não existe "só para testar" com acesso total à sua máquina.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">Permission modes</a>: documentação oficial</li>
+      <li><a href="https://code.claude.com/docs/en/permissions">Configure permissions</a></li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Permission modes). O ciclo exato do <kbd>Shift</kbd>+<kbd>Tab</kbd> e o modo inicial podem variar com a versão e o plano.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Modos de permissão em 1 minuto", cenas: [
+  { fala: "Quanto o Claude pode fazer sem perguntar? Quem decide isso é o modo de permissão.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 4 · AULA 1</span><p class="v-titulo" data-t="0.3">Modos de permissão</p><p class="v-sub" data-t="0.9">O equilíbrio entre autonomia e controle</p>' },
+  { fala: "De um lado, mais controle: você aprova cada ação. Do outro, mais autonomia: o Claude trabalha sem interrupções. Cada modo é um ponto nesse caminho.",
+    html: '<div class="v-linha"><div class="v-caixa" data-t="0.3"><span class="v-ic">🛡</span><b>Controle</b>você aprova tudo</div><span class="v-seta" data-t="2.2">⟷</span><div class="v-caixa" data-t="3"><span class="v-ic">⚡</span><b>Autonomia</b>sem interrupções</div></div>' },
+  { fala: "Manual pergunta antes de editar arquivos e rodar comandos. Accept edits aceita as edições de arquivo sozinho. Plan só investiga e propõe um plano, sem mudar nada.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">✋</span><b>Manual</b>pergunta antes de agir</div><div class="v-caixa" data-t="3"><span class="v-ic">✍</span><b>acceptEdits</b>edições aceitas sozinho</div><div class="v-caixa" data-t="5.4"><span class="v-ic">🗺</span><b>plan</b>só lê e planeja</div></div>' },
+  { fala: "Auto usa um classificador que libera o que é seguro e bloqueia o arriscado. E bypass não pergunta nada: só serve para ambientes isolados e descartáveis.",
+    html: '<div class="v-grade"><div class="v-caixa acc" data-t="0.3"><span class="v-ic">🧠</span><b>auto</b>classificador decide o que é seguro</div><div class="v-caixa err" data-t="4.2"><span class="v-ic">⚠</span><b>bypassPermissions</b>não pergunta nada: só em ambiente isolado</div></div>' },
+  { fala: "Para trocar de modo durante a sessão, aperte Shift Tab. O modo atual aparece perto do campo de digitação.",
+    html: '<div class="v-code" data-t="0.2"><div><span class="d">modo:</span> <span class="u">manual</span></div><div data-t="1.6"><span class="a">⇧ Tab</span> → <span class="u">aceitar edições</span></div><div data-t="2.8"><span class="a">⇧ Tab</span> → <span class="u">plan mode</span></div><div data-t="4"><span class="a">⇧ Tab</span> → <span class="d">…e os outros disponíveis no seu plano</span></div></div>' },
+  { fala: "Como escolher? Aprendendo, use Manual. Mudança grande, comece pelo plan. No dia a dia, auto. E lembre: regras de bloqueio continuam valendo em qualquer modo.",
+    html: '<div class="v-code"><div data-t="0.3">Aprendendo ............ <span class="u">Manual</span></div><div data-t="1.6">Mudança grande ........ <span class="u">plan</span> primeiro</div><div data-t="2.9">Dia a dia ............. <span class="u">auto</span></div></div><p class="v-txt" data-t="5.5" style="text-align:center">🚫 Regras <b style="color:#ef8a8a">deny</b> valem em qualquer modo</p>' }
+] });
+
+Curso.passos("diag", {
+  nos: [{ ic: "📖", rt: "plan" }, { ic: "✋", rt: "default" }, { ic: "✏", rt: "acceptEdits" }, { ic: "🛡", rt: "auto" }, { ic: "⚠", rt: "bypass" }],
+  passos: [
+    { ativos: [0], titulo: "plan: só olhar e planejar", texto: "Lê o projeto e monta um plano. <strong>Nenhuma edição</strong> antes de você aprovar. Ideal para começar algo novo ou investigar." },
+    { ativos: [1], setas: [0], titulo: "default (Manual): pergunta tudo que muda algo", texto: "Leituras liberadas; cada edição, comando ou acesso à rede pergunta. Máximo controle, mais interrupções." },
+    { ativos: [2], setas: [1], titulo: "acceptEdits: edições livres na pasta", texto: "Edita arquivos e roda comandos de arquivo comuns dentro da pasta de trabalho sem perguntar. Outros comandos ainda perguntam." },
+    { ativos: [3], setas: [2], titulo: "auto: um classificador decide", texto: "Em vez de você, um modelo separado revisa cada ação e bloqueia o que parecer arriscado. Suas regras <code>ask</code> e <code>deny</code> continuam valendo." },
+    { ativos: [4], setas: [3], titulo: "bypassPermissions: sem rede de proteção", texto: "Nenhuma pergunta e nenhuma checagem (exceto regras deny e poucos casos críticos). Só para ambientes isolados e descartáveis." },
+    { ativos: [0, 1, 2, 3, 4], setas: [0, 1, 2, 3], titulo: "E o dontAsk?", texto: "Fica fora da escala: <strong>nega</strong> tudo que perguntaria e só roda o que já está pré-aprovado. Pensado para CI e scripts sem ninguém para responder." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Mesmo pedido, modos diferentes (demonstração)", altura: 320,
+  passos: [
+    { t: "nota", x: "Modo: default (Manual)", ms: 900 },
+    { t: "user", x: "adicione o comando editar", leg: "Manual: pergunta antes de editar" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "perm", x: '<span class="t-b">Edit file</span> tarefas.py\nDo you want to make this edit?\n<span class="t-user">❯ 1. Yes</span>\n  2. Yes, allow all edits during this session\n  3. No', ms: 1700 },
+    { t: "nota", x: "Shift+Tab → acceptEdits", ms: 900 },
+    { t: "user", x: "adicione o comando editar", leg: "acceptEdits: edita direto…" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "out", x: "Updated tarefas.py with 12 additions" },
+    { t: "tool", x: "Bash(python -m unittest)", leg: "…mas comandos fora da lista de arquivos ainda perguntam" },
+    { t: "perm", x: '<span class="t-b">Bash command</span>  python -m unittest\n<span class="t-user">❯ 1. Yes</span>\n  2. Yes, and don\'t ask again…\n  3. No', ms: 1500 },
+    { t: "nota", x: "Shift+Tab → plan", ms: 900 },
+    { t: "user", x: "adicione o comando editar", leg: "plan: investiga e propõe, sem editar" },
+    { t: "tool", x: "Read(tarefas.py)" },
+    { t: "claude", x: "Plano: 1) criar editar(numero, titulo) reaproveitando _indice_valido; 2) registrar o subcomando; 3) testar. Aprova?" }
+  ]
+});
+(function () {
+  var casos = [
+    ["Você vai investigar um bug num código que não conhece e não quer nenhuma mudança ainda.", ["plan"], "plan: investiga e propõe sem editar."],
+    ["Primeira semana com o Claude Code; você quer ver e aprovar cada edição para aprender.", ["default", "manual"], "default (Manual): pergunta antes de cada mudança."],
+    ["Plano aprovado, tudo commitado no Git, e você quer que ele implemente sem parar a cada arquivo.", ["acceptedits", "auto"], "acceptEdits (ou auto, se disponível): edições sem interrupção, com Git como rede."],
+    ["Um script no CI que não tem ninguém para responder perguntas; só pode rodar o que está pré-aprovado.", ["dontask"], "dontAsk: o que perguntaria é negado."],
+    ["Um container descartável, sem internet, criado só para um experimento.", ["bypasspermissions", "auto"], "bypassPermissions é aceitável aqui (isolado e sem internet). auto também serviria."],
+    ["Seu notebook do trabalho, com acesso à rede corporativa, e alguém sugere 'liga o bypass que é mais rápido'.", ["default", "manual", "auto", "plan", "acceptedits"], "Qualquer coisa MENOS bypassPermissions. Fora de ambiente isolado, não."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < casos.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + casos.length + ":</span> " + casos[i][0] + '\n<span class="t-dim">Qual modo?</span>' : '<span class="t-ok">Fim! ' + pts + " de " + casos.length + " certas.</span> Digite iniciar para repetir."; }
+  function resp(m) {
+    if (i < 0 || i >= casos.length) return '<span class="t-dim">Digite iniciar.</span>';
+    var c = casos[i], ok = c[1].indexOf(m.toLowerCase()) >= 0;
+    if (i === 5) ok = m.toLowerCase() !== "bypasspermissions";
+    if (ok) pts++;
+    var r = (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ ') + c[2] + "</span>\n\n"; i++; return r + mostra();
+  }
+  Curso.terminal("term", {
+    titulo: "Qual modo? (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Modos: default · acceptEdits · plan · auto · dontAsk · bypassPermissions</span>',
+    metas: ["iniciar"],
+    comandos: { "iniciar": function () { i = 0; pts = 0; return mostra(); } },
+    padroes: [[/^(default|manual|acceptedits|plan|auto|dontask|bypasspermissions|bypass)$/i, function (m) { return resp(m[1].toLowerCase() === "bypass" ? "bypasspermissions" : m[1]); }]],
+    desconhecido: '<span class="t-dim">Responda com um dos modos (ex.: plan) ou digite iniciar.</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Em qual modo o Claude <strong>não</strong> edita nada até você aprovar um plano?", op: ["<code>acceptEdits</code>", "<code>plan</code>", "<code>auto</code>"], c: 1, ex: "No plan mode, edições ficam bloqueadas até a aprovação do plano." },
+  { p: "No <code>acceptEdits</code>, o que ainda pede permissão?", op: ["Nada", "Comandos que não são operações comuns de arquivo (ex.: rodar testes) e caminhos fora da pasta/protegidos", "Leitura de arquivos"], c: 1, ex: "acceptEdits libera edições e comandos de arquivo como mkdir, mv, cp e rm dentro da pasta de trabalho. O resto continua perguntando." },
+  { p: "Você tem uma regra <code>deny</code> para <code>git push</code> e abre em <code>bypassPermissions</code>. O push roda?", op: ["Sim, bypass libera tudo", "Não, regras deny valem em todos os modos"], c: 1, ex: "Deny bloqueia em qualquer modo, inclusive bypassPermissions." },
+  { p: "Qual modo foi pensado para CI e scripts sem ninguém para responder?", op: ["<code>dontAsk</code>", "<code>default</code>", "<code>plan</code>"], c: 0, ex: "dontAsk nega o que perguntaria e só roda o que já está pré-aprovado por regras." },
+  { p: "Onde é seguro usar <code>--dangerously-skip-permissions</code>?", op: ["No notebook do trabalho, para ganhar tempo", "Em container/VM isolado, idealmente sem internet", "Em qualquer projeto com Git"], c: 1, ex: "A documentação limita a ambientes isolados. Git não protege contra comandos fora do projeto ou envio de dados." }
+]);
+Curso.checklist("check", [
+  "Sei o que cada um dos 6 modos libera",
+  "Troco de modo com <kbd>Shift</kbd>+<kbd>Tab</kbd> e abro com <code>--permission-mode</code>",
+  "Escolho o modo de acordo com a situação (investigar, aprender, implementar, CI)",
+  "Sei que regras deny valem em todos os modos",
+  "Implementei o comando <code>editar</code> passando pelo plan mode"
+]);
+</script>
+</body>
+</html>

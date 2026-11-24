@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 0</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 0 · Revisão</p>
+    <h1>Base: terminal, Git e agentes</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Terminal: se localizar</h2>
+    <ul>
+      <li><code>pwd</code>: onde estou?</li>
+      <li><code>ls</code>: o que tem aqui?</li>
+      <li><code>cd pasta</code> / <code>cd ..</code>: entrar e voltar</li>
+      <li><code>mkdir</code>, <code>ni</code>, <code>cat</code>: criar pasta, criar arquivo, ler</li>
+      <li><kbd>Tab</kbd> completa, <kbd>↑</kbd> repete</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Cuidado com o que apaga</h2>
+    <div class="cod" style="max-width:700px"><code>Remove-Item -Recurse .\dados</code></div>
+    <ul>
+      <li>Apaga a pasta e tudo dentro</li>
+      <li><strong>Não vai para a Lixeira</strong></li>
+      <li>Leia todo comando antes de aprovar para o Claude</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Git: o ciclo de segurança</h2>
+    <div class="cod" style="max-width:760px"><code>git status          # o que mudou?
+git diff            # quais linhas?
+git add arquivo     # preparar
+git commit -m "..." # salvar versão
+git restore arquivo # desfazer o que não presta</code></div>
+  </section>
+  <section class="slide">
+    <h2>Regra de ouro</h2>
+    <p style="font-size:clamp(1.4rem,3vw,2.2rem)">Commit <strong>antes</strong> de pedir mudança grande.<br>Diff <strong>depois</strong>, para revisar.</p>
+  </section>
+  <section class="slide">
+    <h2>Chat × Agente</h2>
+    <ul>
+      <li><strong>Chat:</strong> você copia e cola, testa, cola o erro…</li>
+      <li><strong>Agente:</strong> lê, edita, roda, verifica e repete sozinho</li>
+      <li>Seu papel muda: <strong>especificar, supervisionar, revisar</strong></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>O loop agêntico</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">🎯 Objetivo → 🔎 Contexto → 🛠 Ação → ✅ Verificação → 🔁</p>
+    <p>Interrompa com <kbd>Esc</kbd> a qualquer momento para corrigir o rumo.</p>
+  </section>
+  <section class="slide">
+    <h2>As 4 peças</h2>
+    <ul>
+      <li>🧠 <strong>Modelo</strong>: o raciocínio (<code>/model</code>)</li>
+      <li>🧰 <strong>Ferramentas</strong>: ler, editar, rodar, buscar</li>
+      <li>📚 <strong>Contexto</strong>: o que ele enxerga (limitado!)</li>
+      <li>🔐 <strong>Permissões</strong>: o que faz sem perguntar</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 1?</h2>
+    <ul>
+      <li>✓ Pasta <code>estudos-claude</code> criada</li>
+      <li>✓ Git instalado e configurado</li>
+      <li>✓ Diário com 2+ commits</li>
+    </ul>
+    <p><a href="../01-primeiros-passos/01-instalacao.html">Ir para a Aula 1.1: Instalação no Windows →</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verificação e revisão</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3a5">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Aula 5</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Verificação e revisão</h1>
+    <p class="objetivo">Objetivo: exigir evidência em vez de "está pronto", revisar o diff com método e usar o <code>/code-review</code> como um segundo par de olhos que não viu a conversa.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>"Todos os testes passam" é uma frase. A saída do <code>python -m unittest</code> é evidência. A diferença parece pequena, mas é ela que separa confiar de verificar.</p>
+    <p>E quem escreveu o código tende a concordar com o próprio raciocínio. Uma revisão feita por alguém que <strong>não viu a conversa</strong> pega coisas que o autor não vê. No Claude Code, esse alguém é o <code>/code-review</code>.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: camadas de verificação</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>As ferramentas</h2>
+    <h3>Peça evidência, sempre</h3>
+    <div class="cod"><code>rode python -m unittest e o comando atrasadas com uma tarefa vencida, e me mostre as duas saídas</code></div>
+
+    <h3>Revise o diff com um roteiro</h3>
+    <table class="tab">
+      <tbody>
+        <tr><td><code>! git diff --stat</code></td><td>Quais arquivos mudaram? Algum inesperado?</td></tr>
+        <tr><td><code>! git diff</code></td><td>Linha a linha. Leia os trechos de lógica, não só os nomes</td></tr>
+        <tr><td><code>/diff</code></td><td>Visualizador do Claude Code para as mudanças da pasta de trabalho</td></tr>
+      </tbody>
+    </table>
+    <p>Perguntas para fazer em todo diff: <strong>faz o que a spec pede? só o que a spec pede? os casos de borda estão tratados? há algo apagado sem motivo?</strong></p>
+
+    <h3><code>/code-review</code></h3>
+    <p>Um comando que revisa as mudanças do seu branch procurando <strong>bugs de correção</strong> (e, conforme modelo e esforço, também oportunidades de simplificação). <code>/review</code> é um apelido dele.</p>
+    <table class="tab">
+      <thead><tr><th>Uso</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>/code-review</code></td><td>Revisa os commits do branch ainda não enviados e as mudanças não commitadas</td></tr>
+        <tr><td><code>/code-review low</code> … <code>max</code></td><td>Nível de esforço: <code>low</code> mostra só o que tem mais certeza (menos falsos positivos); níveis maiores ampliam a cobertura</td></tr>
+        <tr><td><code>/code-review --fix</code></td><td>Revisa e também aplica as correções (as edições passam pelo seu modo de permissão)</td></tr>
+        <tr><td><code>/code-review HEAD~3..HEAD</code></td><td>Revisa um intervalo de commits; também aceita branch, caminho ou número de PR</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>No terminal, a revisão roda <strong>em segundo plano</strong>, num subagente com contexto próprio. Você continua trabalhando e os achados chegam na conversa quando ela termina.</li>
+      <li>Ela segue o seu <code>CLAUDE.md</code> e consome o seu limite de uso como qualquer outra parte da sessão.</li>
+      <li>Correções aplicadas pelo <code>--fix</code> em segundo plano ficam fora dos checkpoints do <code>/rewind</code>: para desfazer, use o Git. Mais um motivo para commitar antes.</li>
+    </ul>
+    <div class="caixa"><strong>Também existe</strong><code>/verify</code> pede que o Claude rode o app e observe o resultado, pegando problemas que testes não pegam. E no Módulo 5 você verá como um <em>hook</em> pode impedir o Claude de encerrar o turno enquanto os testes falham.</div>
+    <div class="caixa dica"><strong>Teaser do Módulo 7</strong>Você pode criar o seu próprio <em>subagente revisor</em>, com instruções do seu time (por exemplo, revisar sempre contra a spec). Por enquanto, basta pedir: "use um subagente para revisar o diff contra specs/prazo.md".</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: encontre o problema no diff</h2>
+    <p>Mostre o diff simulado e responda o que há de errado. Digite <code>diff</code> para começar.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Com a feature de prazo implementada (aula 3.4), antes do commit final ou logo após:</p>
+    <ol>
+      <li>Peça evidência: <code>rode os testes e o comando atrasadas com uma tarefa vencida; mostre as saídas</code></li>
+      <li>Revise <code>! git diff --stat</code> e <code>! git diff</code> com as 4 perguntas do bloco 3</li>
+      <li>Rode <code>/code-review</code> e continue trabalhando enquanto ele roda</li>
+      <li>Leia os achados. Para cada um, decida: corrigir, ignorar (diga por quê) ou anotar para depois</li>
+      <li>Peça a revisão contra a spec: <code>use um subagente para revisar o diff contra specs/prazo.md, ignore estilo</code></li>
+      <li>Corrija o que fizer sentido, rode os testes e commite</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Não há uma resposta única: os achados dependem do seu código. Achados comuns nesta feature:</p>
+      <ul>
+        <li>Comparação de datas com <code>&lt;=</code> em vez de <code>&lt;</code> (prazo de hoje aparecendo como atrasado)</li>
+        <li><code>t["prazo"]</code> em vez de <code>t.get("prazo")</code>, quebrando tarefas antigas sem o campo</li>
+        <li>Data inválida salva antes de ser validada</li>
+        <li>Tarefas feitas aparecendo em <code>atrasadas</code></li>
+      </ul>
+      <p>Repare que todos correspondem a itens da spec. Se a sua spec e os seus testes cobriam esses casos, a revisão provavelmente encontrou pouco, e esse é o objetivo.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Aceitar "pronto" sem saída</h4><p>Peça o comando que foi rodado e o resultado.</p></div>
+      <div class="mini"><h4>Corrigir todo achado</h4><p>Revisores sempre encontram algo. Avalie se o achado afeta a correção.</p></div>
+      <div class="mini"><h4>Ler só o <code>--stat</code></h4><p>Saber quais arquivos mudaram não basta: leia a lógica.</p></div>
+      <div class="mini"><h4><code>--fix</code> sem commit antes</h4><p>As correções em segundo plano não entram no <code>/rewind</code>. Commite antes.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/code-review-local">Review locally with /code-review</a></li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Best practices</a>: "Give Claude a check to run" e "Review against your spec"</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (página oficial do /code-review). Flags e comportamento podem mudar entre versões.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Verificação e revisão em 1 minuto", cenas: [
+  { fala: "Verificação e revisão: como trocar o está pronto por evidência.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 3 · AULA 5</span><p class=\"v-titulo\" data-t=\"0.3\">Verificação e revisão</p><p class=\"v-sub\" data-t=\"0.9\">Evidência, não promessa</p>" },
+  { fala: "Todos os testes passam é uma frase. A saída do python -m unittest é evidência. Essa diferença separa confiar de verificar.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">💬</span><b>\"Todos os testes passam\"</b>uma frase</div><div class=\"v-caixa ok\" data-t=\"2.4\"><span class=\"v-ic\">🧾</span><b>Saída do unittest</b>evidência</div></div><div class=\"v-code\" data-t=\"4\" style=\"align-self:center\"><span class=\"o\">Ran 8 tests … OK</span></div>" },
+  { fala: "Revise o diff com método: primeiro, quais arquivos mudaram. Depois, linha a linha. E sempre pergunte: faz o que a spec pede? Só o que a spec pede?",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">! git diff --stat</span>  <span class=\"d\">→ algum arquivo inesperado?</span></div><div data-t=\"3\">  <span class=\"a\">! git diff</span>        <span class=\"d\">→ linha a linha</span></div><div data-t=\"5\"><span class=\"w\">faz o que a spec pede? só o que ela pede?</span></div><div data-t=\"6.5\"><span class=\"w\">casos de borda tratados? algo apagado sem motivo?</span></div></div>" },
+  { fala: "Quem escreveu o código tende a concordar com o próprio raciocínio. O /code-review é um segundo par de olhos: revisa as mudanças procurando bugs, sem ter visto a conversa.",
+    html: "<div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">👀</span><b>Um segundo par de olhos</b>não viu a conversa</div><div class=\"v-code\" data-t=\"4\"><div><span class=\"a\">/code-review</span>          <span class=\"d\">branch + mudanças não commitadas</span></div><div><span class=\"a\">/code-review --fix</span>    <span class=\"d\">revisa e aplica correções</span></div></div>" },
+  { fala: "No terminal, a revisão roda em segundo plano e segue o seu CLAUDE.md. As correções do --fix em segundo plano ficam fora do /rewind: para desfazer, use o Git. Mais um motivo para commitar antes.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa\" data-t=\"0.3\"><span class=\"v-ic\">⏳</span><b>Segundo plano</b>você continua trabalhando</div><div class=\"v-caixa warn\" data-t=\"3.8\"><span class=\"v-ic\">↩</span><b>--fix fora do /rewind</b>desfaça com o Git: commit antes</div></div>" },
+  { fala: "Confiar é bom. Verificar é obrigatório.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A regra</p><p class=\"v-titulo\" data-t=\"0.4\">Evidência, não promessa.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧪", rt: "Testes" }, { ic: "▶", rt: "Rodar o app" }, { ic: "👀", rt: "Seu diff" }, { ic: "🔍", rt: "/code-review" }, { ic: "📄", rt: "Contra a spec" }],
+  passos: [
+    { ativos: [0], titulo: "Testes automatizados", texto: "A primeira camada: objetiva, rápida, e o Claude roda sozinho. Peça a saída, não a afirmação." },
+    { ativos: [1], setas: [0], titulo: "Rodar o programa de verdade", texto: "Testes passam e o programa ainda pode estar estranho na prática. Rode o comando real ou peça <code>/verify</code>." },
+    { ativos: [2], setas: [1], titulo: "Sua leitura do diff", texto: "Arquivos inesperados? Lógica que você não entende? Algo apagado? Você é o responsável pelo que entra no commit." },
+    { ativos: [3], setas: [2], titulo: "Um revisor que não viu a conversa", texto: "<code>/code-review</code> roda num subagente com contexto próprio, sem ser influenciado pelo raciocínio que produziu o código." },
+    { ativos: [4], setas: [3], titulo: "Revisão contra a spec", texto: "Cada requisito implementado? Cada caso de borda com teste? A spec fecha o ciclo que começou na aula 3.3." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: revisão (demonstração)", altura: 330,
+  passos: [
+    { t: "user", x: "rode os testes e o comando atrasadas, e me mostre as saídas", leg: "Evidência, não afirmação" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "Ran 10 tests\nOK" },
+    { t: "tool", x: "Bash(python tarefas.py atrasadas)" },
+    { t: "out", x: "1. [ ] Pagar conta fictícia (venceu em 2026-01-10)" },
+    { t: "user", x: "/code-review", leg: "Revisor independente, em segundo plano" },
+    { t: "html", x: '<span class="t-dim">Review running in the background…</span>', ms: 1200 },
+    { t: "user", x: "enquanto isso, atualize o README com o comando atrasadas", leg: "Você continua trabalhando" },
+    { t: "tool", x: "Update(README.md)" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Code review: 1 finding</span>\n<span class="t-warn">correctness</span> tarefas.py:58  listar usa t["prazo"], que quebra em tarefas antigas sem o campo</span>', leg: "Achado chega na conversa", ms: 1800 },
+    { t: "user", x: "corrija esse achado e rode os testes" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "Ran 10 tests\nOK" }
+  ],
+  ilustrativo: true
+});
+(function () {
+  var etapa = 0;
+  var diffs = [
+    { d: '<span class="t-dim">tarefas.py</span>\n def atrasadas(hoje=None):\n     hoje = hoje or date.today()\n<span class="t-warn">-    return [t for t in tarefas if not t["feita"] and prazo(t) &lt; hoje]</span>\n<span class="t-ok">+    return [t for t in tarefas if prazo(t) &lt; hoje]</span>', op: ["a) Mudou o formato da data", "b) Tarefas feitas passaram a aparecer em atrasadas", "c) Nada de errado"], c: "b", ex: "A condição <code>not t[\"feita\"]</code> foi removida. A spec diz que tarefas feitas NÃO aparecem." },
+    { d: '<span class="t-dim">tests/test_prazo.py</span>\n def test_prazo_hoje_nao_esta_atrasado(self):\n<span class="t-warn">-    self.assertNotIn("A", saida)</span>\n<span class="t-ok">+    self.assertIn("A", saida)</span>', op: ["a) O teste foi invertido para passar", "b) Melhorou o teste", "c) Só formatação"], c: "a", ex: "O teste agora espera o contrário da spec. Erro clássico: mudar o teste em vez do código." },
+    { d: '<span class="t-dim">tarefas.py</span>\n def adicionar(titulo, prazo=None):\n     tarefas = carregar()\n<span class="t-ok">+    tarefas.append({"titulo": titulo, "prazo": prazo, "feita": False})\n+    salvar(tarefas)\n+    validar_data(prazo)</span>', op: ["a) Falta docstring", "b) A data é validada DEPOIS de salvar, então data inválida fica gravada", "c) Nada de errado"], c: "b", ex: "A spec diz \"nada é salvo\" com data inválida. A validação precisa vir antes do salvar." }
+  ];
+  function mostra() { if (etapa >= diffs.length) return '<span class="t-ok">Fim da revisão.</span> Repare que todos os problemas violavam a spec. Digite diff para recomeçar.'; var x = diffs[etapa]; return '<span class="t-b">Diff ' + (etapa + 1) + "/" + diffs.length + "</span>\n" + x.d + "\n\n" + x.op.join("\n"); }
+  function resp(l) { if (etapa >= diffs.length || !window._rev) return '<span class="t-dim">Digite diff.</span>'; var x = diffs[etapa], ok = x.c === l; etapa++; return (ok ? '<span class="t-ok">✓ ' : '<span class="t-warn">✗ Era ' + x.c + ". ") + x.ex + "</span>\n\n" + mostra(); }
+  Curso.terminal("term", {
+    titulo: "Revisão de diff (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Você é o revisor. Responda a, b ou c.</span>',
+    metas: ["diff"],
+    comandos: { "diff": function () { window._rev = true; etapa = 0; return mostra(); }, "a": function () { return resp("a"); }, "b": function () { return resp("b"); }, "c": function () { return resp("c"); } }
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "O Claude diz \"todos os testes passam\". Qual é a melhor resposta?", op: ["Ótimo, commit", "Pedir a saída do comando de teste", "Rodar o /code-review sem ler nada"], c: 1, ex: "Peça evidência: o comando executado e a saída. Ler a saída é mais rápido do que rodar de novo." },
+  { p: "Por que o <code>/code-review</code> encontra problemas que o próprio autor não viu?", op: ["Porque usa sempre o modelo mais caro", "Porque roda num subagente com contexto próprio, sem a conversa que produziu o código", "Porque lê a internet"], c: 1, ex: "Sem a conversa, ele não é influenciado pelo raciocínio do autor e olha só para o resultado." },
+  { p: "Você quer menos falsos positivos na revisão. Qual nível usar?", op: ["<code>/code-review low</code>", "<code>/code-review max</code>", "<code>/code-review --fix</code>"], c: 0, ex: "Em <code>low</code>, a revisão reporta só o que tem mais certeza. Níveis maiores ampliam a cobertura." },
+  { p: "Rodou <code>/code-review --fix</code> e não gostou das correções. Como desfazer?", op: ["<code>/rewind</code> sempre resolve", "Com o Git: as correções em segundo plano ficam fora dos checkpoints", "Não tem como desfazer"], c: 1, ex: "A documentação avisa: edições do <code>--fix</code> em segundo plano não são restauradas pelo <code>/rewind</code>. Commit antes, Git depois." },
+  { p: "Ao revisar um diff, qual pergunta NÃO faz parte do roteiro desta aula?", op: ["Faz o que a spec pede?", "Faz só o que a spec pede?", "Usa o maior número possível de bibliotecas?"], c: 2, ex: "O roteiro: faz o que a spec pede, só isso, casos de borda tratados, nada apagado sem motivo." }
+]);
+Curso.checklist("check", [
+  "Peço evidência (comando + saída) em vez de aceitar \"pronto\"",
+  "Reviso diffs com as 4 perguntas do roteiro",
+  "Uso <code>/code-review</code> e escolho o nível de esforço",
+  "Decido quais achados corrigir em vez de aceitar todos",
+  "Revisei a feature de prazo contra a spec e commitei"
+]);
+</script>
+</body>
+</html>

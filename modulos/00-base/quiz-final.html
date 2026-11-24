@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 0</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m0qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 0 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Base</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 0</a>
+    <a class="prox" href="../01-primeiros-passos/01-instalacao.html"><small>Próximo módulo →</small>Módulo 1: Primeiros passos</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 0 · Base › Quiz final");
+Curso.quiz("quiz", [{"p": "Seu terminal diz que a pasta não existe, mas você tem certeza que ela existe. Qual a causa mais provável?", "op": ["Você está em outra pasta ou digitou o nome errado", "O PowerShell está quebrado", "Precisa reiniciar o computador"], "c": 0, "ex": "Quase sempre é o diretório atual errado ou erro de digitação. Use <code>pwd</code>, <code>ls</code> e a tecla <kbd>Tab</kbd>. <span class=\"t-dim\">(aula: Terminal em 20 minutos)</span>"}, {"p": "Por que fazer commit ANTES de pedir uma mudança grande ao Claude?", "op": ["Porque o Claude só funciona em repositórios com commits", "Para ter um ponto seguro e conseguir comparar e desfazer o que ele fizer", "Para o Claude ficar mais rápido"], "c": 1, "ex": "O commit é o seu ponto de restauração. Com ele, o <code>git diff</code> mostra só o que o Claude mudou. <span class=\"t-dim\">(aula: Git essencial: sua rede de segurança)</span>"}, {"p": "O que é a \"janela de contexto\"?", "op": ["A janela do terminal", "Tudo o que o modelo enxerga de uma vez: mensagens, arquivos lidos, saídas e instruções", "O histórico do Git"], "c": 1, "ex": "O contexto é limitado e afeta a qualidade. Vamos dominar isso no Módulo 2. <span class=\"t-dim\">(aula: O que é um agente de IA (e o Claude Code))</span>"}, {"p": "O Claude pede para rodar <code>Remove-Item -Recurse .\\dados</code>. O que acontece se você aprovar?", "op": ["Move a pasta dados para a Lixeira", "Apaga a pasta dados e tudo dentro dela, sem Lixeira", "Lista o conteúdo da pasta dados"], "c": 1, "ex": "<code>Remove-Item</code> apaga, e <code>-Recurse</code> inclui tudo o que está dentro. Pelo terminal não há Lixeira. Só aprove se tiver certeza (e, idealmente, com Git para desfazer). <span class=\"t-dim\">(aula: Terminal em 20 minutos)</span>"}, {"p": "O Claude editou 5 arquivos. Qual comando mostra exatamente quais linhas mudaram?", "op": ["<code>git log</code>", "<code>git status</code>", "<code>git diff</code>"], "c": 2, "ex": "<code>git status</code> lista os arquivos; <code>git diff</code> mostra as linhas adicionadas (+) e removidas (−). <span class=\"t-dim\">(aula: Git essencial: sua rede de segurança)</span>"}, {"p": "O Claude disse \"corrigi o bug\", mas não rodou nenhum teste. O que fazer?", "op": ["Confiar, ele é muito bom", "Pedir para ele verificar (rodar testes ou o programa) e mostrar o resultado", "Desinstalar o Claude Code"], "c": 1, "ex": "Sem verificação, \"corrigi\" é só uma hipótese. Peça evidência: testes passando, saída do programa. <span class=\"t-dim\">(aula: O que é um agente de IA (e o Claude Code))</span>"}, {"p": "Qual tecla completa automaticamente nomes de pastas e arquivos?", "op": ["<kbd>Enter</kbd>", "<kbd>Tab</kbd>", "<kbd>Esc</kbd>"], "c": 1, "ex": "<kbd>Tab</kbd> completa e evita erros de digitação. Ela também funciona dentro do Claude Code. <span class=\"t-dim\">(aula: Terminal em 20 minutos)</span>"}, {"p": "Quer testar uma ideia arriscada sem mexer na versão principal. O que usar?", "op": ["Uma branch: <code>git switch -c experimento</code>", "Apagar a pasta e começar de novo", "<code>git restore .</code>"], "c": 0, "ex": "Branches são linhas paralelas. Deu certo? Junta (merge). Deu errado? Volta para a main. <span class=\"t-dim\">(aula: Git essencial: sua rede de segurança)</span>"}, {"p": "Por que as permissões são importantes?", "op": ["Porque deixam o Claude mais rápido", "Porque definem o que o Claude pode fazer sem você aprovar, mantendo você no controle", "Porque são exigidas pela lei"], "c": 1, "ex": "Você escolhe o equilíbrio entre autonomia e controle. Veremos os modos de permissão no Módulo 4. <span class=\"t-dim\">(aula: O que é um agente de IA (e o Claude Code))</span>"}, {"p": "Você abriu o terminal e não sabe em qual pasta está. Qual comando usar?", "op": ["<code>ls</code>", "<code>pwd</code>", "<code>cd</code>"], "c": 1, "ex": "<code>pwd</code> (Get-Location) mostra o caminho atual. <code>ls</code> lista o conteúdo, mas não diz onde você está. <span class=\"t-dim\">(aula: Terminal em 20 minutos)</span>"}]);
+</script>
+</body>
+</html>

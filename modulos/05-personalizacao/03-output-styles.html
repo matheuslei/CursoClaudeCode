@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Output styles e status line</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m5a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 5 · Aula 3</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~15 min</span>
+    <h1>Output styles e status line</h1>
+    <p class="objetivo">Objetivo: mudar o jeito como o Claude responde (mais curto, mais didático, deixando código para você) e manter uma barra de status com modelo e uso de contexto sempre à vista.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Enquanto você estuda, quer explicações. No dia a dia, quer respostas diretas. Um <strong>output style</strong> troca o "jeito" do Claude para a sessão inteira, sem repetir o pedido em cada mensagem. E a <strong>status line</strong> mostra, sem você perguntar, quanto contexto já foi usado. Isso conecta direto com o Módulo 2.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: os estilos embutidos</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como usar</h2>
+    <h3>Trocar de estilo</h3>
+    <ul>
+      <li><code>/output-style</code> lista os estilos e marca o atual</li>
+      <li><code>/output-style concise</code> troca na hora (o comando ignora maiúsculas)</li>
+      <li><code>/config</code> → <strong>Output style</strong> abre um menu</li>
+      <li>A escolha é salva em <code>.claude/settings.local.json</code>. No settings, o valor é sensível a maiúsculas: <code>"outputStyle": "Explanatory"</code></li>
+    </ul>
+    <h3>Criar um estilo próprio</h3>
+    <p>Um arquivo Markdown em <code>~/.claude/output-styles/</code> (pessoal) ou <code>.claude/output-styles/</code> (projeto):</p>
+    <div class="cod"><span class="rot">.claude/output-styles/tutor-ptbr.md</span><code>---
+name: Tutor PT-BR
+description: Responde em português, explica o porquê e propõe um mini exercício
+keep-coding-instructions: true
+---
+
+Responda sempre em português do Brasil, de forma curta.
+Depois de cada mudança de código, explique em 2 tópicos o porquê da escolha.
+Ao final de cada tarefa, proponha um mini exercício de 1 linha
+para eu praticar o conceito usado.</code></div>
+    <ul>
+      <li><code>keep-coding-instructions: true</code> mantém as instruções de engenharia de software do Claude Code. Sem ele, o estilo substitui essa parte, o que é útil quando o Claude não vai programar (ex.: assistente de escrita).</li>
+      <li>No terminal, estilos são lidos <strong>ao iniciar</strong>: criou ou editou, reinicie o Claude Code.</li>
+    </ul>
+    <div class="caixa"><strong>Estilo × CLAUDE.md × hook</strong>Estilo muda <em>como</em> o Claude responde. CLAUDE.md diz <em>o que ele precisa saber</em> do projeto. E se algo precisa acontecer <em>sempre, sem exceção</em> (formatar após editar), use um <strong>hook</strong> (próxima aula). Estilo é instrução, não garantia.</div>
+
+    <h3>Status line</h3>
+    <p>Uma barra no rodapé que roda um comando seu e mostra o que ele imprimir. O Claude Code envia dados da sessão em JSON pela entrada padrão (stdin): modelo, pasta, % de contexto usado, custo estimado…</p>
+    <p>O jeito mais fácil é pedir:</p>
+    <div class="cod"><code>/statusline mostre o modelo e a porcentagem de contexto usado</code></div>
+    <p>O Claude gera um script em <code>~/.claude/</code> e configura o settings para você. Para remover: <code>/statusline remove</code>. O formato no settings é:</p>
+    <div class="cod"><code>{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
+}</code></div>
+    <div class="caixa alerta"><strong>Windows</strong>O comando roda pelo Git Bash (se instalado) ou pelo PowerShell. Use <strong>barras normais</strong> nos caminhos (<code>C:/Users/ana/.claude/statusline.ps1</code>): no Git Bash, a barra invertida é "comida" e o script falha em silêncio. Para script PowerShell: <code>"command": "powershell -NoProfile -File C:/Users/ana/.claude/statusline.ps1"</code>.</div>
+    <p>Campos úteis do JSON: <code>model.display_name</code>, <code>workspace.current_dir</code>, <code>context_window.used_percentage</code>, <code>cost.total_cost_usd</code> (estimativa, pode diferir da cobrança real).</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: o mesmo pedido em 3 estilos</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: escolha o estilo</h2>
+    <p>Troque o estilo e envie <code>explique a função remover</code> para ver a diferença. Teste <code>/output-style</code>, <code>/output-style concise</code>, <code>/output-style explanatory</code> e <code>/output-style learning</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, rode <code>/output-style learning</code> e peça <code>adicione o comando "renomear &lt;numero&gt; &lt;novo titulo&gt;"</code>. O Claude deve deixar um <code>TODO(human)</code> para você completar</li>
+      <li>Complete o trecho, avise o Claude e veja o comentário dele</li>
+      <li>Crie <code>.claude/output-styles/tutor-ptbr.md</code> (conteúdo da aula), reinicie o Claude Code e ative com <code>/output-style</code></li>
+      <li>Rode <code>/statusline mostre o modelo e a porcentagem de contexto</code> e aprove as edições</li>
+      <li>Volte ao estilo padrão: <code>/output-style default</code></li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <ul>
+        <li>No Learning, o Claude faz a parte rotineira e para num ponto de decisão (ex.: validar o novo título vazio), marcando <code>TODO(human)</code> e explicando o que você deve escrever.</li>
+        <li>O estilo próprio aparece na lista do <code>/output-style</code> pelo <code>name</code> do frontmatter. Se não aparecer, você não reiniciou o Claude Code ou o arquivo está fora de <code>output-styles/</code>.</li>
+        <li>Após o <code>/statusline</code>, seu <code>~/.claude/settings.json</code> ganha a chave <code>statusLine</code> e a barra aparece no rodapé.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"explanatory" no settings</h4><p>No arquivo, o nome é sensível a maiúsculas: <code>Explanatory</code>. Errado = estilo padrão.</p></div>
+      <div class="mini"><h4>Estilo novo não aparece</h4><p>Reinicie o Claude Code: estilos são lidos ao iniciar.</p></div>
+      <div class="mini"><h4>Status line em branco no Windows</h4><p>Barra invertida no caminho. Use <code>/</code>.</p></div>
+      <div class="mini"><h4>Usar estilo como regra</h4><p>Estilo é instrução, não garantia. Para garantir, hook.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/output-styles">Output styles</a></li>
+      <li><a href="https://code.claude.com/docs/en/statusline">Customize your status line</a>: exemplos prontos, inclusive em PowerShell</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Output styles e Status line).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Output styles e status line em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai mudar o jeito como o Claude responde e colocar informações úteis no rodapé do terminal.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 5 · AULA 3</span><p class="v-titulo" data-t="0.3">Output styles e status line</p><p class="v-sub" data-t="0.9">O jeito de responder e o painel do rodapé</p>' },
+  { fala: "Enquanto estuda, você quer explicações. No dia a dia, quer respostas diretas. Um output style troca o jeito do Claude para a sessão inteira, sem repetir o pedido em cada mensagem.",
+    html: '<div class="v-linha"><div class="v-caixa" data-t="0.3"><span class="v-ic">💡</span><b>Estudando</b>quero explicações</div><span class="v-seta" data-t="1.8">⟷</span><div class="v-caixa" data-t="2.4"><span class="v-ic">✂</span><b>Dia a dia</b>quero respostas diretas</div></div><p class="v-txt" data-t="4.5" style="text-align:center">Um <b style="color:#e0875f">output style</b> vale para a sessão inteira</p>' },
+  { fala: "Os estilos embutidos são: Default, o padrão. Proactive, que já começa a implementar. Concise, direto ao ponto. Explanatory, que explica o porquê. E Learning, que deixa pequenos trechos para você escrever.",
+    html: '<div class="v-grade" style="--cols:5"><div class="v-caixa" data-t="0.4"><span class="v-ic">⚖</span><b>Default</b>padrão</div><div class="v-caixa" data-t="1.6"><span class="v-ic">🚀</span><b>Proactive</b>implementa já</div><div class="v-caixa" data-t="3"><span class="v-ic">✂</span><b>Concise</b>direto</div><div class="v-caixa" data-t="4.2"><span class="v-ic">💡</span><b>Explanatory</b>explica</div><div class="v-caixa acc" data-t="5.6"><span class="v-ic">🎓</span><b>Learning</b>você escreve</div></div>' },
+  { fala: "Para trocar, use barra output style e o nome do estilo. Para criar o seu, escreva um arquivo Markdown na pasta output styles. No terminal, reinicie o Claude Code depois de criar.",
+    html: '<div class="v-code" data-t="0.2"><span class="u">&gt; </span><span class="v-digita" style="--n:21">/output-style concise</span></div><div class="v-grade" data-t="3"><div class="v-caixa"><span class="v-ic">📄</span><b>Estilo próprio</b>.claude/output-styles/tutor-ptbr.md</div><div class="v-caixa warn" data-t="5.5"><span class="v-ic">↻</span><b>Terminal</b>reinicie depois de criar</div></div>' },
+  { fala: "A status line é uma barra no rodapé que mostra, sem você perguntar, dados como o modelo e quanto contexto já foi usado. O jeito mais fácil é pedir com barra statusline.",
+    html: '<div class="v-code" data-t="0.3"><span class="u">&gt; </span><span class="v-digita" style="--n:45">/statusline mostre o modelo e o % de contexto</span></div><div class="v-grade" style="--cols:3" data-t="4"><div class="v-caixa"><b>modelo</b>model.display_name</div><div class="v-caixa"><b>pasta</b>workspace.current_dir</div><div class="v-caixa acc"><b>contexto</b>used_percentage</div></div>' },
+  { fala: "E lembre: estilo muda como o Claude responde, mas é instrução, não garantia. O que precisa acontecer sempre vai num hook, o assunto da próxima aula.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">🎨</span><b>Estilo</b>como responde</div><div class="v-caixa" data-t="1.6"><span class="v-ic">📘</span><b>CLAUDE.md</b>o que saber</div><div class="v-caixa acc" data-t="3.6"><span class="v-ic">🪝</span><b>Hook</b>o que sempre acontece</div></div>' }
+] });
+Curso.passos("diag", {
+  seta: "·",
+  nos: [{ ic: "⚖", rt: "Default" }, { ic: "🚀", rt: "Proactive" }, { ic: "✂", rt: "Concise" }, { ic: "💡", rt: "Explanatory" }, { ic: "🎓", rt: "Learning" }],
+  passos: [
+    { ativos: [0], titulo: "Default", texto: "Sem estilo: as instruções padrão do Claude Code para engenharia de software." },
+    { ativos: [1], titulo: "Proactive", texto: "Começa a implementar na hora e assume decisões rotineiras em vez de perguntar. <strong>Não muda as permissões</strong>: os pedidos de aprovação continuam iguais." },
+    { ativos: [2], titulo: "Concise", texto: "A primeira frase já é o resultado. Sem introdução, narração ou resumo final. Erros, avisos de segurança e confirmações continuam completos." },
+    { ativos: [3], titulo: "Explanatory", texto: "Faz a tarefa normalmente e adiciona blocos <code>★ Insight</code> explicando o porquê das escolhas. Ótimo para conhecer um código novo." },
+    { ativos: [4], titulo: "Learning", texto: "Como o Explanatory, mas deixa pequenos trechos para <strong>você</strong> escrever, marcados com <code>TODO(human)</code>. Perfeito para este curso." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: estilos (demonstração)", altura: 320,
+  passos: [
+    { t: "user", x: "/output-style concise", leg: "Respostas diretas" },
+    { t: "user", x: "por que remover usa pop?" },
+    { t: "claude", x: "pop remove pelo índice e devolve o item, então dá para mostrar o título removido.", ms: 1400 },
+    { t: "user", x: "/output-style explanatory", leg: "Com explicações" },
+    { t: "user", x: "por que remover usa pop?" },
+    { t: "claude", x: "Usa pop(numero - 1) para remover e reaproveitar o item na mensagem.", ms: 900 },
+    { t: "html", x: '<span class="t-acc">★ Insight ─────────────────────────────\n- O índice é numero - 1 porque o usuário conta a partir de 1.\n- pop devolve o item: evita ler a lista duas vezes.\n───────────────────────────────────────</span>', ms: 1600 },
+    { t: "user", x: "/output-style learning", leg: "Você escreve uma parte" },
+    { t: "user", x: "adicione o comando renomear" },
+    { t: "html", x: '<span class="t-acc">● Learn by Doing</span>\nContexto: o subcomando renomear já está no argparse.\nSua tarefa: em tarefas.py, implemente a validação do novo título. Procure TODO(human).\nOrientação: título vazio ou só espaços deve dar mensagem clara.', leg: "O Claude espera você completar" }
+  ]
+});
+(function () {
+  var estilo = "default";
+  var resp = {
+    "default": "A função remover carrega a lista, valida o número com _indice_valido, remove com pop(numero - 1), salva e imprime o título removido.",
+    "concise": "Valida o número, remove com pop e salva.",
+    "explanatory": 'Valida o número, remove com pop(numero - 1) e salva.\n<span class="t-acc">★ Insight ───────────────\n- numero - 1: usuário conta do 1, a lista do 0.\n- Validação reaproveitada do concluir: um só lugar para corrigir.\n─────────────────────────</span>',
+    "learning": 'Valida, remove e salva.\n<span class="t-acc">★ Insight: pop devolve o item removido.</span>\n<span class="t-acc">● Learn by Doing</span> Escreva você: o que acontece se tarefas.json estiver vazio? Procure TODO(human).'
+  };
+  Curso.terminal("term", {
+    titulo: "Claude Code: estilos (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Estilo atual: default</span>',
+    metas: ["/output-style", "/output-style concise", "/output-style explanatory", "/output-style learning", "explique a função remover"],
+    comandos: {
+      "/output-style": function () { return ["default", "proactive", "concise", "explanatory", "learning"].map(function (s) { return (s === estilo ? '<span class="t-user">❯ ' : "  ") + s + (s === estilo ? " (atual)</span>" : ""); }).join("\n"); },
+      "explique a função remover": function () { return '<span class="t-dim">[' + estilo + ']</span>\n<span class="t-acc">●</span> ' + (resp[estilo] || resp["default"]); },
+      "/statusline mostre o modelo e o contexto": '<span class="t-ok">Status line configurada.</span>\n<span class="t-dim">───────────────────────────────\n[Modelo] taskflow · ctx 12%</span>'
+    },
+    padroes: [[/^\/output-style\s+(\w+)$/i, function (m) { var s = m[1].toLowerCase(); if (["default", "proactive", "concise", "explanatory", "learning"].indexOf(s) < 0) return '<span class="t-warn">Estilo não encontrado: ' + m[1] + "</span>"; estilo = s; return '<span class="t-ok">Estilo: ' + s + "</span> <span class=\"t-dim\">(vale a partir da próxima mensagem)</span>"; }]],
+    desconhecido: '<span class="t-dim">Envie: explique a função remover · /output-style &lt;estilo&gt; · /statusline mostre o modelo e o contexto</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Você está aprendendo e quer escrever parte do código você mesmo. Qual estilo?", op: ["Concise", "Learning", "Proactive"], c: 1, ex: "O Learning deixa trechos marcados com <code>TODO(human)</code> e explica as escolhas." },
+  { p: "No settings, você escreveu <code>\"outputStyle\": \"concise\"</code> e nada mudou. Por quê?", op: ["Output styles não funcionam no Windows", "O valor no arquivo é sensível a maiúsculas: <code>Concise</code>", "Precisa de plano Enterprise"], c: 1, ex: "O comando <code>/output-style</code> ignora maiúsculas; o arquivo não." },
+  { p: "Você quer que o código SEMPRE seja validado após cada edição. Output style resolve?", op: ["Sim, basta escrever no estilo", "Não: estilo é instrução; para garantir, use um hook"], c: 1, ex: "Output style orienta o Claude, mas não há garantia. Hooks são executados pela ferramenta." },
+  { p: "Sua status line no Windows não aparece. O comando é <code>C:\\Users\\ana\\.claude\\sl.ps1</code>. Causa provável?", op: ["Barras invertidas no caminho, consumidas pelo Git Bash", "O PowerShell não roda scripts", "Status line é só para Mac"], c: 0, ex: "Use barras normais: <code>C:/Users/ana/.claude/sl.ps1</code>, chamado via <code>powershell -NoProfile -File ...</code>." }
+]);
+Curso.checklist("check", [
+  "Conheço os estilos Default, Proactive, Concise, Explanatory e Learning",
+  "Troco de estilo com <code>/output-style</code>",
+  "Criei um estilo próprio com <code>keep-coding-instructions</code>",
+  "Configurei uma status line com <code>/statusline</code>"
+]);
+</script>
+</body>
+</html>

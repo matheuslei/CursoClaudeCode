@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminal em 20 minutos</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m0a1">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 0 · Aula 1</span><span class="selo cinza">Zero</span><span class="selo cinza">~20 min</span>
+    <h1>Terminal em 20 minutos</h1>
+    <p class="objetivo">Objetivo: abrir o PowerShell, se localizar nas pastas e criar arquivos só com comandos, que é o mínimo para usar o Claude Code com tranquilidade.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>O Claude Code nasceu no terminal. Mesmo usando o app desktop ou o VS Code, você vai ver o Claude rodando comandos, e é você quem decide se aprova cada um. Entender o básico do terminal transforma esses pedidos de permissão de "texto misterioso" em algo que você lê e julga em segundos.</p>
+    <div class="caixa"><strong>Cenário</strong>O Claude pede permissão para rodar <code>Remove-Item -Recurse .\dados</code>. Você aprovaria? Ao final desta aula você saberá que isso apaga a pasta <code>dados</code> inteira e vai responder com segurança.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como o terminal funciona</h2>
+    <p>O terminal é uma conversa de texto com o computador: você digita um comando, ele executa e responde. Navegue pelos passos:</p>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os comandos essenciais</h2>
+    <p>No PowerShell, muitos comandos têm um nome longo e um "apelido" curto (alias). Você pode usar qualquer um.</p>
+    <table class="tab">
+      <thead><tr><th>Quero…</th><th>Comando curto</th><th>Nome completo</th></tr></thead>
+      <tbody>
+        <tr><td>Saber em que pasta estou</td><td><code>pwd</code></td><td><code>Get-Location</code></td></tr>
+        <tr><td>Listar o que tem na pasta</td><td><code>ls</code> ou <code>dir</code></td><td><code>Get-ChildItem</code></td></tr>
+        <tr><td>Entrar numa pasta</td><td><code>cd nome</code></td><td><code>Set-Location</code></td></tr>
+        <tr><td>Voltar uma pasta</td><td><code>cd ..</code></td><td></td></tr>
+        <tr><td>Criar pasta</td><td><code>mkdir nome</code></td><td><code>New-Item -ItemType Directory</code></td></tr>
+        <tr><td>Criar arquivo vazio</td><td><code>ni nota.txt</code></td><td><code>New-Item</code></td></tr>
+        <tr><td>Ver conteúdo de arquivo</td><td><code>cat nota.txt</code></td><td><code>Get-Content</code></td></tr>
+        <tr><td>Limpar a tela</td><td><code>cls</code></td><td><code>Clear-Host</code></td></tr>
+        <tr><td>Apagar (cuidado!)</td><td><code>rm nome</code></td><td><code>Remove-Item</code></td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Dois truques que economizam horas</strong>
+      <kbd>Tab</kbd> completa nomes de pastas e arquivos. Digite <code>cd Doc</code> e aperte <kbd>Tab</kbd>.<br>
+      <kbd>↑</kbd> traz de volta os comandos anteriores.</div>
+    <h3>Como abrir</h3>
+    <p>Aperte <kbd>Win</kbd>, digite <strong>Terminal</strong> (ou <strong>PowerShell</strong>) e Enter. Você verá algo como <code>PS C:\Users\seu.usuario&gt;</code>. O <code>PS</code> indica PowerShell e o caminho mostra onde você está.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <p>Veja uma sessão típica: criar a pasta de estudos do curso e um arquivo dentro dela.</p>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Este terminal é de mentira, então pode errar à vontade. Complete o desafio: descubra onde está, crie a pasta <code>estudos</code>, entre nela e crie um arquivo.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Agora no seu PowerShell de verdade:</p>
+    <ol>
+      <li>Abra o Terminal e vá para a sua pasta pessoal: <code>cd ~</code></li>
+      <li>Crie a pasta que usaremos no curso inteiro: <code>C:\Users\&lt;você&gt;\estudos-claude</code></li>
+      <li>Dentro dela, crie o arquivo <code>diario.md</code> e escreva uma linha nele usando o comando <code>Set-Content</code></li>
+      <li>Mostre o conteúdo do arquivo na tela</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <div class="cod"><code>cd ~
+mkdir estudos-claude
+cd estudos-claude
+Set-Content diario.md "Dia 1: aprendi o terminal"
+cat diario.md</code></div>
+      <p><code>~</code> é um atalho para sua pasta de usuário. <code>Set-Content</code> cria (ou sobrescreve) o arquivo com o texto. Para adicionar linhas sem apagar, use <code>Add-Content</code>.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>"não é reconhecido como nome de cmdlet"</h4><p>Erro de digitação ou programa não instalado. Confira a grafia.</p></div>
+      <div class="mini"><h4>Caminhos com espaço</h4><p>Use aspas: <code>cd "Meus Documentos"</code>. O <kbd>Tab</kbd> coloca as aspas para você.</p></div>
+      <div class="mini"><h4>Prompt <code>C:\&gt;</code> sem PS</h4><p>Você está no CMD antigo, não no PowerShell. Alguns comandos mudam. Abra o Terminal/PowerShell.</p></div>
+      <div class="mini"><h4><code>rm</code> não tem lixeira</h4><p>Arquivo apagado pelo terminal não vai para a Lixeira. Leia duas vezes antes de aprovar.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/terminal-guide">Guia de terminal da documentação oficial</a> (em inglês)</li>
+      <li><a href="https://learn.microsoft.com/pt-br/powershell/scripting/learn/ps101/00-introduction">PowerShell 101 da Microsoft</a> (em português)</li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Terminal em 1 minuto", cenas: [
+  { fala: "Nesta aula você vai perder o medo do terminal: o mínimo para usar o Claude Code com tranquilidade.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 0 · AULA 1</span><p class=\"v-titulo\" data-t=\"0.3\">Terminal em 20 minutos</p><p class=\"v-sub\" data-t=\"0.9\">O mínimo para usar o Claude Code com tranquilidade</p>" },
+  { fala: "O terminal é uma conversa de texto com o computador. Você digita um comando, o shell interpreta, o sistema executa e a resposta aparece na tela.",
+    html: "<div class=\"v-linha\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">⌨</span><b>Você digita</b></div><span class=\"v-seta\" data-t=\"1.6\">→</span><div class=\"v-caixa\" data-t=\"2.2\"><span class=\"v-ic\">⚙</span><b>Shell interpreta</b></div><span class=\"v-seta\" data-t=\"3\">→</span><div class=\"v-caixa\" data-t=\"3.6\"><span class=\"v-ic\">🗂</span><b>Sistema age</b></div><span class=\"v-seta\" data-t=\"4.4\">→</span><div class=\"v-caixa ok\" data-t=\"5\"><span class=\"v-ic\">🖥</span><b>Saída na tela</b></div></div>" },
+  { fala: "No Windows usamos o PowerShell. O prompt começa com PS e mostra em qual pasta você está.",
+    html: "<p class=\"v-txt\" data-t=\"0\">O prompt do PowerShell</p><div class=\"v-code\" data-t=\"0.6\"><span class=\"a\">PS C:\\Users\\ana&gt;</span> <span class=\"v-digita\" style=\"--n:3\">pwd</span></div><p class=\"v-txt\" data-t=\"3\"><b style=\"color:#e0875f\">PS</b> = PowerShell · o caminho = a pasta atual</p>" },
+  { fala: "Cinco comandos resolvem quase tudo: pwd mostra onde você está, ls lista o conteúdo, cd entra numa pasta, mkdir cria uma pasta e cat mostra um arquivo.",
+    html: "<div class=\"v-code\"><div data-t=\"0.8\"><span class=\"u\">pwd</span>          <span class=\"d\"># onde estou?</span></div><div data-t=\"2.2\"><span class=\"u\">ls</span>           <span class=\"d\"># o que tem aqui?</span></div><div data-t=\"3.4\"><span class=\"u\">cd estudos</span>   <span class=\"d\"># entrar na pasta</span></div><div data-t=\"4.6\"><span class=\"u\">mkdir nome</span>   <span class=\"d\"># criar pasta</span></div><div data-t=\"5.8\"><span class=\"u\">cat nota.txt</span> <span class=\"d\"># ver o arquivo</span></div></div>" },
+  { fala: "Dois truques economizam horas: a tecla Tab completa nomes de pastas e arquivos, e a seta para cima traz de volta os comandos anteriores.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa acc\" data-t=\"0.6\"><span class=\"v-ic\">⇥</span><b>Tab</b>completa nomes de pastas e arquivos</div><div class=\"v-caixa acc\" data-t=\"3.6\"><span class=\"v-ic\">↑</span><b>Seta para cima</b>traz de volta os comandos anteriores</div></div>" },
+  { fala: "E atenção: Remove-Item apaga de verdade, sem passar pela Lixeira. Quando o Claude pedir para rodar um comando assim, leia antes de aprovar.",
+    html: "<div class=\"v-code\" data-t=\"0.3\"><span class=\"w\">Remove-Item -Recurse .\\dados</span></div><div class=\"v-caixa err\" data-t=\"1.6\"><span class=\"v-ic\">⚠</span><b>Apaga a pasta e tudo dentro</b>não vai para a Lixeira: leia antes de aprovar</div>" },
+  { fala: "Resumindo: entender o terminal é entender o que o Claude está fazendo por você.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A mensagem da aula</p><p class=\"v-titulo\" data-t=\"0.4\">Entender o terminal é entender o Claude</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "⌨", rt: "Você digita" }, { ic: "⚙", rt: "Shell interpreta" }, { ic: "🗂", rt: "Sistema age" }, { ic: "🖥", rt: "Saída na tela" }],
+  passos: [
+    { ativos: [0], titulo: "O prompt espera você", texto: "<code>PS C:\\Users\\ana&gt;</code> é o <em>prompt</em>: ele diz que o terminal está pronto e em qual pasta você está (o <em>diretório atual</em>)." },
+    { ativos: [0, 1], setas: [0], titulo: "O shell lê o comando", texto: "O <strong>shell</strong> (aqui, o PowerShell) separa o comando dos argumentos. Em <code>mkdir estudos</code>, <code>mkdir</code> é o comando e <code>estudos</code> é o argumento." },
+    { ativos: [1, 2], setas: [1], titulo: "O sistema executa", texto: "O comando cria pastas, lê arquivos ou abre programas. Tudo relativo à pasta atual, a não ser que você passe um caminho completo como <code>C:\\Users\\ana\\estudos</code>." },
+    { ativos: [2, 3], setas: [2], titulo: "A resposta aparece", texto: "Pode ser uma lista, um texto, um erro… ou nada! No terminal, <strong>silêncio costuma significar sucesso</strong>." },
+    { ativos: [0, 1, 2, 3], setas: [0, 1, 2], titulo: "E o Claude Code?", texto: "O Claude Code faz exatamente esse ciclo por você, quando você permite. Por isso entender o terminal é entender o que o Claude está fazendo." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "PowerShell (demonstração)", prompt: "PS C:\\Users\\ana>", altura: 220,
+  passos: [
+    { t: "cmd", x: "pwd", leg: "pwd mostra a pasta atual" },
+    { t: "html", x: "\nPath\n----\nC:\\Users\\ana\n" },
+    { t: "cmd", x: "mkdir estudos-claude", leg: "mkdir cria uma pasta" },
+    { t: "html", x: '<span class="t-dim">    Diretório: C:\\Users\\ana\nMode   LastWriteTime   Name\nd----  17/11/2026      estudos-claude</span>' },
+    { t: "cmd", x: "cd estudos-claude", leg: "cd entra na pasta (repare no prompt mudando)" },
+    { t: "html", x: '<span class="t-acc">PS C:\\Users\\ana\\estudos-claude&gt;</span> <span class="t-dim">← o prompt mudou</span>' },
+    { t: "cmd", x: 'Set-Content ola.txt "Olá, terminal!"', leg: "Set-Content cria um arquivo com texto" },
+    { t: "cmd", x: "cat ola.txt", leg: "cat mostra o conteúdo" },
+    { t: "html", x: "Olá, terminal!" }
+  ]
+});
+(function () {
+  var pasta = "C:\\Users\\voce", fs = { "C:\\Users\\voce": ["Documentos", "Downloads", "Desktop"] };
+  function lista() { var it = fs[pasta] || []; if (!it.length) return '<span class="t-dim">(pasta vazia)</span>'; return it.map(function (n) { return (n.indexOf(".") > 0 ? "-a---  " : "d----  ") + n; }).join("\n"); }
+  var cfg = {
+    titulo: "PowerShell (simulação)", prompt: "PS " + pasta + ">",
+    intro: '<span class="t-dim">Terminal de treino. Comandos: pwd, ls, cd, mkdir, ni, cat, cls</span>',
+    metas: ["pwd", "mkdir estudos", "cd estudos", "ni nota.txt", "ls"],
+    comandos: {
+      "pwd": function () { return "\nPath\n----\n" + pasta; },
+      "get-location": function () { return "\nPath\n----\n" + pasta; },
+      "ls": lista, "dir": lista, "get-childitem": lista,
+      "cd ..": function () { var p = pasta.split("\\"); if (p.length > 1) p.pop(); pasta = p.join("\\") || "C:"; atualiza(); return ""; },
+      "cd ~": function () { pasta = "C:\\Users\\voce"; atualiza(); return ""; }
+    },
+    padroes: [
+      [/^(cd|set-location)\s+"?([^"]+?)"?$/i, function (m) { var alvo = m[2].replace(/[\\\/]$/, ""); var it = fs[pasta] || []; var achou = it.filter(function (n) { return n.toLowerCase() === alvo.toLowerCase(); })[0]; if (!achou || achou.indexOf(".") > 0) return '<span class="t-warn">cd : Não é possível localizar o caminho \'' + pasta + "\\" + alvo + "' porque ele não existe.</span>\n" + '<span class="t-dim">Dica: crie antes com mkdir ' + alvo + " ou confira com ls.</span>"; pasta = pasta + "\\" + achou; fs[pasta] = fs[pasta] || []; atualiza(); return ""; }],
+      [/^(mkdir|md)\s+"?([^"]+?)"?$/i, function (m) { fs[pasta] = fs[pasta] || []; if (fs[pasta].indexOf(m[2]) >= 0) return '<span class="t-warn">Já existe um item com o nome ' + m[2] + ".</span>"; fs[pasta].push(m[2]); fs[pasta + "\\" + m[2]] = []; return '<span class="t-dim">    Diretório: ' + pasta + "\nMode   Name\nd----  " + m[2] + "</span>"; }],
+      [/^(ni|new-item)\s+"?([^"]+?)"?$/i, function (m) { fs[pasta] = fs[pasta] || []; fs[pasta].push(m[2]); return '<span class="t-dim">    Diretório: ' + pasta + "\nMode   Name\n-a---  " + m[2] + "</span>"; }],
+      [/^(cat|get-content|type)\s+(.+)$/i, function (m) { return (fs[pasta] || []).indexOf(m[2]) >= 0 ? '<span class="t-dim">(arquivo vazio, foi criado com ni)</span>' : '<span class="t-warn">Get-Content : Não é possível localizar o caminho porque ele não existe.</span>'; }],
+      [/^(rm|remove-item|del)\b/i, function () { return '<span class="t-warn">Nesta simulação o rm está desativado. Lembre: no terminal real, apagar não manda para a Lixeira!</span>'; }]
+    ],
+    desconhecido: function (c) { return '<span class="t-warn">' + c.split(" ")[0] + ' : O termo \'' + c.split(" ")[0] + "' não é reconhecido como nome de cmdlet, função ou programa.</span>\n<span class=\"t-dim\">Dica: confira a grafia. Comandos da aula: pwd, ls, cd, mkdir, ni, cat, cls</span>"; }
+  };
+  function atualiza() { var p = document.querySelector("#term .pr"); if (p) p.textContent = "PS " + pasta + ">"; cfg.prompt = "PS " + pasta + ">"; }
+  Curso.terminal("term", cfg);
+})();
+Curso.quiz("quiz", [
+  { p: "Você abriu o terminal e não sabe em qual pasta está. Qual comando usar?", op: ["<code>ls</code>", "<code>pwd</code>", "<code>cd</code>"], c: 1, ex: "<code>pwd</code> (Get-Location) mostra o caminho atual. <code>ls</code> lista o conteúdo, mas não diz onde você está." },
+  { p: "O Claude pede para rodar <code>Remove-Item -Recurse .\\dados</code>. O que acontece se você aprovar?", op: ["Move a pasta dados para a Lixeira", "Apaga a pasta dados e tudo dentro dela, sem Lixeira", "Lista o conteúdo da pasta dados"], c: 1, ex: "<code>Remove-Item</code> apaga, e <code>-Recurse</code> inclui tudo o que está dentro. Pelo terminal não há Lixeira. Só aprove se tiver certeza (e, idealmente, com Git para desfazer)." },
+  { p: "Seu terminal diz que a pasta não existe, mas você tem certeza que ela existe. Qual a causa mais provável?", op: ["Você está em outra pasta ou digitou o nome errado", "O PowerShell está quebrado", "Precisa reiniciar o computador"], c: 0, ex: "Quase sempre é o diretório atual errado ou erro de digitação. Use <code>pwd</code>, <code>ls</code> e a tecla <kbd>Tab</kbd>." },
+  { p: "Qual tecla completa automaticamente nomes de pastas e arquivos?", op: ["<kbd>Enter</kbd>", "<kbd>Tab</kbd>", "<kbd>Esc</kbd>"], c: 1, ex: "<kbd>Tab</kbd> completa e evita erros de digitação. Ela também funciona dentro do Claude Code." }
+]);
+Curso.checklist("check", [
+  "Abro o PowerShell e reconheço o prompt <code>PS C:\\...&gt;</code>",
+  "Uso <code>pwd</code>, <code>ls</code> e <code>cd</code> para me localizar",
+  "Crio pastas e arquivos pelo terminal",
+  "Sei que <code>rm</code>/<code>Remove-Item</code> apaga sem Lixeira",
+  "Criei a pasta <code>estudos-claude</code> no meu computador"
+]);
+</script>
+</body>
+</html>

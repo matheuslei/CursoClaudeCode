@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code no GitHub Actions</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m9a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 9 · Aula 3</span><span class="selo cinza">Avançado</span><span class="selo cinza">~30 min</span>
+    <h1>Claude Code no GitHub Actions</h1>
+    <p class="objetivo">Objetivo: entender a action oficial do Claude Code, escrever um workflow YAML de revisão com segredos e limites de custo, e conferi-lo no seu PC antes de qualquer execução real.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Na aula 1 o Claude entrou nos seus scripts; na aula 2 ele virou revisor. O passo seguinte é tirá-lo do seu PC: no <strong>GitHub Actions</strong>, ele roda sozinho quando algo acontece no repositório, como um pull request aberto, um comentário com <code>@claude</code> ou um horário marcado.</p>
+    <div class="caixa alerta"><strong>Antes de tudo: dados e segurança</strong>No GitHub Actions o código roda <strong>fora do seu PC</strong>, num servidor do GitHub, e é enviado à API do Claude. Neste curso, você escreve e confere o workflow localmente. Rodar no GitHub é opcional e só num <strong>repositório pessoal de teste, com dados fictícios</strong>. Código ou dados da empresa só com aval da área de segurança da informação.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: do evento ao comentário</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>A action oficial e o workflow</h2>
+    <p>A action se chama <code>anthropics/claude-code-action</code>, versão <code>@v1</code>. Ela é construída sobre o Agent SDK e funciona em dois modos, escolhidos automaticamente:</p>
+    <div class="grade">
+      <div class="mini"><h4>💬 Interativo</h4><p>Sem <code>prompt</code> no workflow. O Claude espera a frase <code>@claude</code> num comentário de issue ou PR e responde ali mesmo.</p></div>
+      <div class="mini"><h4>⚙ Automação</h4><p>Com <code>prompt</code>. Roda direto no evento (PR aberto, horário…). Por padrão, o resultado vai para o log da execução.</p></div>
+    </div>
+
+    <h3>Anatomia do workflow</h3>
+    <p>O workflow é um arquivo YAML em <code>.github/workflows/</code>. Este é o exemplo do curso (também em <code>projeto-taskflow/etapa-09/gabarito/.github/workflows/claude-review.yml</code>):</p>
+    <div class="cod"><span class="rot">.github/workflows/claude-review.yml</span><code>name: Revisão do TaskFlow
+
+on:                                   # QUANDO roda
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+concurrency:                          # uma revisão por PR de cada vez (custo)
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15               # tempo máximo do job (custo)
+    permissions:                      # o MÍNIMO necessário
+      contents: read
+      pull-requests: read
+      id-token: write                 # exigido pela autenticação padrão da action
+    steps:
+      - uses: actions/checkout@v6     # baixa o código no servidor
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}   # NUNCA a chave em si
+          prompt: |
+            Revise o código Python deste repositório seguindo o CLAUDE.md.
+            Rode python -m unittest. Não edite arquivos.
+            Responda em português com Testes, Achados e Veredito.
+          claude_args: |
+            --max-turns 10
+            --allowedTools "Read,Grep,Glob,Bash(python -m unittest *)"</code></div>
+    <table class="tab">
+      <thead><tr><th>Entrada (<code>with:</code>)</th><th>Para quê</th></tr></thead>
+      <tbody>
+        <tr><td><code>prompt</code></td><td>O pedido (texto ou <code>/nome-da-skill</code>). Sem ele, modo interativo.</td></tr>
+        <tr><td><code>claude_args</code></td><td>Qualquer flag da CLI: <code>--max-turns</code>, <code>--model</code>, <code>--allowedTools</code>… São as mesmas da aula 1.</td></tr>
+        <tr><td><code>anthropic_api_key</code></td><td>Chave da API, sempre via <code>${{ secrets.ANTHROPIC_API_KEY }}</code>.</td></tr>
+        <tr><td><code>claude_code_oauth_token</code></td><td>Alternativa: token da sua assinatura (gerado com <code>claude setup-token</code>), via <code>${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}</code>.</td></tr>
+        <tr><td><code>trigger_phrase</code></td><td>Troca o <code>@claude</code> padrão do modo interativo.</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Ferramentas no modo automação</strong>Com um <code>prompt</code> de texto, o Claude <strong>não tem shell nem acesso à API do GitHub</strong> até você liberar com <code>--allowedTools</code> em <code>claude_args</code>. É a mesma ideia do <code>-p</code>: libere só o necessário. No servidor (Ubuntu), a ferramenta de shell é a <code>Bash</code>.</div>
+
+    <h3>Segredos: a regra que não tem exceção</h3>
+    <ul>
+      <li>A chave fica no GitHub, em <em>Settings › Secrets and variables › Actions</em>. O workflow só a <strong>referencia</strong>: <code>${{ secrets.ANTHROPIC_API_KEY }}</code>.</li>
+      <li><strong>Nunca</strong> escreva uma chave ou token no YAML, no código, num print ou num chat. Se isso acontecer, apagar o arquivo não basta: <strong>revogue a chave</strong> no Console e crie outra.</li>
+      <li>Excluir o segredo do repositório não invalida a chave; para aposentá-la, apague-a também no Claude Console.</li>
+      <li>Em repositórios públicos, o GitHub não entrega segredos a PRs vindos de forks.</li>
+    </ul>
+
+    <h3>Duas formas de instalar</h3>
+    <ul>
+      <li><strong>Rápida:</strong> <code>/install-github-app</code> dentro do <code>claude</code>. Exige GitHub CLI logado, permissão de admin no repositório e repositório no github.com. Instala o app do Claude no GitHub, grava o segredo e abre um PR com os workflows.</li>
+      <li><strong>Manual:</strong> instalar o app do Claude no GitHub, criar o segredo e copiar o YAML. O app pede várias permissões de uma vez (o GitHub não permite aceitar só parte); leia a lista antes.</li>
+    </ul>
+
+    <h3>Custo: duas contas</h3>
+    <table class="tab">
+      <thead><tr><th>O que consome</th><th>Como limitar</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Minutos do GitHub Actions</strong> (servidores do GitHub)</td><td><code>timeout-minutes</code> no job; <code>concurrency</code> para não rodar várias vezes; gatilhos específicos.</td></tr>
+        <tr><td><strong>Tokens do Claude</strong> (API ou assinatura, se usar token OAuth)</td><td><code>--max-turns</code> em <code>claude_args</code>; pedido claro e específico; <code>CLAUDE.md</code> enxuto (é lido em toda execução).</td></tr>
+      </tbody>
+    </table>
+    <p>Quem pode disparar? Em eventos de issue e PR, só quem tem acesso de escrita ao repositório; bots são recusados, salvo lista em <code>allowed_bots</code>. Agendamentos (<code>on: schedule</code>) rodam só a partir da branch padrão.</p>
+    <div class="caixa"><strong>Versão beta antiga?</strong>Se encontrar <code>@beta</code> num workflow: troque por <code>@v1</code>, remova a entrada <code>mode</code>, troque <code>direct_prompt</code> por <code>prompt</code> e leve opções como <code>max_turns</code> e <code>model</code> para <code>claude_args</code>.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: conferir e simular no PC</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: YAML certo ou errado?</h2>
+    <p>Para cada trecho de workflow, responda <code>ok</code> ou <code>erro</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: o workflow de revisão</h2>
+    <p>Use a pasta de treino do Módulo 9 (<a href="../../projeto-taskflow/etapa-09/README.md">README da etapa 09</a>). Os passos 1 a 3 não usam internet nem gastam uso.</p>
+    <ol>
+      <li>Na pasta de treino, crie <code>.github\workflows\claude-review.yml</code> com um workflow que: roda em pull request; tem <code>concurrency</code> e <code>timeout-minutes</code>; declara <code>permissions</code> mínimas com <code>id-token: write</code>; usa <code>anthropics/claude-code-action@v1</code>; pega a chave de <code>${{ secrets.ANTHROPIC_API_KEY }}</code>; e passa <code>--max-turns</code> e <code>--allowedTools</code> em <code>claude_args</code>.</li>
+      <li>Confira com o verificador do curso (troque <code>&lt;curso&gt;</code> pela pasta do curso):
+        <div class="cod"><span class="rot">PowerShell</span><code>python "&lt;curso&gt;\projeto-taskflow\etapa-09\gabarito\conferir_workflow.py" .github\workflows\claude-review.yml</code></div>
+        A meta é <code>0 erro(s)</code>. Depois, de propósito, troque a referência ao segredo por um texto qualquer e veja o verificador reclamar. Desfaça.</li>
+      <li>Leia o seu YAML e responda: em que evento ele roda? Que ferramentas o Claude terá? O que limita o custo?</li>
+      <li><strong>Simulação (gasta uso, uma vez):</strong> rode no PC o mesmo pedido que a action faria, com os mesmos limites. Como você está no Windows, entregue os testes pelo pipe (aula 1) ou use o seu <code>revisar.ps1</code>:
+        <div class="cod"><span class="rot">PowerShell</span><code>python -m unittest 2&gt;&amp;1 | claude -p "Este é o resultado dos testes. Revise o código Python deste repositório seguindo o CLAUDE.md. Não edite arquivos. Responda em português com Testes, Achados e Veredito." --max-turns 10 --allowedTools "Read,Grep,Glob"</code></div></li>
+      <li><em>(Opcional)</em> Num repositório <strong>pessoal de teste</strong>, só com o TaskFlow fictício: cadastre o segredo no GitHub, envie o workflow, abra um PR e leia o resultado no log da execução (aba <em>Actions</em>). Apague o repositório ou o segredo quando terminar.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>O YAML completo é o da seção 3 (arquivo <code>gabarito/.github/workflows/claude-review.yml</code>). Saída esperada do verificador:</p>
+      <div class="cod"><span class="rot">saída</span><code>[OK   ] YAML válido (conferido com PyYAML).
+[OK   ] Sem tabulação (YAML só aceita espaços).
+[OK   ] Tem gatilho (on:).
+[OK   ] Usa anthropics/claude-code-action@v1.
+[OK   ] Nada da versão beta (@beta, direct_prompt).
+[OK   ] A credencial vem de ${{ secrets.... }}.
+[OK   ] Nenhuma chave escrita no arquivo.
+[OK   ] Declara permissions.
+[OK   ] Tem id-token: write (autenticação do app).
+[OK   ] Limita turnos com --max-turns (custo).
+[OK   ] Tem timeout-minutes (custo).
+[OK   ] Tem concurrency (evita execuções em paralelo).
+
+0 erro(s), 0 aviso(s).</code></div>
+      <p>Sem o pacote PyYAML, a primeira linha vira um <code>AVISO</code> (a sintaxe não é conferida, só o texto). Não precisa instalar nada para concluir o exercício.</p>
+      <p><strong>Respostas do passo 3:</strong> roda quando um PR é aberto, atualizado, reaberto ou marcado como pronto; o Claude pode ler arquivos e rodar só <code>python -m unittest</code>; o custo é limitado por <code>--max-turns 10</code>, <code>timeout-minutes: 15</code> e <code>concurrency</code>.</p>
+      <p><strong>Por que a simulação usa pipe?</strong> No Windows, o Claude roda comandos pela ferramenta <code>PowerShell</code>, e a regra <code>Bash(...)</code> do YAML não valeria. O resultado da revisão deve ser parecido com o da aula 1.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Chave no YAML</h4><p>Qualquer pessoa com acesso ao repositório (ou ao histórico do Git) vê. Use <code>${{ secrets.… }}</code> e, se vazou, revogue a chave.</p></div>
+      <div class="mini"><h4>Sem limites</h4><p>Sem <code>--max-turns</code>, <code>timeout-minutes</code> e <code>concurrency</code>, cada push pode virar uma execução longa e paga.</p></div>
+      <div class="mini"><h4>Permissões demais</h4><p>Uma revisão só lê: <code>contents: read</code>. Dê <code>write</code> apenas a workflows que precisam criar commits ou comentar.</p></div>
+      <div class="mini"><h4>Tabulação no YAML</h4><p>YAML só aceita espaços. Uma tabulação quebra o arquivo inteiro.</p></div>
+      <div class="mini"><h4>Código da empresa em repositório de teste</h4><p>O exercício é com o TaskFlow fictício. Código real só com aval da segurança da informação.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/github-actions">Claude Code GitHub Actions</a> (em inglês): instalação, modos, exemplos (menções, skill de revisão, agendamento) e custos.</li>
+      <li><a href="https://github.com/anthropics/claude-code-action">Repositório da action</a>: lista completa de entradas, segurança e exemplos.</li>
+      <li>Usa GitLab? A doc tem uma página própria, "Claude Code GitLab CI/CD".</li>
+      <li>Próxima aula: <strong>tarefas agendadas e loops</strong>, inclusive como elas se comparam a um <code>on: schedule</code> do GitHub.</li>
+      <li><a href="https://academy.claude.com/courses/claude-code-in-action">Claude Code in Action</a> (Anthropic Academy, em inglês): lição sobre GitHub Actions e revisão de código.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (página oficial "Claude Code GitHub Actions"; action <code>anthropics/claude-code-action@v1</code>).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "GitHub Actions em 1 minuto", cenas: [
+  { fala: "Nesta aula, o Claude Code vai para o GitHub Actions e roda sozinho a cada pull request.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 9 · AULA 3</span><p class="v-titulo" data-t="0.3">GitHub Actions</p><p class="v-sub" data-t="1.2">o Claude rodando a cada pull request</p>' },
+  { fala: "A action oficial é anthropics barra claude code action, versão um. Com arroba claude num comentário, ela responde. Com um prompt no workflow, ela roda sozinha.",
+    html: '<div class="v-code" data-t="0.3"><span class="a">uses:</span> anthropics/claude-code-action@v1</div><div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="5"><span class="v-ic">💬</span><b>@claude</b>modo interativo</div><div class="v-caixa acc" data-t="8"><span class="v-ic">⚙</span><b>prompt</b>modo automação</div></div>' },
+  { fala: "O workflow é um arquivo YAML na pasta ponto github barra workflows. Ele diz quando rodar, com quais permissões e o que pedir ao Claude.",
+    html: '<p class="v-txt" data-t="0">.github/workflows/claude-review.yml</p><div class="v-code" data-t="0.4"><div data-t="4.5"><span class="a">on:</span> pull_request</div><div data-t="6"><span class="a">permissions:</span> contents: read</div><div data-t="7.5"><span class="a">prompt:</span> Revise o código…</div></div>' },
+  { fala: "A chave nunca fica no arquivo. Ela vai para os GitHub Secrets, e o workflow só faz referência a ela.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa err" data-t="0.3"><span class="v-ic">✗</span><b>No arquivo</b>sk-ant-…</div><div class="v-caixa ok" data-t="3"><span class="v-ic">🔐</span><b>GitHub Secrets</b>${{ secrets.ANTHROPIC_API_KEY }}</div></div>' },
+  { fala: "Cada execução gasta minutos do GitHub e tokens. Limite com hífen hífen max turns, um tempo máximo no job e controle de concorrência.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa warn" data-t="4"><span class="v-ic">🔁</span><b>--max-turns</b>tokens</div><div class="v-caixa warn" data-t="5.6"><span class="v-ic">⏱</span><b>timeout-minutes</b>minutos</div><div class="v-caixa warn" data-t="7"><span class="v-ic">🚦</span><b>concurrency</b>uma por vez</div></div>' },
+  { fala: "Neste curso, você escreve e confere o YAML no seu PC. Rodar no GitHub é opcional, só num repositório pessoal de teste.",
+    html: '<div class="v-linha" data-t="0.3"><div class="v-caixa ok"><span class="v-ic">✍</span><b>Escrever</b>no PC</div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">✔</span><b>Conferir</b>sem internet</div><span class="v-seta">→</span><div class="v-caixa"><span class="v-ic">☁</span><b>GitHub</b>opcional</div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🔀", rt: "Evento (PR, @claude, horário)" }, { ic: "🖥", rt: "Servidor do GitHub" }, { ic: "✻", rt: "claude-code-action" }, { ic: "📋", rt: "Log ou comentário" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Algo acontece no repositório", texto: "Um PR é aberto, alguém comenta <code>@claude</code> ou chega o horário de um <code>schedule</code>. O bloco <code>on:</code> decide o que conta." },
+    { ativos: [1], setas: [], titulo: "O GitHub sobe um servidor", texto: "Ele baixa o código (<code>actions/checkout</code>) e lê os segredos. A chave entra como <code>${{ secrets.ANTHROPIC_API_KEY }}</code>, nunca escrita no arquivo." },
+    { ativos: [1, 2], setas: [1], titulo: "A action roda o Claude Code", texto: "Com o <code>prompt</code> e os <code>claude_args</code> (<code>--max-turns</code>, <code>--allowedTools</code>…). É o mesmo motor do <code>claude -p</code>." },
+    { ativos: [2, 3], setas: [2], titulo: "O resultado aparece", texto: "No modo automação, vai para o log da execução (ou para o PR, se você liberar uma ferramenta de comentário). No modo interativo, vira comentário." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Conferir o workflow sem internet (ilustrativo)", altura: 300,
+  passos: [
+    { t: "cmd", x: "python ..\\curso\\projeto-taskflow\\etapa-09\\gabarito\\conferir_workflow.py .github\\workflows\\claude-review.yml", leg: "O verificador do curso: sem internet, sem custo" },
+    { t: "out", x: "[ERRO ] A credencial precisa vir de um segredo: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}.\n[AVISO] Sem --max-turns em claude_args: nada limita quantos turnos cada execução gasta.\n\n1 erro(s), 1 aviso(s).", leg: "Primeira versão: credencial errada e sem limite" },
+    { t: "nota", x: "corrigido: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }} e --max-turns 10", leg: "Ajuste no YAML" },
+    { t: "cmd", x: "python ..\\curso\\projeto-taskflow\\etapa-09\\gabarito\\conferir_workflow.py .github\\workflows\\claude-review.yml", leg: "Confere de novo" },
+    { t: "out", x: "0 erro(s), 0 aviso(s).", leg: "Pronto para a simulação" },
+    { t: "cmd", x: "python -m unittest 2>&1 | claude -p \"...mesmo pedido do workflow...\" --max-turns 10 --allowedTools \"Read,Grep,Glob\"", leg: "Simulação local: o que a action faria (gasta uso)" }
+  ]
+});
+(function () {
+  var itens = [
+    ["anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}", "ok", "A chave fica nos GitHub Secrets e o workflow só referencia."],
+    ["anthropic_api_key: sk-ant-EXEMPLO-FICTICIO", "erro", "Chave escrita no arquivo! Use um segredo e, se for real, revogue a chave."],
+    ["uses: anthropics/claude-code-action@beta", "erro", "A versão atual é @v1. A beta usa entradas antigas (mode, direct_prompt)."],
+    ["claude_args: \"--max-turns 5 --model claude-sonnet-5\"", "ok", "claude_args aceita flags da CLI; --max-turns limita o custo."],
+    ["Workflow que roda a cada push, sem --max-turns, sem timeout-minutes e sem concurrency", "erro", "Nada limita turnos, tempo ou execuções simultâneas: custo sem controle."],
+    ["permissions: contents: read, pull-requests: read, id-token: write (numa revisão que só lê)", "ok", "Permissões mínimas, com o id-token que a autenticação padrão exige."],
+    ["direct_prompt: Revise o código", "erro", "Entrada da versão beta. Na v1, use prompt."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Trecho ' + (i + 1) + "/" + itens.length + ":</span> " + Curso_esc(itens[i][0]) + '\n<span class="t-dim">Responda: ok · erro</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function Curso_esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Na verdade: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); }, "ok": function () { return resp("ok"); }, "erro": function () { return resp("erro"); } };
+  Curso.terminal("term", { titulo: "YAML certo ou errado? (simulação)", prompt: ">", intro: '<span class="t-dim">ok = trecho correto e seguro · erro = trecho com problema</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: ok ou erro.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "Qual a diferença entre o modo interativo e o de automação da action?", op: ["O interativo é pago e o de automação é grátis", "Sem <code>prompt</code>, ela espera <code>@claude</code>; com <code>prompt</code>, roda direto no evento", "O de automação só funciona com agendamento"], c: 1, ex: "A action detecta o modo pela presença da entrada <code>prompt</code>." },
+  { p: "Onde fica a chave da API?", op: ["No YAML, entre aspas", "Nos GitHub Secrets, referenciada como <code>${{ secrets.ANTHROPIC_API_KEY }}</code>", "No <code>CLAUDE.md</code>"], c: 1, ex: "Nunca no código. Se uma chave vazar, revogue-a no Console." },
+  { p: "Com um <code>prompt</code> de texto, o Claude pode rodar <code>python -m unittest</code> no servidor?", op: ["Sim, sempre", "Só se você liberar, por exemplo com <code>--allowedTools \"Bash(python -m unittest *)\"</code> em <code>claude_args</code>", "Nunca"], c: 1, ex: "No modo automação com prompt de texto, não há shell até você liberar as ferramentas." },
+  { p: "Quais dois recursos uma execução consome?", op: ["Minutos do GitHub Actions e tokens do Claude", "Só tokens", "Espaço em disco e memória do seu PC"], c: 0, ex: "Limite os dois: <code>timeout-minutes</code>/<code>concurrency</code> e <code>--max-turns</code>." },
+  { p: "Neste curso, qual é o jeito certo de praticar?", op: ["Rodar no repositório do time para ver o resultado real", "Escrever e conferir o YAML no PC e simular com <code>claude -p</code>; GitHub só num repositório pessoal de teste", "Colar o YAML no chat com a chave para o Claude revisar"], c: 1, ex: "Dados fictícios e repositório pessoal. Código da empresa só com aval da segurança da informação." }
+]);
+Curso.checklist("check", [
+  "Explico os modos interativo (<code>@claude</code>) e automação (<code>prompt</code>)",
+  "Escrevo um workflow com <code>anthropics/claude-code-action@v1</code> e permissões mínimas",
+  "Uso <code>${{ secrets.ANTHROPIC_API_KEY }}</code> e sei o que fazer se uma chave vazar",
+  "Limito custo com <code>--max-turns</code>, <code>timeout-minutes</code> e <code>concurrency</code>",
+  "Confiro o YAML no PC e simulo a execução com <code>claude -p</code>"
+]);
+</script>
+</body>
+</html>

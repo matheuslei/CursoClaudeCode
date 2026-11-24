@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+tarefas.json
+.claude/worktrees/
+revisao-*.md

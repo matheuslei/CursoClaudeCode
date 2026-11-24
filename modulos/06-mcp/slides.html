@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 6</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 6 · Revisão</p>
+    <h1>MCP e integrações</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>MCP em uma frase</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">Um padrão aberto para ligar o Claude a ferramentas e dados externos, como uma tomada universal.</p>
+    <ul>
+      <li>🛠 <strong>tools</strong>: ações que o Claude chama</li>
+      <li>📄 <strong>resources</strong>: dados com <code>@servidor:protocolo://caminho</code></li>
+      <li>💬 <strong>prompts</strong>: viram comandos no menu <code>/</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Transportes</h2>
+    <ul>
+      <li><code>stdio</code>: programa local iniciado pelo Claude Code (padrão)</li>
+      <li><code>http</code>: serviço hospedado numa URL (recomendado para remotos)</li>
+      <li><code>sse</code>: depreciado; prefira http</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Adicionar e gerenciar</h2>
+    <div class="cod" style="max-width:900px"><code>claude mcp add --transport http claude-code-docs https://code.claude.com/docs/mcp
+claude mcp add playwright -- npx -y @playwright/mcp@latest
+claude mcp list
+claude mcp get &lt;nome&gt;
+claude mcp remove &lt;nome&gt;</code></div>
+    <p>O <code>--</code> separa as opções do Claude Code do comando do servidor.</p>
+  </section>
+  <section class="slide">
+    <h2>Escopos</h2>
+    <ul>
+      <li><code>local</code> (padrão): só você, só este projeto</li>
+      <li><code>project</code>: <code>.mcp.json</code> no Git, para o time (cada um aprova)</li>
+      <li><code>user</code>: só você, todos os projetos</li>
+    </ul>
+    <p>Login OAuth: <code>/mcp</code> → Authenticate, ou <code>claude mcp login &lt;nome&gt;</code></p>
+  </section>
+  <section class="slide">
+    <h2>Seu servidor em Python</h2>
+    <div class="cod" style="max-width:820px"><code>from mcp.server import MCPServer
+mcp = MCPServer("taskflow")
+
+@mcp.tool()
+def listar_tarefas() -&gt; str:
+    """Docstring = descrição para o Claude."""
+    ...
+
+mcp.run(transport="stdio")</code></div>
+    <p>Sem <code>print()</code> num servidor stdio! (SDK v2: <code>FastMCP</code> virou <code>MCPServer</code>)</p>
+  </section>
+  <section class="slide">
+    <h2>Segurança</h2>
+    <ul>
+      <li>Só conecte servidores em que você confia</li>
+      <li>Conteúdo externo pode trazer <strong>prompt injection</strong></li>
+      <li>Comece com leitura; credenciais somente leitura</li>
+      <li>Dados corporativos: decisão da segurança da informação e da privacidade (LGPD)</li>
+      <li>Remova o que não usa: menos contexto, menos risco</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Um motor, várias superfícies</h2>
+    <ul>
+      <li><strong>CLI</strong>: explícito, scriptável</li>
+      <li><strong>VS Code</strong>: diffs lado a lado, <kbd>Alt</kbd>+<kbd>K</kbd> para linhas, plano comentável</li>
+      <li><strong>Desktop</strong>: sessões paralelas, diffs com comentários, navegador embutido</li>
+      <li>Iguais em todas: CLAUDE.md, settings, MCP, skills · trocar: <code>/desktop</code>, <code>/ide</code>, <code>/resume</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 7?</h2>
+    <ul>
+      <li>✓ Conectou, usou e removeu um servidor MCP</li>
+      <li>✓ Criou o servidor <code>taskflow</code> em Python</li>
+      <li>✓ Usou o Claude Code no VS Code e/ou no Desktop</li>
+    </ul>
+    <p>Próximo: <a href="../07-subagentes/01-subagentes.html"><strong>Módulo 7: Subagentes e paralelismo</strong></a> →</p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

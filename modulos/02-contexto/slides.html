@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 2</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 2 · Revisão</p>
+    <h1>Contexto é tudo</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>A janela de contexto</h2>
+    <ul>
+      <li>Tudo o que o Claude "sabe" agora, medido em tokens</li>
+      <li>Já começa ocupada: system prompt, ferramentas, CLAUDE.md, memória</li>
+      <li>O que mais pesa: arquivos lidos, saídas, respostas longas</li>
+      <li>Perto do limite: <strong>compactação automática</strong></li>
+      <li>Medir: <code>/context</code> · <code>/context all</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>CLAUDE.md: onde mora</h2>
+    <ul>
+      <li><code>~/.claude/CLAUDE.md</code>: você, todos os projetos</li>
+      <li><code>./CLAUDE.md</code>: o projeto, vai para o Git</li>
+      <li><code>./CLAUDE.local.md</code>: você neste projeto (<code>.gitignore</code>)</li>
+      <li>Todos são <strong>somados</strong>; <code>/init</code> cria o rascunho</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>CLAUDE.md: como escrever</h2>
+    <ul>
+      <li>Concreto: "Rode <code>python -m unittest</code>", não "teste bem"</li>
+      <li>Curto: menos de 200 linhas</li>
+      <li>Imports: <code>@README.md</code> (até 4 níveis)</li>
+      <li>É contexto, não trava. Para bloquear: permissões e hooks</li>
+      <li><strong>Nunca</strong> segredos</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Memória automática</h2>
+    <ul>
+      <li>Escrita pelo <strong>Claude</strong>: user, feedback, project, reference</li>
+      <li><code>~/.claude/projects/&lt;projeto&gt;/memory/MEMORY.md</code></li>
+      <li>Local da máquina, não vai para o Git</li>
+      <li>"Lembre que…" → memória · "Adicione ao CLAUDE.md" → CLAUDE.md</li>
+      <li><code>/memory</code>: revisar, editar, ligar e desligar</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Recomeçar, resumir, voltar</h2>
+    <ul>
+      <li><code>/clear</code>: assunto novo (o anterior fica no <code>/resume</code>)</li>
+      <li><code>/compact foque em…</code>: mesma tarefa, conversa longa</li>
+      <li><code>/rewind</code> ou <kbd>Esc</kbd><kbd>Esc</kbd>: volta código e/ou conversa</li>
+      <li>Regra: <strong>uma tarefa, uma conversa</strong></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Limites do rewind</h2>
+    <ul>
+      <li>Rastreia as edições feitas pelas ferramentas do Claude</li>
+      <li>Não rastreia arquivos alterados só por comandos</li>
+      <li>Não rastreia mudanças feitas fora do Claude Code</li>
+      <li>Checkpoint é para a sessão; <strong>Git</strong> é para sempre</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Os botões do custo</h2>
+    <ul>
+      <li><strong>Modelo</strong>: haiku · sonnet (dia a dia) · opus (complexo) · fable</li>
+      <li><strong>Esforço</strong>: <code>/effort low … max</code></li>
+      <li><strong>Contexto</strong>: enxuto = barato</li>
+      <li><strong>Velocidade</strong>: <code>/fast</code>, mesmo modelo, mais rápido, mais caro</li>
+      <li>Acompanhe: <code>/usage</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 3?</h2>
+    <ul>
+      <li>✓ TaskFlow com um CLAUDE.md enxuto e commitado</li>
+      <li>✓ Você mede, limpa, resume e volta no tempo</li>
+      <li>✓ Escolhe modelo e esforço pelo tamanho da tarefa</li>
+    </ul>
+    <p><a href="../03-fluxo/01-explorar-planejar.html">Ir para o Módulo 3: Fluxo profissional →</a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarefas agendadas e loops</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m9a4">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 9 · Aula 4</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>Tarefas agendadas e loops</h1>
+    <p class="objetivo">Objetivo: repetir um pedido com <code>/loop</code>, conhecer as tarefas agendadas do app Desktop e da nuvem, diferenciar <code>/loop</code> de <code>/goal</code> e escolher a ferramenta certa para cada rotina, de olho no custo.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Algumas tarefas não são "faça agora", e sim "faça <strong>de tempos em tempos</strong>": ver se o build terminou, rodar os testes a cada meia hora, revisar os commits do dia toda manhã. Em vez de lembrar de pedir, você agenda. O desafio é escolher <strong>onde</strong> a tarefa roda (na sessão aberta, no seu computador ou na nuvem) e não deixar um agendamento esquecido gastando o seu plano.</p>
+    <div class="caixa alerta"><strong>Aviso de custo</strong>Todo disparo de um agendamento é um novo turno: ele envia o contexto e consome o seu plano, mesmo com você longe do teclado. Prefira intervalos longos, pedidos curtos e cancele o que não precisa mais. O <code>/usage</code> mostra uma linha para os loops mais pesados (v2.1.242 ou mais nova).</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: onde cada agendamento roda</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>/loop, Desktop, nuvem e /goal</h2>
+    <h3>/loop: repetir enquanto a sessão está aberta</h3>
+    <div class="cod"><span class="rot">no claude</span><code>/loop 5m rode python -m unittest e responda só OK ou FALHOU   # intervalo fixo
+/loop confira se o build terminou                              # o Claude escolhe o ritmo
+/loop                                                          # prompt de manutenção ou .claude/loop.md</code></div>
+    <table class="tab">
+      <thead><tr><th>Ponto</th><th>Como funciona</th></tr></thead>
+      <tbody>
+        <tr><td>Intervalo</td><td>Unidades <code>s</code>, <code>m</code>, <code>h</code>, <code>d</code>; o mínimo é 1 minuto (segundos são arredondados para cima). Intervalos "quebrados", como <code>7m</code>, são ajustados e o Claude avisa qual escolheu.</td></tr>
+        <tr><td>Sem intervalo</td><td>O Claude escolhe a espera a cada rodada, entre 1 minuto e 1 hora, e diz o motivo.</td></tr>
+        <tr><td>Sem pedido</td><td>Roda um prompt de manutenção embutido (continuar trabalho pendente, cuidar do PR da branch, limpezas) ou o seu <code>.claude/loop.md</code>.</td></tr>
+        <tr><td>Quando dispara</td><td>Só com o Claude Code <strong>aberto e ocioso</strong>, entre os seus turnos. Fechou o terminal, parou. Horários têm uma pequena variação proposital.</td></tr>
+        <tr><td>Duração</td><td>Tarefas recorrentes <strong>expiram em 7 dias</strong>. Até 50 tarefas por sessão.</td></tr>
+        <tr><td>Parar</td><td>Loop com ritmo do Claude: <kbd>Esc</kbd> com o campo vazio. Loop de intervalo fixo: peça <em>"cancele o loop dos testes"</em> (<kbd>Esc</kbd> e <kbd>Ctrl+C</kbd> não param).</td></tr>
+        <tr><td>Listar</td><td>Pergunte <em>"quais tarefas agendadas eu tenho?"</em>. Cada uma tem um ID de 8 caracteres.</td></tr>
+      </tbody>
+    </table>
+    <p>Para um lembrete único, não precisa de <code>/loop</code>: escreva em linguagem natural, como <em>"daqui a 45 minutos, confira se os testes passaram"</em>. Para desligar o agendador da sessão: variável de ambiente <code>CLAUDE_CODE_DISABLE_CRON=1</code>.</p>
+
+    <h3>Tarefas agendadas sem sessão aberta</h3>
+    <table class="tab">
+      <thead><tr><th></th><th>App Desktop (local)</th><th>Nuvem <span class="selo cinza">prévia</span></th><th><code>/loop</code></th></tr></thead>
+      <tbody>
+        <tr><td>Roda em</td><td>Seu computador</td><td>Nuvem da Anthropic</td><td>Seu computador</td></tr>
+        <tr><td>Computador ligado?</td><td>Sim (app aberto, sem dormir)</td><td>Não</td><td>Sim</td></tr>
+        <tr><td>Sessão aberta?</td><td>Não</td><td>Não</td><td>Sim</td></tr>
+        <tr><td>Arquivos locais?</td><td>Sim</td><td>Não (clone novo do GitHub)</td><td>Sim</td></tr>
+        <tr><td>Intervalo mínimo</td><td>1 h nos formulários (1 min se pedir ao Claude)</td><td>1 hora</td><td>1 minuto</td></tr>
+        <tr><td>Como criar</td><td>Aba Code › <strong>Scheduled</strong> › <strong>New task</strong></td><td><code>/schedule</code> ou claude.ai/code/routines</td><td><code>/loop</code></td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li><strong>Desktop</strong> (Claude Desktop 1.1.5368 ou mais novo): cada tarefa tem pasta, horário (Hourly, Daily, Weekdays, Weekly, Manual ou Custom com cron) e modo de permissão próprios. Se o computador dormiu no horário, ao acordar roda <strong>uma</strong> execução de recuperação da mais recente perdida (até 7 dias). O pedido fica em <code>~/.claude/scheduled-tasks/&lt;nome&gt;/SKILL.md</code>.</li>
+      <li><strong>Nuvem</strong> (antes chamada de <em>routines</em>; em <strong>research preview</strong>): planos Pro, Max, Ultra, Team e Enterprise, com login da assinatura claude.ai (não funciona com chave de API). Roda num clone do repositório do GitHub, por horário, chamada de API ou evento do GitHub. Gerencie com <code>/schedule list</code>, <code>/schedule update</code> e <code>/schedule run</code> (alias <code>/routines</code>). O código sai do seu PC: código da empresa só com aval da segurança da informação.</li>
+      <li><strong>GitHub Actions</strong> (aula 3) também agenda, com <code>on: schedule</code> e <code>cron</code>, rodando no servidor do GitHub.</li>
+    </ul>
+
+    <h3>/loop ou /goal?</h3>
+    <table class="tab">
+      <thead><tr><th></th><th>O próximo turno começa quando…</th><th>Para quando…</th></tr></thead>
+      <tbody>
+        <tr><td><code>/loop</code></td><td>passa um <strong>intervalo de tempo</strong></td><td>você cancela, o Claude decide que acabou (ritmo próprio) ou vencem 7 dias</td></tr>
+        <tr><td><code>/goal</code> (Módulo 7)</td><td>o turno anterior termina</td><td>um modelo avaliador confirma a <strong>condição</strong> (ou a julga impossível), ou você usa <code>/goal clear</code></td></tr>
+      </tbody>
+    </table>
+    <p>Regra prática: <strong>esperar algo de fora</strong> (build, deploy, PR) → <code>/loop</code>. <strong>Trabalhar até um resultado</strong> (testes passando) → <code>/goal</code>. O <code>/goal</code> também roda no <code>-p</code>: <code>claude -p "/goal ..."</code> vai até o fim numa só chamada.</p>
+
+    <h3>Quanto conferir o que rodou sozinho?</h3>
+    <p>Loop, <code>/goal</code>, tarefa agendada e <code>claude -p</code> têm uma coisa em comum: o Claude trabalha <strong>sem você olhando</strong>. A regra é simples: <strong>quanto menos você acompanhou, mais você confere</strong>.</p>
+    <table class="tab">
+      <thead><tr><th>Como foi o trabalho</th><th>O que conferir antes de aceitar</th></tr></thead>
+      <tbody>
+        <tr><td>Você acompanhou cada passo</td><td>Leia o diff final e rode os testes uma vez.</td></tr>
+        <tr><td><code>/goal</code> ou loop com você por perto</td><td>Os testes você mesmo; o diff inteiro; se nada fora do pedido mudou.</td></tr>
+        <tr><td>Agendado, <code>-p</code> ou noturno, sem ninguém</td><td>Tudo acima, mais: o que ele <strong>disse</strong> que fez bate com o que fez (histórico e <code>git log</code>)? Revisão com contexto novo (<code>/code-review</code>, aula 9.2) antes de juntar.</td></tr>
+      </tbody>
+    </table>
+    <p>E dá para <strong>não depender da memória</strong>: um hook de <code>Stop</code> (Módulo 5) roda toda vez que o Claude vai encerrar o turno. Se o script sair com código <code>2</code>, o Claude <strong>não para</strong>: o texto do erro volta para ele como motivo para continuar.</p>
+    <div class="cod"><span class="rot">.claude/settings.json (trecho)</span><code>{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command",
+          "command": "python \"${CLAUDE_PROJECT_DIR}/.claude/hooks/testes_antes_de_parar.py\"" } ] }
+    ]
+  }
+}</code></div>
+    <p>O script roda <code>python -m unittest</code>. Se falhar, sai com <code>2</code> e manda o fim do erro; se passar, sai com <code>0</code>. Está em <code>projeto-taskflow/etapa-09/gabarito/.claude/hooks/testes_antes_de_parar.py</code> (testado em 19/11/2026: libera com testes passando, bloqueia com testes falhando).</p>
+    <div class="caixa alerta"><strong>Evite o laço sem fim</strong>O hook recebe <code>stop_hook_active: true</code> quando o Claude já está continuando por causa dele. O script do gabarito libera a parada nesse caso. Além disso, o Claude Code ignora o bloqueio depois de várias continuações seguidas sem uso de ferramenta. Um teste que nunca passa vira só uma mensagem de erro, não um gasto infinito, mas confira mesmo assim.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: um loop de testes</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual ferramenta?</h2>
+    <p>Para cada rotina, responda <code>loop</code>, <code>goal</code>, <code>desktop</code>, <code>nuvem</code> ou <code>actions</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: um loop curto e cancelado</h2>
+    <p>Use a pasta de treino do Módulo 9 (<a href="../../projeto-taskflow/etapa-09/README.md">README da etapa 09</a>).</p>
+    <div class="caixa alerta"><strong>Custo</strong>Cada disparo consome o seu plano. Deixe o loop rodar <strong>uma ou duas vezes</strong> e cancele. Não saia deixando um loop ativo.</div>
+    <ol>
+      <li>Abra o <code>claude</code> na pasta de treino e rode: <code>/loop 5m rode python -m unittest e responda só OK ou FALHOU</code>. Leia a confirmação: intervalo e ID da tarefa.</li>
+      <li>Pergunte: <em>"quais tarefas agendadas eu tenho?"</em>. Ache o ID e o próximo horário.</li>
+      <li>Depois de um ou dois disparos, peça: <em>"cancele o loop dos testes"</em>. Pergunte de novo a lista para confirmar que ficou vazia.</li>
+      <li><em>(Opcional)</em> Crie <code>.claude/loop.md</code> com o seu pedido padrão (modelo em <code>gabarito/.claude/loop.md</code>), rode <code>/loop</code> sem nada, espere uma rodada e pare com <kbd>Esc</kbd> no campo vazio.</li>
+      <li>Compare com o <code>/goal</code>: <code>/goal python -m unittest mostra OK nesta conversa, ou pare após 3 turnos</code>. Qual dos dois depende do relógio?</li>
+      <li><em>(Opcional, Desktop)</em> No app, aba Code › Scheduled › New task: crie uma tarefa local na pasta de treino com horário <strong>Manual</strong> e clique em <strong>Run now</strong>. Assim nada roda sozinho depois.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <ul>
+        <li><strong>Passo 1:</strong> o Claude converte <code>5m</code> no cron <code>*/5 * * * *</code>, agenda e confirma o ritmo e um ID de 8 caracteres. A cada disparo, roda os testes e responde <code>OK</code> (o TaskFlow tem 6 testes passando).</li>
+        <li><strong>Passos 2 e 3:</strong> por baixo, o Claude usa as ferramentas <code>CronList</code> (listar) e <code>CronDelete</code> (cancelar pelo ID). <kbd>Esc</kbd> não cancela um loop de intervalo fixo; é preciso pedir.</li>
+        <li><strong>Passo 4:</strong> conteúdo de exemplo do <code>.claude/loop.md</code>:
+          <div class="cod"><span class="rot">.claude/loop.md</span><code>Rode python -m unittest. Se todos os testes passarem, responda só "OK, N testes".
+Se algum falhar, mostre o nome do teste e a primeira linha do erro. Não edite arquivos.</code></div>
+          Sem intervalo, o Claude escolhe a espera; <kbd>Esc</kbd> com o campo vazio para esse tipo de loop.</li>
+        <li><strong>Passo 5:</strong> o <code>/loop</code> depende do relógio; o <code>/goal</code> depende da condição. Com os testes já passando, o <code>/goal</code> deve terminar logo no primeiro turno.</li>
+        <li><strong>Passo 6:</strong> com <strong>Manual</strong>, a tarefa só roda quando você clica em <strong>Run now</strong>. Se aparecer pedido de permissão, responda na sessão da execução (lista <em>History</em> da tarefa).</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Loop esquecido</h4><p>Um <code>/loop 1m</code> deixado aberto dispara 60 vezes por hora, cada vez com todo o contexto. Use intervalos longos e cancele.</p></div>
+      <div class="mini"><h4>Achar que Esc para tudo</h4><p><kbd>Esc</kbd> só para o loop de ritmo próprio. O de intervalo fixo se cancela pedindo ao Claude.</p></div>
+      <div class="mini"><h4>Esperar que rode com o terminal fechado</h4><p><code>/loop</code> vive na sessão. Para rodar sem ela, use Desktop (PC ligado) ou nuvem.</p></div>
+      <div class="mini"><h4>Usar /loop para "até passar"</h4><p>Repetir no relógio até os testes passarem desperdiça disparos. Isso é trabalho para o <code>/goal</code>.</p></div>
+      <div class="mini"><h4>Nuvem com código da empresa</h4><p>A tarefa na nuvem clona o repositório fora do seu PC. Só com aval da segurança da informação.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/scheduled-tasks">Run prompts on a schedule</a> (em inglês): <code>/loop</code>, cron, variação de horário, lembretes e limites.</li>
+      <li><a href="https://code.claude.com/docs/en/desktop-scheduled-tasks">Desktop scheduled tasks</a> e <a href="https://code.claude.com/docs/en/routines">cloud scheduled tasks</a> (research preview).</li>
+      <li><a href="https://code.claude.com/docs/en/goal">/goal</a>: avaliador, limites e uso no modo <code>-p</code>.</li>
+      <li><a href="https://code.claude.com/docs/en/hooks">Hooks, evento Stop</a> (em inglês): bloquear a parada, <code>stop_hook_active</code> e o limite de continuações.</li>
+      <li><a href="https://academy.claude.com/courses/claude-code-in-action">Claude Code in Action</a> (Anthropic Academy, gratuito, em inglês): lições sobre tarefas agendadas, headless e como confiar em execuções sem supervisão.</li>
+      <li>Próximo módulo: <strong>Agent SDK</strong>, para construir o seu próprio agente em Python.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Run prompts on a schedule", "Schedule recurring tasks in Claude Code Desktop", "Automate work with scheduled tasks" e "Keep Claude working toward a goal"); seção "Quanto conferir" e hook de Stop conferidos em 23/11/2026 (Hooks reference, evento Stop).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Agendamentos em 1 minuto", cenas: [
+  { fala: "Última aula do módulo: fazer o Claude trabalhar sozinho, no horário certo ou até cumprir um objetivo.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 9 · AULA 4</span><p class="v-titulo" data-t="0.3">Agendamentos e loops</p><p class="v-sub" data-t="1.2">no horário certo ou até o objetivo</p>' },
+  { fala: "Barra loop repete um pedido enquanto a sessão está aberta. Barra loop cinco m roda a cada cinco minutos. Sem intervalo, o Claude escolhe o ritmo.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span><span class="v-digita" style="--n:30">/loop 5m rode os testes</span></div><div data-t="5"><span class="o">agendado</span> <span class="d">· a cada 5 minutos · id a1b2c3d4</span></div></div><div class="v-caixa acc" data-t="7.5"><span class="v-ic">🎚</span><b>Sem intervalo</b>o Claude escolhe o ritmo</div>' },
+  { fala: "Um loop recorrente expira em sete dias e só roda com a sessão aberta. Para parar um loop de intervalo fixo, peça ao Claude para cancelar.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa warn" data-t="0.3"><span class="v-ic">📅</span><b>7 dias</b>e expira</div><div class="v-caixa warn" data-t="2.5"><span class="v-ic">🖥</span><b>Sessão aberta</b>e ociosa</div><div class="v-caixa" data-t="5.5"><span class="v-ic">🛑</span><b>Parar</b>"cancele o loop"</div></div>' },
+  { fala: "Para rodar sem a sessão aberta, existem as tarefas agendadas: no app Desktop, no seu computador, ou na nuvem, com barra schedule, ainda em prévia.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa ok" data-t="4.5"><span class="v-ic">💻</span><b>Desktop</b>no seu PC ligado</div><div class="v-caixa acc" data-t="7"><span class="v-ic">☁</span><b>Nuvem · /schedule</b>research preview</div></div>' },
+  { fala: "E o barra goal? Ele não olha o relógio: continua turno após turno até uma condição ser cumprida. Loop é tempo. Goal é objetivo.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa" data-t="0.3"><span class="v-ic">⏰</span><b>/loop</b>intervalo de tempo</div><div class="v-caixa ok" data-t="2"><span class="v-ic">🎯</span><b>/goal</b>condição cumprida</div></div><p class="v-titulo" data-t="7">Loop é tempo. Goal é objetivo.</p>' },
+  { fala: "Todo disparo envia o contexto e consome o seu plano. Use intervalos longos, limites claros e cancele o que não precisa mais.",
+    html: '<div class="v-grade" style="--cols:2"><div data-t="0.3"><p class="v-txt">/loop 1m por 1 hora</p><div class="v-barra"><i style="--w:95%;--cor:#e07a6a;animation-delay:.6s"></i></div></div><div data-t="2.5"><p class="v-txt">/loop 30m por 1 hora</p><div class="v-barra"><i style="--w:8%;--cor:#6ac08a;animation-delay:2.8s"></i></div></div></div><div class="v-caixa warn" data-t="5"><span class="v-ic">🪙</span><b>Cancele</b>o que não precisa mais</div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "⏰", rt: "/loop (sessão aberta)" }, { ic: "💻", rt: "Desktop (PC ligado)" }, { ic: "☁", rt: "Nuvem (/schedule)" }, { ic: "🐙", rt: "GitHub Actions" }],
+  passos: [
+    { ativos: [0], setas: [], titulo: "Dentro da sessão: /loop", texto: "Mais rápido de criar. Usa os arquivos locais e as permissões da sessão, mas <strong>para quando você fecha o terminal</strong> e expira em 7 dias." },
+    { ativos: [0, 1], setas: [0], titulo: "Sem sessão, no seu PC: Desktop", texto: "O app Desktop abre uma sessão nova no horário. Tem os arquivos locais, mas precisa do <strong>app aberto e do computador acordado</strong>." },
+    { ativos: [1, 2], setas: [1], titulo: "Sem o seu PC: nuvem", texto: "Roda mesmo com o notebook desligado, num clone do GitHub. Está em <strong>research preview</strong> e o código sai da sua máquina." },
+    { ativos: [2, 3], setas: [2], titulo: "No CI do repositório: Actions", texto: "Um <code>on: schedule</code> com cron no workflow da aula 3. Roda no servidor do GitHub, com segredos do GitHub." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Um loop de testes, do início ao cancelamento (ilustrativo)", altura: 320,
+  passos: [
+    { t: "user", x: "/loop 5m rode python -m unittest e responda só OK ou FALHOU", leg: "Intervalo fixo de 5 minutos" },
+    { t: "tool", x: "CronCreate(*/5 * * * *)  next run 10:25", leg: "O Claude converte em cron e agenda" },
+    { t: "claude", x: "Agendado a cada 5 minutos (id 3f9a1c7e). Expira em 7 dias.", leg: "Confirma o ritmo e o ID" },
+    { t: "out", x: "[10:25] OK, 6 testes", leg: "Um disparo, entre os seus turnos" },
+    { t: "user", x: "cancele o loop dos testes", leg: "Esc não para um loop de intervalo fixo" },
+    { t: "tool", x: "CronDelete(3f9a1c7e)", leg: "Cancelado pelo ID" },
+    { t: "claude", x: "Loop cancelado. Nenhuma tarefa agendada nesta sessão.", leg: "Nada mais gastando o plano" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Enquanto trabalho, ver a cada 10 minutos se o build do servidor terminou", "loop", "Esperar algo de fora, com a sessão aberta: /loop 10m."],
+    ["Continuar trabalhando até todos os testes passarem, sem eu pedir cada passo", "goal", "Trabalhar até uma condição é /goal, não relógio."],
+    ["Todo dia às 9h, revisar os commits numa pasta do meu PC, sem deixar o terminal aberto", "desktop", "Arquivos locais e sem sessão aberta: tarefa agendada do Desktop (PC ligado)."],
+    ["Toda noite, mesmo com o notebook desligado, revisar os PRs de um repositório pessoal no GitHub", "nuvem", "Sem depender do PC: tarefa na nuvem com /schedule (research preview)."],
+    ["A cada pull request, rodar a revisão no CI do repositório, com a chave nos segredos do GitHub", "actions", "Evento do repositório no CI: workflow do GitHub Actions (aula 3)."],
+    ["Rodar uma checagem no meu PC a cada 2 horas por um mês, sem sessão aberta", "desktop", "/loop expira em 7 dias e precisa da sessão; o Desktop persiste."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Rotina ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: loop · goal · desktop · nuvem · actions</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["loop", "goal", "desktop", "nuvem", "actions"].forEach(function (r) { cmds[r] = function () { return resp(r); }; });
+  cmds["/loop"] = cmds.loop; cmds["/goal"] = cmds.goal;
+  Curso.terminal("term", { titulo: "Qual ferramenta? (simulação)", prompt: ">", intro: '<span class="t-dim">Escolha onde cada rotina deve rodar.</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: loop, goal, desktop, nuvem ou actions.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que acontece com um <code>/loop 5m ...</code> quando você fecha o terminal?", op: ["Continua rodando na nuvem", "Para de disparar: ele só roda com o Claude Code aberto e ocioso", "Vira uma tarefa do Desktop"], c: 1, ex: "O <code>/loop</code> é da sessão. Para rodar sem ela, use Desktop ou nuvem." },
+  { p: "Como parar um loop de intervalo fixo, como <code>/loop 5m</code>?", op: ["Apertando <kbd>Esc</kbd>", "Pedindo ao Claude para cancelar (ou esperando expirar em 7 dias)", "Com <code>/goal clear</code>"], c: 1, ex: "<kbd>Esc</kbd> só para o loop de ritmo próprio. O fixo se cancela pelo ID, pedindo ao Claude." },
+  { p: "Qual é a diferença central entre <code>/loop</code> e <code>/goal</code>?", op: ["Nenhuma, são sinônimos", "<code>/loop</code> repete por intervalo de tempo; <code>/goal</code> continua até uma condição ser cumprida", "<code>/goal</code> só funciona na nuvem"], c: 1, ex: "Loop é tempo; goal é objetivo verificado por um avaliador." },
+  { p: "Você quer uma tarefa que rode mesmo com o notebook desligado. O que usar?", op: ["Tarefa agendada do Desktop", "Tarefa agendada na nuvem (<code>/schedule</code>), em research preview", "<code>/loop 1d</code>"], c: 1, ex: "Desktop e <code>/loop</code> precisam do computador ligado; a nuvem não." },
+  { p: "Por que um <code>/loop 1m</code> esquecido é um problema?", op: ["Porque trava o computador", "Porque cada disparo envia o contexto e consome o plano, 60 vezes por hora", "Porque apaga arquivos"], c: 1, ex: "Use intervalos longos e cancele o que não precisa mais." }
+]);
+Curso.checklist("check", [
+  "Crio um <code>/loop</code> com intervalo e sem intervalo",
+  "Listo e cancelo tarefas agendadas pedindo ao Claude",
+  "Sei quando usar Desktop, nuvem ou GitHub Actions em vez de <code>/loop</code>",
+  "Explico a diferença entre <code>/loop</code> (tempo) e <code>/goal</code> (condição)",
+  "Calculo o custo de um agendamento antes de deixá-lo rodando"
+]);
+</script>
+</body>
+</html>

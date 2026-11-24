@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m5a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 5 · Aula 2</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~30 min</span>
+    <h1>Skills</h1>
+    <p class="objetivo">Objetivo: transformar um pedido que você repete sempre numa skill reutilizável, chamada com <code>/nome</code> ou carregada pelo Claude quando a tarefa pede.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Você se pega digitando o mesmo pedido longo várias vezes? <em>"Revise o diff, procure erros de validação, confira os testes, sugira mensagem de commit…"</em>. Uma <strong>skill</strong> guarda esse procedimento num arquivo. Você chama com <code>/revisar-taskflow</code>, e o time inteiro usa o mesmo padrão se a skill for commitada.</p>
+    <div class="grade">
+      <div class="mini"><h4>CLAUDE.md</h4><p>O que o Claude deve <strong>saber sempre</strong>. Carregado em toda sessão.</p></div>
+      <div class="mini"><h4>Skill</h4><p>Um <strong>procedimento para um tipo de tarefa</strong>. Só o corpo completo entra no contexto quando é usado.</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como uma skill é carregada</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Anatomia de uma skill</h2>
+    <p>Cada skill é uma <strong>pasta</strong> com um arquivo <code>SKILL.md</code> (e arquivos de apoio, se quiser):</p>
+    <table class="tab">
+      <thead><tr><th>Escopo</th><th>Caminho</th><th>Vale para</th></tr></thead>
+      <tbody>
+        <tr><td>Pessoal</td><td><code>~/.claude/skills/&lt;nome&gt;/SKILL.md</code></td><td>Todos os seus projetos nesta máquina</td></tr>
+        <tr><td>Projeto</td><td><code>.claude/skills/&lt;nome&gt;/SKILL.md</code></td><td>Este repositório (commite para o time)</td></tr>
+        <tr><td>Plugin</td><td><code>&lt;plugin&gt;/skills/&lt;nome&gt;/SKILL.md</code></td><td>Onde o plugin estiver ativo (Módulo 8)</td></tr>
+      </tbody>
+    </table>
+    <p>Exemplo no formato da documentação, adaptado ao TaskFlow:</p>
+    <div class="cod"><span class="rot">.claude/skills/revisar-taskflow/SKILL.md</span><code>---
+description: Revisa as mudanças não commitadas do TaskFlow e aponta riscos. Use quando o usuário pedir revisão do diff ou uma mensagem de commit.
+argument-hint: [foco opcional da revisão]
+---
+
+## Mudanças atuais
+
+!`git diff HEAD`
+
+## Instruções
+
+Resuma as mudanças acima em 2 ou 3 tópicos. Depois liste riscos:
+validação de número da tarefa, tratamento de tarefas.json inexistente,
+mensagens de erro em português e testes que precisam ser atualizados.
+Foco extra pedido pelo usuário: $ARGUMENTS
+Termine sugerindo uma mensagem de commit em português.
+Se o diff estiver vazio, diga que não há mudanças.</code></div>
+    <h3>O que cada parte faz</h3>
+    <ul>
+      <li><strong>Frontmatter</strong> (entre <code>---</code>): todos os campos são opcionais, mas <code>description</code> é o mais importante. É ela que o Claude lê para decidir quando usar a skill.</li>
+      <li><code>name</code>: se omitido, o nome vem da pasta (<code>revisar-taskflow</code> → <code>/revisar-taskflow</code>).</li>
+      <li><code>argument-hint</code>: dica que aparece no menu <code>/</code>.</li>
+      <li><code>$ARGUMENTS</code>: recebe tudo o que você digita depois do comando. <code>$0</code>, <code>$1</code>… pegam por posição.</li>
+      <li><code>!`comando`</code>: roda <strong>antes</strong> de o Claude ver a skill, e a saída substitui a linha. Aqui injeta o diff atual.</li>
+    </ul>
+    <h3>Quem pode chamar</h3>
+    <table class="tab">
+      <tbody>
+        <tr><td>Padrão</td><td>Você (<code>/nome</code>) <strong>e</strong> o Claude (quando a tarefa combina com a description)</td></tr>
+        <tr><td><code>disable-model-invocation: true</code></td><td>Só você. Bom para ações sensíveis, como um <code>/deploy</code></td></tr>
+        <tr><td><code>user-invocable: false</code></td><td>Só o Claude. Não aparece no menu <code>/</code></td></tr>
+      </tbody>
+    </table>
+    <h3>Comandos úteis</h3>
+    <ul>
+      <li><code>/skills</code>: lista as skills disponíveis</li>
+      <li><code>/skill-doctor</code>: mostra quanto contexto cada skill custa e quanto é usada</li>
+      <li><code>/reload-skills</code>: recarrega skills criadas ou editadas durante a sessão</li>
+    </ul>
+    <h3>Skills de verificação: o Claude confere o próprio trabalho</h3>
+    <p>Um tipo de skill que vale muito: a que diz ao Claude <strong>como provar</strong> que terminou. Em vez de você lembrar de pedir "rode os testes e mostre", a skill guarda o roteiro de conferência do projeto, e o Claude a usa sozinho quando a description combina.</p>
+    <div class="cod"><span class="rot">.claude/skills/verificar-taskflow/SKILL.md</span><code>---
+description: Confere uma mudança no TaskFlow antes de dizer que terminou. Use sempre que terminar de alterar tarefas.py ou os testes, antes de responder que a tarefa está pronta.
+---
+
+Antes de dizer que terminou:
+
+1. Rode `python -m unittest` e mostre a última linha da saída.
+2. Rode o comando que você mudou com dados fictícios, por exemplo:
+   `python tarefas.py adicionar "Tarefa de teste"` e `python tarefas.py listar`.
+   Mostre a saída.
+3. Releia o pedido do usuário e diga, item por item, onde cada um foi atendido.
+4. Rode `git diff --stat` e confirme que só mudaram os arquivos esperados.
+
+Se algo falhar, corrija e repita. Nunca diga "pronto" sem mostrar essas saídas.</code></div>
+    <ul>
+      <li><strong>Por que funciona:</strong> a description diz <em>quando</em> (ao terminar uma mudança) e o corpo diz <em>como</em>. A prova aparece na conversa, onde você confere e onde o avaliador do <code>/goal</code> também consegue ler (Módulo 7).</li>
+      <li><strong>Skill ou hook?</strong> A skill <em>orienta</em> e pode ser pulada. Para uma regra que precisa valer sempre, como "não encerrar com teste falhando", use um hook (aula 5.4 e o hook de <code>Stop</code> da aula 9.4).</li>
+    </ul>
+    <div class="caixa"><strong>E o <code>.claude/commands/</code>?</strong>É o formato antigo, de arquivo único: <code>.claude/commands/deploy.md</code> vira <code>/deploy</code>. Ainda funciona, mas a documentação recomenda <strong>skills</strong> para coisas novas, porque elas aceitam arquivos de apoio. Para migrar, mova para <code>.claude/skills/deploy/SKILL.md</code>.</div>
+    <div class="caixa alerta"><strong>Skills de terceiros</strong>Uma skill pode rodar comandos (<code>!`...`</code>) e orientar o Claude. Leia o conteúdo antes de instalar skills que você não escreveu.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: monte a skill</h2>
+    <p>O simulador valida um <code>SKILL.md</code>. Envie cada parte e veja o que falta. Comece com <code>novo</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <ol>
+      <li>No TaskFlow, crie <code>.claude/skills/revisar-taskflow/SKILL.md</code> com o conteúdo da aula</li>
+      <li>Faça uma pequena mudança em <code>tarefas.py</code> (ex.: mude uma mensagem)</li>
+      <li>Abra <code>claude</code>, rode <code>/skills</code> e confira se ela aparece. Se a sessão já estava aberta, use <code>/reload-skills</code></li>
+      <li>Rode <code>/revisar-taskflow mensagens de erro</code></li>
+      <li>Crie uma segunda skill, <code>nova-funcionalidade</code>, com <code>disable-model-invocation: true</code>, que recebe o nome da funcionalidade em <code>$ARGUMENTS</code> e manda o Claude: explorar, propor plano, esperar aprovação, implementar e testar</li>
+      <li>Rode <code>/skill-doctor</code> e veja o custo de contexto das duas</li>
+      <li><em>(Extra)</em> Crie a skill <code>verificar-taskflow</code> da seção 3. Peça uma mudança pequena (<em>"faça o listar mostrar o total de tarefas no fim"</em>) sem falar em testes e observe: o Claude usa a skill e mostra as provas antes de dizer que terminou?</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito da skill nova-funcionalidade</summary>
+      <div class="cod"><code>---
+description: Implementa uma funcionalidade nova no TaskFlow seguindo explorar, planejar, implementar e testar.
+argument-hint: [descrição da funcionalidade]
+disable-model-invocation: true
+---
+
+Funcionalidade pedida: $ARGUMENTS
+
+1. Leia tarefas.py e os testes existentes.
+2. Proponha um plano curto (arquivos, funções, casos de teste) e ESPERE minha aprovação.
+3. Implemente usando só a biblioteca padrão do Python.
+4. Rode os testes e o comando novo; mostre a saída.
+5. Sugira uma mensagem de commit em português.</code></div>
+      <p>Com <code>disable-model-invocation: true</code>, o Claude não dispara essa skill sozinho: só quando você digita <code>/nova-funcionalidade ...</code>. Uma versão pronta está em <code>projeto-taskflow/etapa-05/.claude/skills/</code>.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Description vaga</h4><p>"Ajuda com código" não diz quando usar. Escreva o quê e quando: "Use quando o usuário pedir…".</p></div>
+      <div class="mini"><h4>Arquivo solto</h4><p>A skill é uma <strong>pasta</strong> com <code>SKILL.md</code> dentro, não um <code>.md</code> solto em <code>skills/</code>.</p></div>
+      <div class="mini"><h4>Campo com nome errado</h4><p>Campos com grafia errada são ignorados sem aviso. Use hífens: <code>argument-hint</code>.</p></div>
+      <div class="mini"><h4>Skill gigante</h4><p>Muita coisa numa skill só gasta contexto. Divida e veja o custo com <code>/skill-doctor</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/skills">Extend Claude with skills</a>: frontmatter completo</li>
+      <li><a href="https://code.claude.com/docs/en/claude-directory">Explore the .claude directory</a></li>
+      <li><a href="https://academy.claude.com/courses/introduction-to-agent-skills">Introduction to agent skills</a> (Anthropic Academy, gratuito, em inglês) e a lição sobre skills de verificação do <a href="https://academy.claude.com/courses/claude-code-in-action">Claude Code in Action</a>.</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026 (Skills); seção de skills de verificação em 23/11/2026. Campos menos usados do frontmatter (<code>allowed-tools</code>, <code>model</code>, <code>context</code>, <code>paths</code>…) ficam para consulta na doc.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Skills em 1 minuto", cenas: [
+  { fala: "Nesta aula, você vai transformar um pedido que você repete toda hora numa skill reutilizável.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 5 · AULA 2</span><p class="v-titulo" data-t="0.3">Skills</p><p class="v-sub" data-t="0.9">Procedimentos reutilizáveis com um comando</p>' },
+  { fala: "Sabe aquele pedido longo que você digita várias vezes? Revise o diff, confira os testes, sugira o commit. Uma skill guarda esse procedimento num arquivo, e você chama com um comando.",
+    html: '<p class="v-txt" data-t="0.3">Em vez de repetir o pedido longo…</p><div class="v-code" data-t="3.5"><span class="u">&gt; </span><span class="v-digita" style="--n:17">/revisar-taskflow</span></div>' },
+  { fala: "Diferente do CLAUDE.md, que entra em toda sessão, o conteúdo completo da skill só entra no contexto quando ela é usada.",
+    html: '<div class="v-grade"><div class="v-caixa" data-t="0.3"><span class="v-ic">📘</span><b>CLAUDE.md</b>o que o Claude deve saber sempre</div><div class="v-caixa acc" data-t="2.5"><span class="v-ic">🧩</span><b>Skill</b>procedimento para um tipo de tarefa, carregado quando usado</div></div>' },
+  { fala: "Cada skill é uma pasta com um arquivo SKILL.md. No topo, a description é a parte mais importante: é ela que o Claude lê para decidir quando usar a skill. E uma linha com exclamação roda um comando antes, como injetar o diff atual.",
+    html: '<p class="v-txt" data-t="0">.claude/skills/revisar-taskflow/SKILL.md</p><div class="v-code" data-t="0.4"><div><span class="d">---</span></div><div data-t="2.4"><span class="a">description:</span> Revisa as mudanças… Use quando…</div><div data-t="3.6"><span class="a">argument-hint:</span> [foco opcional da revisão]</div><div><span class="d">---</span></div><div data-t="6"><span class="w">!`git diff HEAD`</span>  <span class="d">roda antes</span></div></div>' },
+  { fala: "Por padrão, tanto você quanto o Claude podem chamar a skill. Com disable model invocation, só você chama, bom para ações sensíveis. Com user invocable falso, só o Claude.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">🤝</span><b>Padrão</b>você e o Claude</div><div class="v-caixa warn" data-t="2.2"><span class="v-ic">✋</span><b>disable-model-invocation: true</b>só você (ex.: /deploy)</div><div class="v-caixa" data-t="4.6"><span class="v-ic">🤖</span><b>user-invocable: false</b>só o Claude</div></div>' },
+  { fala: "Barra skills lista as disponíveis, e barra skill doctor mostra quanto contexto cada uma custa. Atenção: leia o conteúdo antes de instalar skills de terceiros.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">📋</span><b>/skills</b>lista as skills</div><div class="v-caixa" data-t="1.8"><span class="v-ic">🩺</span><b>/skill-doctor</b>custo de contexto e uso</div><div class="v-caixa err" data-t="4"><span class="v-ic">⚠</span><b>Terceiros</b>leia antes de instalar</div></div>' },
+  { fala: "A regra é simples: repetiu o mesmo pedido? Transforme em skill.",
+    html: '<p class="v-sub" data-t="0">A regra prática</p><p class="v-titulo" data-t="0.4">Pedido repetido vira skill</p>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "📇", rt: "Description no contexto" }, { ic: "🎯", rt: "Gatilho" }, { ic: "📖", rt: "Corpo carregado" }, { ic: "🛠", rt: "Execução" }],
+  passos: [
+    { ativos: [0], titulo: "Só a descrição fica sempre visível", texto: "No início da sessão, o Claude vê apenas a <code>description</code> de cada skill (uma espécie de cardápio). O corpo completo <strong>não</strong> ocupa contexto ainda." },
+    { ativos: [1], setas: [0], titulo: "Dois gatilhos possíveis", texto: "Você digita <code>/revisar-taskflow</code>, <strong>ou</strong> o Claude percebe que seu pedido combina com a description (\"revise meu diff\") e carrega a skill sozinho." },
+    { ativos: [2], setas: [1], titulo: "O corpo entra no contexto", texto: "O <code>SKILL.md</code> é lido: os <code>!`comandos`</code> rodam antes, <code>$ARGUMENTS</code> é substituído, e as instruções viram parte da conversa." },
+    { ativos: [3], setas: [2], titulo: "O Claude segue o procedimento", texto: "Com as instruções carregadas, ele executa usando as ferramentas normais e as permissões de sempre." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: usando uma skill (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "/skills", leg: "Quais skills existem aqui?" },
+    { t: "html", x: '<span class="t-caixa">Skills\n  revisar-taskflow  <span class="t-dim">project · Revisa as mudanças não commitadas…</span>\n  nova-funcionalidade  <span class="t-dim">project · manual only</span></span>' },
+    { t: "user", x: "/revisar-taskflow mensagens de erro", leg: "Chamando com argumento" },
+    { t: "nota", x: "!`git diff HEAD` rodou antes; $ARGUMENTS = 'mensagens de erro'", ms: 1500 },
+    { t: "claude", x: "Mudanças: (1) remover agora mostra o título removido; (2) validação reaproveitada do concluir.", ms: 1300 },
+    { t: "claude", x: "Riscos: a mensagem 'Tarefa 0 não existe' pode confundir; sugiro 'Use um número entre 1 e N'.", ms: 1300 },
+    { t: "claude", x: "Commit sugerido: \"Melhora mensagens de erro do remover\"", leg: "Procedimento repetível, sempre igual" }
+  ]
+});
+(function () {
+  var p = {};
+  function status() {
+    var f = [];
+    if (!p.pasta) f.push("pasta .claude/skills/<nome>/ (envie: pasta revisar-taskflow)");
+    if (!p.desc) f.push("description no frontmatter (envie: description ...)");
+    if (!p.args) f.push("uso de $ARGUMENTS (envie: corpo ... $ARGUMENTS)");
+    return f.length ? '<span class="t-warn">Falta: </span>' + f.join("\n       ") : '<span class="t-ok">✓ Skill válida! Agora ela aparece em /skills e pode ser chamada com /' + p.pasta + "</span>";
+  }
+  Curso.terminal("term", {
+    titulo: "Validador de SKILL.md (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Comandos: novo · pasta &lt;nome&gt; · description &lt;texto&gt; · corpo &lt;texto&gt; · validar · /skills</span>',
+    metas: ["novo", "pasta revisar-taskflow", "validar", "/skills"],
+    comandos: {
+      "novo": function () { p = {}; return "Nova skill iniciada.\n" + status(); },
+      "validar": function () { return status(); },
+      "/skills": function () { return p.pasta && p.desc ? '<span class="t-caixa">Skills\n  ' + p.pasta + ' <span class="t-dim">project · ' + p.desc.slice(0, 50) + "</span></span>" : '<span class="t-dim">Nenhuma skill de projeto válida ainda. Complete pasta e description.</span>'; }
+    },
+    padroes: [
+      [/^pasta\s+([a-z0-9-]+)$/i, function (m) { p.pasta = m[1].toLowerCase(); return "Criada .claude/skills/" + p.pasta + "/SKILL.md\n" + status(); }],
+      [/^pasta\s+(.+)$/i, function () { return '<span class="t-warn">Use letras minúsculas, números e hífens no nome da pasta.</span>'; }],
+      [/^description\s+(.+)$/i, function (m) { p.desc = m[1]; var dica = /use quando|quando o usu/i.test(m[1]) ? "" : '\n<span class="t-dim">Dica: diga QUANDO usar ("Use quando o usuário pedir…"). Isso ajuda o Claude a decidir.</span>'; return "description registrada." + dica + "\n" + status(); }],
+      [/^corpo\s+(.+)$/i, function (m) { p.args = /\$ARGUMENTS|\$\d/.test(m[1]); return (p.args ? "Corpo com argumentos registrado." : '<span class="t-warn">Corpo sem $ARGUMENTS: funciona, mas o texto digitado após o comando é só anexado ao final.</span>') + "\n" + status(); }]
+    ]
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "Onde fica uma skill de projeto chamada <code>revisar</code>?", op: ["<code>.claude/revisar.md</code>", "<code>.claude/skills/revisar/SKILL.md</code>", "<code>CLAUDE.md</code>"], c: 1, ex: "Cada skill é uma pasta com <code>SKILL.md</code>. O nome da pasta vira o comando <code>/revisar</code>." },
+  { p: "Qual campo o Claude usa para decidir carregar a skill sozinho?", op: ["<code>argument-hint</code>", "<code>description</code>", "O nome do arquivo"], c: 1, ex: "A description fica no contexto como um cardápio. O corpo só entra quando a skill é usada." },
+  { p: "Você criou <code>/deploy</code> e não quer que o Claude o dispare por conta própria. O que usar?", op: ["<code>disable-model-invocation: true</code>", "<code>user-invocable: false</code>", "Apagar a description"], c: 0, ex: "<code>disable-model-invocation: true</code> deixa a skill só para você chamar. <code>user-invocable: false</code> faz o contrário." },
+  { p: "O que faz a linha <code>!`git diff HEAD`</code> dentro do SKILL.md?", op: ["Pede permissão ao usuário", "Roda o comando antes e coloca a saída no lugar da linha", "Nada, é um comentário"], c: 1, ex: "É uma injeção de contexto dinâmica: a skill já chega ao Claude com o diff atual." },
+  { p: "Qual comando mostra quanto contexto cada skill consome?", op: ["<code>/context</code>", "<code>/skill-doctor</code>", "<code>/usage</code>"], c: 1, ex: "<code>/skill-doctor</code> mostra custo e frequência de uso, para você desligar skills que pesam e pouco ajudam." }
+]);
+Curso.checklist("check", [
+  "Sei a diferença entre CLAUDE.md (sempre) e skill (sob demanda)",
+  "Crio a pasta <code>.claude/skills/&lt;nome&gt;/SKILL.md</code> com uma boa description",
+  "Uso <code>$ARGUMENTS</code> e <code>!`comando`</code>",
+  "Sei quando usar <code>disable-model-invocation</code>",
+  "Criei e usei <code>/revisar-taskflow</code> e <code>/nova-funcionalidade</code>"
+]);
+</script>
+</body>
+</html>

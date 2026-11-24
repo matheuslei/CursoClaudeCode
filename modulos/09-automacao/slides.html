@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 9</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 9 · Revisão</p>
+    <h1>Automação</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>claude -p em uma frase</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">Pedido entra, o Claude trabalha sem conversa, a resposta sai e o processo termina.</p>
+    <div class="cod" style="max-width:900px"><code>git diff | claude -p "aponte erros" --max-turns 3 &gt; r.txt
+$r = claude -p "..." --output-format json | ConvertFrom-Json   # .result .session_id .total_cost_usd</code></div>
+  </section>
+  <section class="slide">
+    <h2>Freios do modo -p</h2>
+    <ul>
+      <li><code>--allowedTools "Read,Grep"</code>: libera só o necessário (o resto que pede aprovação é negado)</li>
+      <li><code>--max-turns</code> e <code>--max-budget-usd</code>: limites de turnos e de gasto estimado</li>
+      <li><code>--output-format json</code> / <code>stream-json</code> · <code>--json-schema</code> → <code>structured_output</code></li>
+      <li><code>--bare</code> exige <code>ANTHROPIC_API_KEY</code>: não usa o login da assinatura</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Revisão de código</h2>
+    <ul>
+      <li><code>/code-review [low…max] [--fix] [alvo]</code>: bugs, em subagente de segundo plano</li>
+      <li><code>/security-review</code>: vulnerabilidades, compara com <code>origin/HEAD</code> (precisa de <code>origin</code>)</li>
+      <li>Subagente revisor: regras do <strong>seu</strong> projeto · <code>/simplify</code>: só limpeza</li>
+      <li>Commit antes do <code>--fix</code> · <code>ultra</code> roda na nuvem</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>GitHub Actions</h2>
+    <div class="cod" style="max-width:900px"><code>- uses: anthropics/claude-code-action@v1
+  with:
+    anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+    prompt: "Revise ... seguindo o CLAUDE.md"
+    claude_args: "--max-turns 10 --allowedTools Read,Grep,Glob"</code></div>
+    <p>Sem <code>prompt</code>: responde a <code>@claude</code> · com <code>prompt</code>: roda no evento</p>
+  </section>
+  <section class="slide">
+    <h2>Segredos e custo no CI</h2>
+    <ul>
+      <li>🔐 Chave só em GitHub Secrets. Vazou? <strong>Revogue</strong>.</li>
+      <li>🪙 Duas contas: minutos do GitHub + tokens do Claude</li>
+      <li>Limites: <code>--max-turns</code>, <code>timeout-minutes</code>, <code>concurrency</code>, permissões mínimas</li>
+      <li>Treino: YAML conferido no PC; GitHub só em repositório pessoal de teste</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>/loop</h2>
+    <ul>
+      <li><code>/loop 5m pedido</code> · <code>/loop pedido</code> (ritmo do Claude) · <code>/loop</code> (manutenção ou <code>.claude/loop.md</code>)</li>
+      <li>Só com a sessão aberta e ociosa · expira em 7 dias · mínimo 1 minuto</li>
+      <li>Parar: <kbd>Esc</kbd> no ritmo próprio · "cancele o loop" no intervalo fixo</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Onde agendar?</h2>
+    <ul>
+      <li>⏰ <strong>/loop</strong>: na sessão, para acompanhar algo agora</li>
+      <li>💻 <strong>Desktop</strong>: no seu PC ligado, com arquivos locais, sem sessão aberta</li>
+      <li>☁ <strong>Nuvem</strong> (<code>/schedule</code>, research preview): sem o seu PC, num clone do GitHub</li>
+      <li>🐙 <strong>Actions</strong>: <code>on: schedule</code> no CI do repositório</li>
+      <li>🎯 <strong>/goal</strong> não é agendamento: trabalha até uma condição</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 10?</h2>
+    <ul>
+      <li>✓ Rodou o seu <code>revisar.ps1</code> com <code>claude -p</code> e JSON</li>
+      <li>✓ Revisou <code>buscar.py</code> com <code>/code-review</code> e corrigiu os achados</li>
+      <li>✓ Escreveu e conferiu um workflow com segredo e limites</li>
+      <li>✓ Criou e cancelou um <code>/loop</code></li>
+    </ul>
+    <p>Próximo: <a href="../10-agent-sdk/01-loop-agente.html"><strong>Módulo 10: Agent SDK</strong></a></p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

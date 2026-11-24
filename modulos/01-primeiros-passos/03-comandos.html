@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comandos com barra</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m1a3">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 1 · Aula 3</span><span class="selo cinza">Iniciante</span><span class="selo cinza">~20 min</span>
+    <h1>Comandos com barra (/)</h1>
+    <p class="objetivo">Objetivo: conhecer os comandos que controlam a sessão (ajuda, modelo, contexto, histórico, custo) e as formas de abrir o Claude Code pelo terminal.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Tudo o que você digita vai para o Claude, <strong>exceto</strong> o que começa com <code>/</code>. Esses são comandos para a <em>ferramenta</em>: trocar modelo, limpar a conversa, ver custo. Saber os 12 principais te dá controle total da sessão.</p>
+    <div class="caixa dica"><strong>Não decore</strong>Digite <code>/</code> e uma lista aparece. Continue digitando para filtrar (<code>/con</code> mostra <code>/config</code>, <code>/context</code>, <code>/compact</code>…). <kbd>Tab</kbd> completa.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: comandos por momento da sessão</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os comandos essenciais</h2>
+    <table class="tab">
+      <thead><tr><th>Comando</th><th>Para quê</th><th>Quando usar</th></tr></thead>
+      <tbody>
+        <tr><td><code>/help</code></td><td>Lista comandos disponíveis</td><td>Na dúvida</td></tr>
+        <tr><td><code>/status</code></td><td>Versão, modelo, conta, conectividade</td><td>Conferir o ambiente</td></tr>
+        <tr><td><code>/model</code></td><td>Troca o modelo (e salva como padrão)</td><td>Tarefa difícil → modelo maior</td></tr>
+        <tr><td><code>/effort</code></td><td>Ajusta o esforço de raciocínio (<code>low</code> … <code>xhigh</code>, <code>max</code>, <code>auto</code>)</td><td>Problemas complexos</td></tr>
+        <tr><td><code>/context</code></td><td>Mostra o uso da janela de contexto</td><td>Respostas piorando? Confira</td></tr>
+        <tr><td><code>/clear</code></td><td>Conversa nova, contexto vazio</td><td>Mudou de assunto</td></tr>
+        <tr><td><code>/compact</code></td><td>Resume a conversa para liberar espaço</td><td>Mesma tarefa, conversa longa</td></tr>
+        <tr><td><code>/rewind</code></td><td>Volta conversa e/ou código a um ponto anterior</td><td>O Claude foi pelo caminho errado</td></tr>
+        <tr><td><code>/resume</code></td><td>Retoma uma conversa anterior</td><td>Continuar o trabalho de ontem</td></tr>
+        <tr><td><code>/usage</code></td><td>Custo, limites do plano, estatísticas</td><td>Acompanhar consumo</td></tr>
+        <tr><td><code>/init</code></td><td>Cria o <code>CLAUDE.md</code> do projeto</td><td>Primeira vez num projeto (Módulo 2)</td></tr>
+        <tr><td><code>/powerup</code></td><td>Lições interativas oficiais</td><td>Para complementar o curso</td></tr>
+      </tbody>
+    </table>
+    <h3>Abrindo o Claude Code de jeitos diferentes</h3>
+    <table class="tab">
+      <thead><tr><th>No terminal</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>claude</code></td><td>Sessão interativa normal</td></tr>
+        <tr><td><code>claude "explique o tarefas.py"</code></td><td>Abre já com um pedido</td></tr>
+        <tr><td><code>claude -c</code></td><td>Continua a conversa mais recente desta pasta</td></tr>
+        <tr><td><code>claude -r</code></td><td>Escolhe qual conversa anterior retomar</td></tr>
+        <tr><td><code>claude -p "pergunta"</code></td><td>Responde e sai, sem sessão interativa (ótimo para scripts, Módulo 9)</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa"><strong>/clear não apaga para sempre</strong>A conversa anterior continua acessível pelo <code>/resume</code>. O <code>/clear</code> só começa uma conversa nova com contexto limpo.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Explore os comandos. Digite <code>/</code> sozinho para ver a lista.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz: qual comando?</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>Na pasta <code>taskflow</code>:</p>
+    <ol>
+      <li>Abra com <code>claude</code>, rode <code>/context</code> e anote quanto está em uso</li>
+      <li>Peça <code>explique a função listar</code> e rode <code>/context</code> de novo. O que mudou?</li>
+      <li>Rode <code>/usage</code> e veja o consumo da sessão</li>
+      <li>Rode <code>/clear</code>, saia com <code>/exit</code> e volte com <code>claude -r</code>: encontre a conversa anterior na lista</li>
+      <li>Fora da sessão, rode: <code>claude -p "quantas funções existem em tarefas.py?"</code></li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <ul>
+        <li>Passo 2: o uso de contexto aumenta, porque agora inclui o arquivo lido e a explicação. <strong>Tudo o que o Claude lê ocupa contexto.</strong></li>
+        <li>Passo 4: <code>claude -r</code> abre uma lista de conversas; a de antes do <code>/clear</code> aparece lá.</li>
+        <li>Passo 5: o <code>-p</code> imprime a resposta e volta ao prompt do PowerShell, sem sessão interativa.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Usar a mesma conversa para tudo</h4><p>Assuntos misturados confundem o modelo. Assunto novo → <code>/clear</code>.</p></div>
+      <div class="mini"><h4>Confundir /clear e /compact</h4><p><code>/clear</code>: recomeça. <code>/compact</code>: resume e continua.</p></div>
+      <div class="mini"><h4>Sempre o modelo mais caro</h4><p>Tarefas simples vão bem com modelos menores e esforço menor. Economize limite.</p></div>
+      <div class="mini"><h4>Comando no meio do texto</h4><p>O <code>/</code> só funciona no <strong>início</strong> da mensagem.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/commands">Referência completa de comandos</a> (são dezenas!)</li>
+      <li><a href="https://code.claude.com/docs/en/cli-reference">Referência da CLI</a>: todas as flags do <code>claude</code></li>
+      <li><a href="../../referencia/cola-comandos.html">Cola de comandos do curso</a></li>
+    </ul>
+    <p class="conferido">Conferido em 17/11/2026 (Commands reference). Os comandos mudam com frequência; use <code>/help</code> na sua versão.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Comandos com barra em 1 minuto", cenas: [
+  { fala: "Tudo o que você digita vai para o Claude, exceto o que começa com barra: esses comandos controlam a própria ferramenta.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 1 · AULA 3</span><p class=\"v-titulo\" data-t=\"0.3\">Comandos com barra (/)</p><p class=\"v-sub\" data-t=\"0.9\">Controle total da sessão</p>" },
+  { fala: "Não precisa decorar. Digite barra e uma lista aparece. Continue digitando para filtrar, e Tab completa.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"u\">&gt; </span><span class=\"v-digita\" style=\"--n:4\">/con</span></div><div data-t=\"2.2\"><span class=\"a\">/config</span></div><div data-t=\"2.6\"><span class=\"a\">/context</span></div><div data-t=\"3\"><span class=\"a\">/compact</span></div><div data-t=\"4\"><span class=\"d\">Tab completa</span></div></div>" },
+  { fala: "Para monitorar: barra context mostra o uso do contexto, barra usage mostra custo e limites, e barra status confere o ambiente.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">📊</span><b>/context</b>uso do contexto</div><div class=\"v-caixa\" data-t=\"3\"><span class=\"v-ic\">💲</span><b>/usage</b>custo e limites</div><div class=\"v-caixa\" data-t=\"5\"><span class=\"v-ic\">🩺</span><b>/status</b>o ambiente</div></div>" },
+  { fala: "Para ajustar: barra model troca o modelo, e barra effort muda o nível de raciocínio. Tarefa simples, modelo e esforço menores.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa\" data-t=\"0.8\"><span class=\"v-ic\">🧠</span><b>/model</b>troca o modelo</div><div class=\"v-caixa\" data-t=\"2.8\"><span class=\"v-ic\">🎚</span><b>/effort</b>nível de raciocínio</div></div><p class=\"v-txt\" data-t=\"5\" style=\"text-align:center\">Tarefa simples → modelo e esforço menores</p>" },
+  { fala: "Para corrigir o rumo, barra rewind volta a um ponto anterior. Barra compact resume e continua a mesma tarefa. E barra clear começa uma conversa nova.",
+    html: "<div class=\"v-grade\" style=\"--cols:3\"><div class=\"v-caixa\" data-t=\"0.6\"><span class=\"v-ic\">↩</span><b>/rewind</b>volta a um ponto anterior</div><div class=\"v-caixa\" data-t=\"3.2\"><span class=\"v-ic\">🗜</span><b>/compact</b>resume e continua</div><div class=\"v-caixa acc\" data-t=\"6\"><span class=\"v-ic\">✨</span><b>/clear</b>conversa nova</div></div>" },
+  { fala: "E no PowerShell: claude -c continua a última conversa, -r escolhe qual retomar, e -p responde e sai, ótimo para scripts.",
+    html: "<div class=\"v-code\"><div data-t=\"0.8\"><span class=\"u\">claude -c</span>             <span class=\"d\"># continua a última</span></div><div data-t=\"2.6\"><span class=\"u\">claude -r</span>             <span class=\"d\"># escolhe qual retomar</span></div><div data-t=\"4.2\"><span class=\"u\">claude -p \"pergunta\"</span>  <span class=\"d\"># responde e sai</span></div></div>" },
+  { fala: "Regra prática: uma tarefa, uma conversa.",
+    html: "<p class=\"v-sub\" data-t=\"0\">Regra prática</p><p class=\"v-titulo\" data-t=\"0.4\">Uma tarefa, uma conversa</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🚀", rt: "Começar" }, { ic: "⚙", rt: "Ajustar" }, { ic: "📊", rt: "Monitorar" }, { ic: "↩", rt: "Corrigir rumo" }, { ic: "🔁", rt: "Recomeçar" }],
+  passos: [
+    { ativos: [0], titulo: "Começar", texto: "<code>claude</code>, <code>claude -c</code>, <code>claude -r</code> ou <code>/resume</code> para retomar. <code>/init</code> na primeira vez num projeto." },
+    { ativos: [1], setas: [0], titulo: "Ajustar", texto: "<code>/model</code> para trocar de modelo e <code>/effort</code> para o nível de raciocínio. Tarefa simples, modelo e esforço menores. Tarefa difícil, maiores." },
+    { ativos: [2], setas: [1], titulo: "Monitorar", texto: "<code>/context</code> mostra quanto do contexto está ocupado e <code>/usage</code> mostra custo e limites. <code>/status</code> confere o ambiente." },
+    { ativos: [3], setas: [2], titulo: "Corrigir rumo", texto: "<code>/rewind</code> (ou <kbd>Esc</kbd> <kbd>Esc</kbd> com o campo vazio) volta a um ponto anterior da conversa e/ou do código." },
+    { ativos: [4], setas: [3], titulo: "Recomeçar", texto: "<code>/compact</code> resume para continuar a mesma tarefa e <code>/clear</code> começa outra. Regra prática: <strong>uma tarefa, uma conversa</strong>." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code (demonstração)", altura: 300,
+  passos: [
+    { t: "user", x: "/status", leg: "Conferir o ambiente" },
+    { t: "html", x: '<span class="t-caixa">Version: 2.1.xxx\nModel: (modelo padrão do seu plano)\nAccount: voce@exemplo.com\nCwd: C:\\Users\\ana\\estudos-claude\\taskflow</span>' },
+    { t: "user", x: "/model", leg: "Trocar de modelo" },
+    { t: "html", x: '<span class="t-caixa">Select model\n<span class="t-user">❯ Default (recommended)</span>\n  Opus\n  Sonnet\n  Haiku\n<span class="t-dim">←/→ ajusta o esforço</span></span>' },
+    { t: "user", x: "/context", leg: "Quanto do contexto está em uso?" },
+    { t: "html", x: '<span class="t-caixa">Context usage\n<span class="t-acc">⛁ ⛁</span> <span class="t-ok">⛁</span> ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ~3% used\n<span class="t-acc">⛁</span> System + tools  <span class="t-ok">⛁</span> Messages  ⛶ Free</span>' },
+    { t: "user", x: "/clear", leg: "Tarefa nova: contexto limpo" },
+    { t: "html", x: '<span class="t-dim">(conversa anterior disponível em /resume)</span>' }
+  ]
+});
+Curso.terminal("term", {
+  titulo: "Claude Code: comandos (simulação)", prompt: ">",
+  intro: '<span class="t-dim">✻ Claude Code (simulação) · taskflow · digite / para ver os comandos</span>',
+  metas: ["/help", "/status", "/model", "/context", "/usage", "/clear", "/resume"],
+  comandos: {
+    "/": '<span class="t-dim">Comandos (parcial):</span>\n/help  /status  /model  /effort  /context  /clear  /compact\n/rewind  /resume  /usage  /init  /doctor  /powerup  /exit',
+    "/help": 'Claude Code: ajuda\n  Digite / para ver comandos · ! para shell · @ para mencionar arquivos\n  Esc interrompe · Shift+Tab alterna permissões · ? mostra atalhos',
+    "/status": '<span class="t-caixa">Version: 2.1.xxx\nModel: (padrão do plano)\nCwd: C:\\estudos-claude\\taskflow\nConnectivity: OK</span>',
+    "/model": '<span class="t-caixa">Select model\n<span class="t-user">❯ Default (recommended)</span>\n  Opus · Sonnet · Haiku\n<span class="t-dim">(na versão real você navega com ↑↓ e ajusta o esforço com ←→)</span></span>',
+    "/effort": '<span class="t-dim">Níveis: low · medium · high · xhigh · max · auto. Ex.: /effort high</span>',
+    "/effort high": '<span class="t-ok">Effort set to high.</span>',
+    "/context": '<span class="t-caixa">Context usage: ~3% used\n<span class="t-acc">⛁</span> System prompt & tools\n<span class="t-ok">⛁</span> Messages\n⛶ Free space</span>',
+    "/usage": '<span class="t-caixa">Session: custo e tokens desta sessão\nPlan usage: % do limite atual e quando renova\nStats: atividade recente</span>',
+    "/clear": '<span class="t-ok">Conversa nova iniciada.</span> <span class="t-dim">A anterior está no /resume.</span>',
+    "/compact": '<span class="t-ok">Conversa resumida.</span> <span class="t-dim">Uso de contexto reduzido; o fio da tarefa continua.</span>',
+    "/resume": '<span class="t-caixa">Resume a conversation\n<span class="t-user">❯ "o que este projeto faz?" · há 5 min</span>\n  "adicione o comando concluir" · ontem</span>',
+    "/rewind": '<span class="t-caixa">Rewind to…\n<span class="t-user">❯ antes de "adicione o comando concluir"</span>\n  Opções: restaurar conversa · restaurar código · ambos</span>',
+    "/init": '<span class="t-dim">Criaria o CLAUDE.md analisando o projeto. Vamos fazer isso de verdade no Módulo 2.</span>',
+    "/doctor": '<span class="t-ok">✔ Tudo certo com a instalação e as configurações.</span>',
+    "/powerup": '<span class="t-dim">Abriria as lições interativas oficiais. Experimente na versão real!</span>',
+    "/exit": '<span class="t-dim">Até logo! (na simulação, a sessão continua)</span>'
+  },
+  padroes: [[/^\/\w+/, function (m) { return '<span class="t-warn">Comando ' + m[0] + ' não simulado aqui.</span> <span class="t-dim">Digite / para ver a lista.</span>'; }]],
+  desconhecido: '<span class="t-acc">●</span> <span class="t-dim">(Na versão real o Claude responderia sua mensagem. Aqui, pratique os comandos com /.)</span>'
+});
+Curso.quiz("quiz", [
+  { p: "Você terminou uma tarefa e vai começar outra sem relação. Qual comando?", op: ["<code>/compact</code>", "<code>/clear</code>", "<code>/rewind</code>"], c: 1, ex: "Assunto novo, contexto limpo. A conversa anterior continua no <code>/resume</code>." },
+  { p: "A conversa ficou longa, mas você está no meio da MESMA tarefa. Qual comando?", op: ["<code>/compact</code>", "<code>/clear</code>", "<code>/exit</code>"], c: 0, ex: "<code>/compact</code> resume a conversa para liberar espaço e mantém o fio da tarefa." },
+  { p: "O Claude fez 3 edições num caminho que você não queria. Como voltar?", op: ["<code>/rewind</code> (ou Esc Esc com o campo vazio)", "<code>/status</code>", "<code>/model</code>"], c: 0, ex: "O rewind restaura a conversa e/ou o código para antes daquele ponto. O Git continua sendo a rede de segurança definitiva." },
+  { p: "Você quer continuar a conversa de ontem nesta pasta. O que digitar no PowerShell?", op: ["<code>claude -p</code>", "<code>claude -c</code> ou <code>claude -r</code>", "<code>claude --version</code>"], c: 1, ex: "<code>-c</code> continua a mais recente; <code>-r</code> abre a lista para escolher." },
+  { p: "Quer uma resposta rápida num script, sem abrir sessão. Qual flag?", op: ["<code>-p</code>", "<code>-c</code>", "<code>-r</code>"], c: 0, ex: "<code>claude -p \"...\"</code> responde e sai. Base da automação (Módulo 9)." }
+]);
+Curso.checklist("check", [
+  "Uso <code>/</code> para descobrir comandos sem decorar",
+  "Sei a diferença entre <code>/clear</code>, <code>/compact</code> e <code>/rewind</code>",
+  "Confiro contexto e consumo com <code>/context</code> e <code>/usage</code>",
+  "Retomo conversas com <code>claude -c</code>, <code>claude -r</code> ou <code>/resume</code>",
+  "Rodei um <code>claude -p</code> pelo PowerShell"
+]);
+</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de código com o Claude</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m9a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 9 · Aula 2</span><span class="selo cinza">Avançado</span><span class="selo cinza">~25 min</span>
+    <h1>Revisão de código com o Claude</h1>
+    <p class="objetivo">Objetivo: revisar mudanças antes de juntar com <code>/code-review</code> (alvo, esforço e <code>--fix</code>), checar segurança com <code>/security-review</code> e saber quando usar o seu subagente revisor.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Quem escreveu o código é a pior pessoa para revisá-lo: você lê o que <em>quis</em> escrever. Um revisor com outro olhar pega o índice errado, a docstring que mente, o <code>eval</code> esquecido. O Claude Code tem revisores prontos, que você chama com um comando e que também podem rodar em script (aula 1) e no GitHub (aula 3).</p>
+    <div class="caixa"><strong>Analogia</strong>É o "passa o olho aqui antes de eu mandar?" que você pede a um colega. Só que disponível a qualquer hora, sempre com o mesmo método. E, como com o colega, a decisão final continua sendo sua.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: como o /code-review trabalha</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Os revisores e como apontar cada um</h2>
+    <h3>/code-review (alias <code>/review</code>)</h3>
+    <p>Procura <strong>bugs de funcionamento</strong> nas mudanças da sua branch. Funciona em qualquer plano e consome o uso como o resto da sessão. No terminal, roda como <strong>subagente em segundo plano</strong>, com contexto próprio (Módulo 7): você continua trabalhando e os achados chegam na conversa.</p>
+    <div class="cod"><span class="rot">sintaxe</span><code>/code-review [low|medium|high|xhigh|max|ultra] [--fix] [--comment] [--max-findings n|all|default] [alvo]</code></div>
+    <table class="tab">
+      <thead><tr><th>Para revisar</th><th>Digite</th></tr></thead>
+      <tbody>
+        <tr><td>A branch atual e o que ainda não tem commit</td><td><code>/code-review</code></td></tr>
+        <tr><td>Os últimos 15 commits</td><td><code>/code-review HEAD~15..HEAD</code></td></tr>
+        <tr><td>Uma branch contra outra</td><td><code>/code-review main...minha-branch</code></td></tr>
+        <tr><td>Um pull request pelo número</td><td><code>/code-review 1234</code></td></tr>
+        <tr><td>Um arquivo ou pasta</td><td><code>/code-review buscar.py</code></td></tr>
+      </tbody>
+    </table>
+    <p>Sem alvo, ele revisa os commits à frente da branch remota mais as mudanças sem commit. Se a branch não tem remota, compara com <code>main</code> ou com o commit anterior.</p>
+    <table class="tab">
+      <thead><tr><th>Opção</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td><code>low</code> … <code>max</code></td><td>Esforço. <code>low</code> traz os achados de que tem mais certeza (menos alarme falso); níveis mais altos ampliam a cobertura e gastam mais. Sem nível, ele reusa o último que você digitou.</td></tr>
+        <tr><td><code>--fix</code></td><td>Depois de revisar, aplica as correções. As edições passam pelo seu modo de permissão.</td></tr>
+        <tr><td><code>--max-findings</code></td><td>Muda quantos achados aparecem (v2.1.288 ou mais nova).</td></tr>
+        <tr><td><code>--comment</code></td><td>Publica os achados num PR do GitHub ou MR do GitLab. Fora do escopo deste curso offline.</td></tr>
+        <tr><td><code>ultra</code></td><td>Revisão profunda <strong>na nuvem</strong> (ultrareview), com vários agentes; exige conta claude.ai. Envia o código para fora do seu PC: em código da empresa, só com aval da segurança da informação.</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa alerta"><strong>--fix e o /rewind</strong>Uma revisão em segundo plano aplica o <code>--fix</code> fora dos checkpoints da sessão: o <code>/rewind</code> não desfaz essas edições. Faça commit antes e, se não gostar, desfaça pelo Git.</div>
+    <p>O <code>/code-review</code> segue o seu <code>CLAUDE.md</code>, inclusive no <code>-p</code>. Em script, ele roda em primeiro plano e imprime os achados: <code>claude -p "/code-review low" --max-turns 10</code>.</p>
+
+    <h3>/security-review</h3>
+    <p>Olha só para <strong>segurança</strong>: injeção, problemas de autenticação, exposição de dados. Compara a sua branch com <code>origin/HEAD</code>, ou seja, <strong>precisa de um remoto <code>origin</code></strong>. Sem ele, falha com <code>ambiguous argument 'origin/HEAD...'</code>. Para treinar sem internet, o "remoto" pode ser outra pasta do seu PC (veja o exercício).</p>
+    <div class="caixa dica"><strong>Caráter informativo</strong>Uma revisão automática de segurança ajuda a achar problemas, mas não é parecer de segurança. Em sistemas da empresa, decisões de segurança e privacidade (LGPD) passam pela área competente.</div>
+
+    <h3>Qual revisor usar?</h3>
+    <table class="tab">
+      <thead><tr><th>Revisor</th><th>Procura</th><th>Quando</th></tr></thead>
+      <tbody>
+        <tr><td><code>/code-review</code></td><td>Bugs de funcionamento</td><td>Antes de juntar qualquer mudança</td></tr>
+        <tr><td><code>/security-review</code></td><td>Vulnerabilidades</td><td>Mudanças que tocam entrada de usuário, arquivos, autenticação, dados</td></tr>
+        <tr><td><code>revisor-taskflow</code> (Módulo 7)</td><td>Regras <strong>do seu projeto</strong></td><td>Checklist da equipe: docstrings, dados fictícios, idioma, testes</td></tr>
+        <tr><td><code>/simplify</code></td><td>Limpeza (reuso, simplicidade)</td><td>O código funciona, mas pode ficar mais simples. Não procura bugs.</td></tr>
+      </tbody>
+    </table>
+    <p>Quer outro comportamento? Uma skill de projeto chamada <code>code-review</code> substitui a embutida; o alias <code>/review</code> continua chamando a original.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração: revisando a busca</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique: qual revisor?</h2>
+    <p>Para cada situação, responda <code>code-review</code>, <code>security-review</code>, <code>revisor</code> ou <code>simplify</code>. Comece com <code>iniciar</code>.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real: revisar um arquivo com problemas</h2>
+    <p>Use a pasta de treino com Git (passos 1 e 2 do <a href="../../projeto-taskflow/etapa-09/README.md">README da etapa 09</a>).</p>
+    <div class="caixa alerta"><strong>Custo e dados</strong>Cada revisão consome o seu plano: use <code>low</code> no primeiro teste e não use <code>ultra</code> aqui. Só código de treino com dados fictícios.</div>
+    <ol>
+      <li><em>(Opcional, para o <code>/security-review</code>)</em> Ainda na <code>main</code>, crie um remoto local:
+        <div class="cod"><span class="rot">PowerShell</span><code>git init --bare ..\origem-taskflow.git
+git remote add origin ..\origem-taskflow.git
+git push -u origin main
+git remote set-head origin main</code></div></li>
+      <li>Crie uma branch: <code>git switch -c busca</code>.</li>
+      <li>Copie <code>projeto-taskflow/etapa-09/gabarito/buscar_com_bug.py</code> (do curso) para a pasta de treino com o nome <code>buscar.py</code>. Ele tem problemas <strong>de propósito</strong>. Depois: <code>git add buscar.py</code> e <code>git commit -m "busca"</code>.</li>
+      <li>Abra o <code>claude</code> e rode <code>/code-review low</code>. Continue conversando enquanto ele trabalha.</li>
+      <li>Se criou o remoto no passo 1, rode <code>/security-review</code>. Compare os achados.</li>
+      <li>Peça a correção (<code>/code-review --fix</code> ou à mão), crie <code>tests/test_buscar.py</code> e rode <code>python -m unittest</code>.</li>
+    </ol>
+    <details class="gabarito"><summary>Ver o gabarito</summary>
+      <p>O que uma boa revisão deve achar (redação real varia). Detalhes em <code>gabarito/revisao-esperada.md</code>.</p>
+      <table class="tab">
+        <thead><tr><th>Gravidade</th><th>Onde</th><th>Problema</th></tr></thead>
+        <tbody>
+          <tr><td>🔴 Grave (segurança)</td><td><code>filtrar</code></td><td><code>eval</code> com texto do usuário executa qualquer código. O <code>/security-review</code> deve apontar.</td></tr>
+          <tr><td>🔴 Grave (bug)</td><td><code>primeira_pendente</code></td><td><code>pendentes[1]</code> pula a primeira e quebra com <code>IndexError</code> quando só há uma.</td></tr>
+          <tr><td>🟡 Ajustar (bug)</td><td><code>buscar</code></td><td>A docstring promete ignorar maiúsculas, mas a comparação diferencia.</td></tr>
+          <tr><td>🟡 Ajustar</td><td>arquivo</td><td>Sem teste próprio (regra do <code>CLAUDE.md</code>).</td></tr>
+        </tbody>
+      </table>
+      <div class="cod"><span class="rot">buscar.py (corrigido)</span><code>def buscar(termo):
+    """Retorna as tarefas cujo título contém o termo, ignorando maiúsculas e minúsculas."""
+    termo = termo.casefold()
+    return [t for t in tarefas.carregar() if termo in t["titulo"].casefold()]
+
+
+def filtrar(feita):
+    """Retorna as tarefas com o status pedido: True para feitas, False para pendentes."""
+    return [t for t in tarefas.carregar() if bool(t.get("feita")) == feita]
+
+
+def primeira_pendente():
+    """Retorna a primeira tarefa ainda não feita, ou None se não houver."""
+    for t in tarefas.carregar():
+        if not t.get("feita"):
+            return t
+    return None</code></div>
+      <p>Com <code>gabarito/tests/test_buscar.py</code> copiado para <code>tests/</code>, <code>python -m unittest</code> mostra <code>Ran 11 tests</code> e <code>OK</code>.</p>
+      <p><strong>Erro <code>ambiguous argument 'origin/HEAD...'</code>?</strong> Falta o passo 1. Rode os quatro comandos na <code>main</code> e tente de novo.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Aceitar tudo sem ler</h4><p>Revisão automática erra para os dois lados: inventa problema e deixa passar outro. Leia cada achado antes de corrigir.</p></div>
+      <div class="mini"><h4>--fix sem commit antes</h4><p>As edições da revisão em segundo plano não voltam com <code>/rewind</code>. Faça commit primeiro e desfaça pelo Git se precisar.</p></div>
+      <div class="mini"><h4>Usar ultra em tudo</h4><p><code>ultra</code> roda na nuvem, custa mais e envia o código para fora do PC. Comece com <code>low</code>.</p></div>
+      <div class="mini"><h4>/security-review sem origin</h4><p>Ele compara com <code>origin/HEAD</code>. Sem remoto, falha antes de começar.</p></div>
+      <div class="mini"><h4>Confundir com /simplify</h4><p><code>/simplify</code> só limpa o código. Para achar bugs, use <code>/code-review</code>.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/code-review-local">Review locally with /code-review</a> (em inglês): alvos, níveis, <code>--fix</code>, primeiro plano e ultrareview.</li>
+      <li><a href="https://code.claude.com/docs/en/commands">Commands</a>: linhas de <code>/code-review</code>, <code>/security-review</code> e <code>/simplify</code>.</li>
+      <li>Times nos planos Team e Enterprise podem ligar o serviço gerenciado "Code Review", que revisa todo PR no GitHub. É configurado pela organização, não por você.</li>
+      <li>Próxima aula: levar a revisão para o <strong>GitHub Actions</strong>.</li>
+    </ul>
+    <p class="conferido">Conferido em 19/11/2026 (páginas oficiais "Review locally with /code-review", "Commands" e "Error reference"; Claude Code v2.1.327).</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Revisão de código em 1 minuto", cenas: [
+  { fala: "Nesta aula, o Claude revisa o seu código antes de você juntar: barra code review, barra security review e o seu revisor.",
+    html: '<span class="v-tag" data-t="0">MÓDULO 9 · AULA 2</span><p class="v-titulo" data-t="0.3">Revisão de código</p><p class="v-sub" data-t="1.2">um segundo olhar antes de juntar</p>' },
+  { fala: "Barra code review procura bugs nas mudanças da sua branch. Ela roda num subagente em segundo plano, e os achados chegam na conversa.",
+    html: '<div class="v-code" data-t="0.3"><span class="u">&gt; </span><span class="v-digita" style="--n:12">/code-review</span></div><div class="v-linha" data-t="4"><div class="v-caixa acc"><span class="v-ic">🤖</span><b>Subagente</b>em segundo plano</div><span class="v-seta">→</span><div class="v-caixa ok"><span class="v-ic">📋</span><b>Achados</b>na conversa</div></div>' },
+  { fala: "Você escolhe o alvo e o esforço. Low traz poucos achados, com mais certeza. Níveis mais altos ampliam a busca. E hífen hífen fix aplica as correções.",
+    html: '<div class="v-code" data-t="0.3"><div><span class="u">&gt; </span>/code-review <span class="a">low</span> buscar.py</div><div data-t="8"><span class="u">&gt; </span>/code-review <span class="a">--fix</span></div></div><div class="v-grade" style="--cols:2"><div class="v-caixa ok" data-t="3"><span class="v-ic">🎯</span><b>low</b>poucos, mais certeza</div><div class="v-caixa warn" data-t="5.5"><span class="v-ic">🔭</span><b>high, max</b>mais cobertura</div></div>' },
+  { fala: "Barra security review olha só para segurança: injeção, autenticação e exposição de dados. Ela compara a sua branch com o remoto origin.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa err" data-t="2.5"><span class="v-ic">💉</span><b>Injeção</b></div><div class="v-caixa err" data-t="3.5"><span class="v-ic">🔑</span><b>Autenticação</b></div><div class="v-caixa err" data-t="4.5"><span class="v-ic">📤</span><b>Dados expostos</b></div></div><div class="v-code" data-t="6.5"><span class="d">compara com</span> <span class="a">origin/HEAD</span></div>' },
+  { fala: "E o revisor do Módulo 7 continua útil: ele segue as regras do seu projeto. Cada revisor tem o seu papel.",
+    html: '<div class="v-grade" style="--cols:3"><div class="v-caixa" data-t="0.3"><span class="v-ic">🐞</span><b>/code-review</b>bugs</div><div class="v-caixa" data-t="1.5"><span class="v-ic">🛡</span><b>/security-review</b>segurança</div><div class="v-caixa acc" data-t="2.8"><span class="v-ic">📏</span><b>revisor-taskflow</b>regras do projeto</div></div>' },
+  { fala: "Lembre: revisão automática ajuda, mas não substitui a sua leitura. E cada revisão também consome uso do plano.",
+    html: '<div class="v-grade" style="--cols:2"><div class="v-caixa warn" data-t="0.3"><span class="v-ic">👀</span><b>Leia os achados</b>a decisão é sua</div><div class="v-caixa err" data-t="4.5"><span class="v-ic">🪙</span><b>Custo</b>cada revisão conta</div></div>' }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "🧑", rt: "Você" }, { ic: "✻", rt: "Sessão principal" }, { ic: "🔎", rt: "Subagente de revisão" }, { ic: "🌿", rt: "Mudanças da branch" }],
+  passos: [
+    { ativos: [0, 1], setas: [0], titulo: "Você chama /code-review", texto: "Com ou sem alvo e nível. Sem alvo: commits à frente da remota + mudanças sem commit." },
+    { ativos: [1, 2], setas: [1], titulo: "Um subagente assume", texto: "No terminal, a revisão roda como <strong>subagente em segundo plano</strong>, com contexto próprio. Sua conversa não enche e você pode continuar trabalhando." },
+    { ativos: [2, 3], setas: [2], titulo: "Ele lê as mudanças e o CLAUDE.md", texto: "Procura bugs de funcionamento e segue as regras do projeto. O nível de esforço decide quanto ele amplia a busca." },
+    { ativos: [2, 1, 0], setas: [1, 0], titulo: "Os achados voltam", texto: "A lista chega na conversa. Com <code>--fix</code>, ele também aplica as correções, sempre pelo seu modo de permissão." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Revisando buscar.py (ilustrativo)", altura: 300,
+  passos: [
+    { t: "user", x: "/code-review low", leg: "Revisão da branch busca, nível low" },
+    { t: "tool", x: "code-review(Revisar a branch busca)  · em segundo plano", leg: "Roda como subagente; você pode continuar" },
+    { t: "user", x: "enquanto isso, explique o que _indice_valido faz", leg: "A conversa segue normal" },
+    { t: "claude", x: "Achados da revisão:\n🔴 buscar.py:16 primeira_pendente usa pendentes[1]: pula a primeira pendente e falha com uma só.\n🟡 buscar.py:7 buscar diferencia maiúsculas, ao contrário da docstring.\n🟡 buscar.py:12 filtrar usa eval com texto do usuário (o CLAUDE.md proíbe).", leg: "Os achados chegam quando a revisão termina" },
+    { t: "user", x: "/security-review", leg: "Agora a lente de segurança" },
+    { t: "claude", x: "🔴 Execução de código arbitrário: filtrar() passa a entrada do usuário para eval().", leg: "Mesmo arquivo, foco diferente" }
+  ]
+});
+(function () {
+  var itens = [
+    ["Antes do commit, quero achar bugs nas mudanças desta branch", "code-review", "Bugs de funcionamento nas mudanças: é o trabalho do /code-review."],
+    ["A mudança lê um nome de arquivo digitado pelo usuário. Abre alguma brecha?", "security-review", "Entrada do usuário e acesso a arquivos: foco em vulnerabilidades."],
+    ["Conferir as regras do nosso projeto: docstring, dados fictícios, mensagens em português", "revisor", "Regras específicas do projeto ficam num subagente revisor com a sua checklist."],
+    ["O código funciona e tem testes; só quero deixá-lo mais simples", "simplify", "/simplify cuida de limpeza e simplificação, sem procurar bugs."],
+    ["Revisar o pull request 42 com mais cobertura que o normal", "code-review", "/code-review high 42: alvo por número de PR e esforço maior."],
+    ["Uma função nova monta um comando de shell com texto vindo de um formulário", "security-review", "Texto externo montando comando = risco de injeção."]
+  ], i = -1, pts = 0;
+  function mostra() { return i < itens.length ? '<span class="t-b">Situação ' + (i + 1) + "/" + itens.length + ":</span> " + itens[i][0] + '\n<span class="t-dim">Responda: code-review · security-review · revisor · simplify</span>' : '<span class="t-ok">Fim! ' + pts + " de " + itens.length + ".</span> Digite iniciar para repetir."; }
+  function resp(r) { if (i < 0 || i >= itens.length) return '<span class="t-dim">Digite iniciar.</span>'; var ok = itens[i][1] === r; if (ok) pts++; var s = (ok ? '<span class="t-ok">✓ Certo.</span> ' : '<span class="t-warn">✗ Melhor: ' + itens[i][1] + ".</span> ") + itens[i][2] + "\n\n"; i++; return s + mostra(); }
+  var cmds = { "iniciar": function () { i = 0; pts = 0; return mostra(); } };
+  ["code-review", "security-review", "revisor", "simplify"].forEach(function (r) {
+    cmds[r] = function () { return resp(r); };
+    cmds["/" + r] = function () { return resp(r); };
+  });
+  Curso.terminal("term", { titulo: "Qual revisor? (simulação)", prompt: ">", intro: '<span class="t-dim">Escolha o revisor certo para cada situação.</span>', metas: ["iniciar"], comandos: cmds, desconhecido: '<span class="t-dim">Responda com: code-review, security-review, revisor ou simplify.</span>' });
+})();
+Curso.quiz("quiz", [
+  { p: "O que o <code>/code-review</code> procura?", op: ["Só problemas de estilo", "Bugs de funcionamento nas mudanças", "Vulnerabilidades de segurança apenas"], c: 1, ex: "Ele foca em bugs de funcionamento; conforme modelo e esforço, também sugere limpezas." },
+  { p: "Qual comando revisa só o arquivo <code>buscar.py</code> com esforço baixo?", op: ["<code>/code-review low buscar.py</code>", "<code>/code-review buscar.py --low</code>", "<code>/review --file buscar.py</code>"], c: 0, ex: "Primeiro o nível, depois as flags, por fim o alvo." },
+  { p: "Você usou <code>/code-review --fix</code> e não gostou das edições. O <code>/rewind</code> desfaz?", op: ["Sim, sempre", "Não necessariamente: a revisão em segundo plano edita fora dos checkpoints; use o Git", "Só se você estiver no plan mode"], c: 1, ex: "Faça commit antes de usar <code>--fix</code> para poder voltar com o Git." },
+  { p: "O <code>/security-review</code> falhou com <code>ambiguous argument 'origin/HEAD...'</code>. Por quê?", op: ["Falta um remoto <code>origin</code> com <code>origin/HEAD</code>", "O plano não inclui revisão de segurança", "O arquivo é grande demais"], c: 0, ex: "Ele compara com <code>origin/HEAD</code>. Crie o remoto (pode ser uma pasta local) e rode <code>git remote set-head origin main</code>." },
+  { p: "Qual revisor garante a checklist específica do seu projeto?", op: ["<code>/simplify</code>", "Um subagente revisor com as regras do projeto", "<code>/code-review ultra</code>"], c: 1, ex: "O subagente do Módulo 7 carrega a sua checklist e ferramentas só de leitura." }
+]);
+Curso.checklist("check", [
+  "Rodo <code>/code-review</code> na branch, num arquivo ou num intervalo de commits",
+  "Escolho o nível de esforço e sei o que muda entre <code>low</code> e <code>max</code>",
+  "Faço commit antes de usar <code>--fix</code>",
+  "Preparo um <code>origin</code> local para usar o <code>/security-review</code>",
+  "Escolho entre <code>/code-review</code>, <code>/security-review</code>, subagente revisor e <code>/simplify</code>"
+]);
+</script>
+</body>
+</html>

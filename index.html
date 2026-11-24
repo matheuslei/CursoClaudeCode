@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curso Claude Code</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/curso.css">
+</head>
+<body data-raiz="">
+<main>
+  <section class="hero">
+    <span class="selo">Estudo pessoal · offline</span>
+    <h1>Claude Code: do zero ao avançado</h1>
+    <p>Um curso interativo para aprender praticando. Cada aula combina conceito, demonstração animada, terminal simulado, quiz e um exercício no Claude Code de verdade.</p>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="caixa alerta">
+    <strong>🚧 Site em construção</strong>
+    O curso ainda está sendo produzido. Todas as aulas já estão disponíveis, mas os <a href="podcasts.html">podcasts</a> dos módulos estão saindo aos poucos: onde aparecer "em produção", o episódio ainda não ficou pronto. Algumas partes também podem mudar depois de revisadas.
+  </div>
+
+  <div class="caixa dica">
+    <strong>Como estudar</strong>
+    Siga os módulos em ordem. Em cada aula, faça o terminal simulado e o quiz, e só depois o exercício real. No fim de cada módulo, revise com os slides. Se já usa terminal e Git, comece direto pelo Módulo 1.
+  </div>
+
+  <h2 style="margin-top:2rem">Trilha</h2>
+  <div id="modulos"></div>
+
+  <section class="bloco" style="margin-top:2rem">
+    <h2>Referência rápida</h2>
+    <div class="grade">
+      <div class="mini"><h4><a href="referencia/cola-comandos.html">Cola de comandos</a></h4><p>Comandos, atalhos e flags com busca e botão de copiar.</p></div>
+      <div class="mini"><h4><a href="referencia/glossario.html">Glossário</a></h4><p>Os termos do curso explicados em uma frase.</p></div>
+      <div class="mini"><h4><a href="podcasts.html">🎧 Podcasts</a></h4><p>Sem tempo de ler? Ouça um episódio por módulo, no trânsito ou na academia.</p></div>
+      <div class="mini"><h4><a href="certificado.html">Certificado</a></h4><p>Conclua as 47 aulas e gere o seu certificado de estudo, offline.</p></div>
+      <div class="mini"><h4>Tutor no Claude Code</h4><p>Abra esta pasta no Claude Code e peça: <code>me explique a aula 1.3</code>. O <code>CLAUDE.md</code> orienta o tutor.</p></div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Seu progresso</h2>
+    <p>O progresso fica salvo apenas neste navegador. Se você limpar os dados de navegação, ele se perde, então exporte de vez em quando.</p>
+    <div class="ferramentas">
+      <button id="exportar" type="button">⬇ Exportar progresso</button>
+      <button id="importar" type="button">⬆ Importar progresso</button>
+      <input type="file" id="arq-import" accept="application/json" class="sr">
+      <button id="zerar" type="button">Zerar progresso</button>
+    </div>
+  </section>
+
+  <p class="conferido">Conteúdo conferido na documentação oficial do Claude Code em 17/11/2026. Material de estudo pessoal, sem vínculo oficial com a Anthropic.</p>
+</main>
+<script src="assets/curso.js"></script>
+<script>Curso.iniciarIndex();</script>
+</body>
+</html>

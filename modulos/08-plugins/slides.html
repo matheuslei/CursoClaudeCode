@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 8</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 8 · Revisão</p>
+    <h1>Plugins</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Plugin em uma frase</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">Uma pasta que junta skills, subagentes, hooks e servidores MCP e instala tudo como uma unidade.</p>
+    <ul>
+      <li>Vem de um <strong>marketplace</strong> (catálogo); o oficial é <code>claude-plugins-official</code></li>
+      <li>Use quando várias peças andam juntas ou vão para vários projetos</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Instalar com cuidado</h2>
+    <ul>
+      <li><code>/plugin</code>: Discover · Installed · Marketplaces · Errors</li>
+      <li>Leia <strong>Will install</strong> e <strong>Context cost</strong> antes</li>
+      <li>Escopos: usuário · projeto · local</li>
+      <li>Plugin roda código com as suas permissões, fora do sandbox</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Estrutura</h2>
+    <div class="cod" style="max-width:760px"><code>taskflow/
+  .claude-plugin/plugin.json   ← só ele aqui
+  skills/&lt;nome&gt;/SKILL.md
+  agents/*.md
+  hooks/hooks.json
+  .mcp.json</code></div>
+    <p><code>${CLAUDE_PLUGIN_ROOT}</code> · <code>${CLAUDE_PROJECT_DIR}</code></p>
+  </section>
+  <section class="slide">
+    <h2>Desenvolver</h2>
+    <div class="cod" style="max-width:860px"><code>claude plugin validate .\taskflow
+claude --plugin-dir .\taskflow
+/reload-plugins
+claude plugin details taskflow</code></div>
+    <p>Nomes: <code>/taskflow:revisar-taskflow</code> · <code>taskflow:revisor-taskflow</code> · <code>plugin:taskflow:tarefas</code></p>
+  </section>
+  <section class="slide">
+    <h2>Avaliar</h2>
+    <ul>
+      <li><code>evals/&lt;caso&gt;/prompt.md</code> + <code>graders/*.md</code></li>
+      <li>Grátis: regex, tool_used, tool_order, file_exists · Pagos: llm, baseline</li>
+      <li><code>WITH</code> − <code>W/OUT</code> = <code>Δ</code> (o que o plugin acrescenta)</li>
+      <li>Barato: <code>--case x --runs 1 --ablation none</code> · teto: <code>--max-cost-usd</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Marketplace local</h2>
+    <div class="cod" style="max-width:860px"><code>claude plugin marketplace add .\marketplace-taskflow
+claude plugin install taskflow@treino-taskflow --scope local
+claude plugin marketplace remove treino-taskflow</code></div>
+    <p><code>source</code> relativo à raiz do marketplace, sem <code>..</code> · nada publicado</p>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 9?</h2>
+    <ul>
+      <li>✓ Instalou, conferiu e removeu um plugin</li>
+      <li>✓ Empacotou o TaskFlow como plugin e validou</li>
+      <li>✓ Leu um relatório de avaliação</li>
+      <li>✓ Instalou o próprio plugin por nome</li>
+    </ul>
+    <p>Próximo: <a href="../09-automacao/01-claude-p.html"><strong>Módulo 9: Automação</strong></a> →</p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

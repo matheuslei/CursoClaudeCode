@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan mode</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m3a2">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 3 · Aula 2</span><span class="selo cinza">Intermediário</span><span class="selo cinza">~20 min</span>
+    <h1>Plan mode</h1>
+    <p class="objetivo">Objetivo: entrar no plan mode, revisar e editar o plano proposto e escolher como aprovar, para que nenhuma linha seja alterada antes de você concordar com o caminho.</p>
+  </header>
+
+  <section class="bloco">
+    <h2>▶ Vídeo da aula <span class="selo cinza">~1 min</span></h2>
+    <p>Comece por aqui: um resumo animado e narrado. Clique no vídeo ou aperte Espaço para pausar.</p>
+    <div id="video"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">1</span>Por que importa</h2>
+    <p>Na aula anterior você pediu "ainda não mude nada". Funciona, mas depende de o Claude respeitar o pedido. O <strong>plan mode</strong> é a garantia: nele o Claude pode ler arquivos e investigar, mas <strong>as edições ficam bloqueadas até você aprovar o plano</strong>.</p>
+    <div class="caixa"><strong>Bom para</strong>Mudanças que tocam vários arquivos, código que você não conhece, decisões com mais de um caminho razoável, e sempre que você quiser ver o raciocínio antes da execução.</div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">2</span>Conceito: o ciclo do plan mode</h2>
+    <div id="diag"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">3</span>Como usar</h2>
+    <h3>Três jeitos de entrar</h3>
+    <table class="tab">
+      <thead><tr><th>Jeito</th><th>Como</th><th>Quando</th></tr></thead>
+      <tbody>
+        <tr><td>Atalho</td><td><kbd>Shift</kbd>+<kbd>Tab</kbd> até a barra de status mostrar <code>⏸ plan mode on</code></td><td>No meio da sessão</td></tr>
+        <tr><td>Comando</td><td><code>/plan descreva a tarefa</code></td><td>Um pedido específico em modo plano</td></tr>
+        <tr><td>Ao abrir</td><td><code>claude --permission-mode plan</code></td><td>Sessão inteira começando por planejamento</td></tr>
+      </tbody>
+    </table>
+    <p>No ciclo do <kbd>Shift</kbd>+<kbd>Tab</kbd>, o plan mode vem depois do <code>acceptEdits</code>. Os modos disponíveis podem variar conforme seu plano e configuração (Módulo 4).</p>
+
+    <h3>O que o Claude pode fazer em plan mode</h3>
+    <ul>
+      <li><strong>Pode:</strong> ler arquivos, buscar no código, rodar comandos para investigar (dependendo da configuração, alguns comandos pedem aprovação ou passam por verificação automática) e escrever o plano.</li>
+      <li><strong>Não pode:</strong> editar seus arquivos de código antes da aprovação.</li>
+    </ul>
+
+    <h3>Quando o plano fica pronto</h3>
+    <p>O Claude apresenta o plano e oferece opções como:</p>
+    <table class="tab">
+      <tbody>
+        <tr><td><strong>Yes, and use auto mode</strong><br><span style="color:var(--txt3)">(ou "Yes, auto-accept edits" se o auto mode não estiver disponível)</span></td><td>Aprova e deixa o Claude executar sem pedir cada edição</td></tr>
+        <tr><td><strong>Yes, manually approve edits</strong></td><td>Aprova, mas você revisa cada edição. <strong>Recomendado enquanto aprende.</strong></td></tr>
+        <tr><td><strong>No, keep planning</strong></td><td>Continua em plan mode para você dizer o que mudar</td></tr>
+      </tbody>
+    </table>
+    <div class="caixa dica"><strong>Editar o plano você mesmo</strong>Na tela de aprovação, <kbd>Ctrl</kbd>+<kbd>G</kbd> abre o plano no seu editor de texto padrão. Você ajusta, salva, fecha, e o Claude segue a versão editada.</div>
+    <div class="caixa alerta"><strong>Cuidado com o Shift+Tab na tela de aprovação</strong>Ali, <kbd>Shift</kbd>+<kbd>Tab</kbd> <em>aprova</em> o plano. Para sair sem aprovar, aperte <kbd>Esc</kbd> primeiro e depois <kbd>Shift</kbd>+<kbd>Tab</kbd>.</div>
+    <p>Quer que um projeto sempre comece em plan mode? Dá para configurar <code>defaultMode</code> como <code>plan</code> nas configurações do projeto. Veremos settings no Módulo 5.</p>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">4</span>Demonstração</h2>
+    <div id="demo"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">5</span>Pratique na simulação</h2>
+    <p>Entre em plan mode, peça um plano, rejeite uma vez com ajuste e depois aprove com revisão manual.</p>
+    <div id="term"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">6</span>Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">7</span>Exercício real</h2>
+    <p>No TaskFlow:</p>
+    <ol>
+      <li>Aperte <kbd>Shift</kbd>+<kbd>Tab</kbd> até ver <code>⏸ plan mode on</code></li>
+      <li>Peça: <code>quero que listar aceite --pendentes para mostrar só as tarefas não feitas. proponha um plano</code></li>
+      <li>Escolha <strong>No, keep planning</strong> e peça uma mudança (ex.: "adicione também --feitas")</li>
+      <li>Na nova versão, use <kbd>Ctrl</kbd>+<kbd>G</kbd> para abrir o plano no editor e acrescente uma linha: "adicionar testes para as duas opções"</li>
+      <li>Aprove com <strong>Yes, manually approve edits</strong>, revise cada edição e faça commit</li>
+    </ol>
+    <details class="gabarito"><summary>Ver gabarito</summary>
+      <p>Resultado esperado: o subcomando <code>listar</code> ganha duas opções no <code>argparse</code> (por exemplo, um grupo mutuamente exclusivo com <code>--pendentes</code> e <code>--feitas</code>), o filtro aplicado em <code>listar()</code> e testes novos. Os números exibidos continuam sendo os números reais das tarefas, para <code>concluir</code> e <code>remover</code> funcionarem com eles.</p>
+      <p>Se o plano do Claude renumerava a lista filtrada, esse era o tipo de problema que valia pegar no plano, antes do código.</p>
+    </details>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">8</span>Erros comuns</h2>
+    <div class="grade">
+      <div class="mini"><h4>Aprovar no automático</h4><p>O plan mode só ajuda se você ler o plano. Procure arquivos inesperados e casos de erro ausentes.</p></div>
+      <div class="mini"><h4>Shift+Tab na aprovação</h4><p>Ali ele aprova. Para sair sem aprovar: <kbd>Esc</kbd> antes.</p></div>
+      <div class="mini"><h4>Plano vago</h4><p>Se o plano não diz quais arquivos e testes, peça: "detalhe arquivos, casos de erro e testes".</p></div>
+      <div class="mini"><h4>Tudo em plan mode</h4><p>Para mudanças triviais, é burocracia. Use quando houver decisão a tomar.</p></div>
+    </div>
+    <h3>Consigo fazer?</h3>
+    <div id="check"></div>
+    <div id="concluir"></div>
+  </section>
+
+  <section class="bloco">
+    <h2><span class="num">9</span>Para ir além</h2>
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/permission-modes">Permission modes</a>: seção de plan mode e aprovação</li>
+      <li><a href="https://code.claude.com/docs/en/common-workflows">Common workflows</a>: "Plan before editing"</li>
+    </ul>
+    <p class="conferido">Conferido em 18/11/2026. Os rótulos das opções de aprovação podem variar entre versões e planos.</p>
+  </section>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarAula();
+Curso.video("video", { titulo: "Plan mode em 1 minuto", cenas: [
+  { fala: "Plan mode: o jeito de garantir que nenhuma linha muda antes de você concordar com o caminho.",
+    html: "<span class=\"v-tag\" data-t=\"0\">MÓDULO 3 · AULA 2</span><p class=\"v-titulo\" data-t=\"0.3\">Plan mode</p><p class=\"v-sub\" data-t=\"0.9\">Primeiro o caminho, depois o código</p>" },
+  { fala: "Pedir ainda não mude nada funciona, mas depende de o Claude respeitar. No plan mode, as edições ficam bloqueadas até você aprovar o plano.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa warn\" data-t=\"0.3\"><span class=\"v-ic\">🙏</span><b>\"ainda não mude nada\"</b>depende do Claude respeitar</div><div class=\"v-caixa ok\" data-t=\"4\" style=\"--fx:v-zoom\"><span class=\"v-ic\">🔒</span><b>Plan mode</b>edições bloqueadas até você aprovar</div></div>" },
+  { fala: "Três jeitos de entrar: Shift Tab até aparecer plan mode on, o comando /plan com a tarefa, ou abrir o Claude já com o modo plan.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\"><span class=\"a\">⇧ Tab</span> … <span class=\"u\">⏸ plan mode on</span></div><div data-t=\"3\"><span class=\"a\">/plan</span> quero data de vencimento nas tarefas</div><div data-t=\"5.4\"><span class=\"d\">PS&gt;</span> claude <span class=\"a\">--permission-mode plan</span></div></div>" },
+  { fala: "Em plan mode, o Claude pode ler arquivos, buscar no código, investigar e escrever o plano. O que ele não pode é editar seus arquivos antes da aprovação.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa ok\" data-t=\"0.3\"><span class=\"v-ic\">✅</span><b>Pode</b>ler, buscar, investigar, escrever o plano</div><div class=\"v-caixa err\" data-t=\"4.5\"><span class=\"v-ic\">⛔</span><b>Não pode</b>editar seus arquivos antes da aprovação</div></div>" },
+  { fala: "Com o plano pronto, você escolhe: aprovar e deixar executar, aprovar revisando cada edição, que é o recomendado enquanto aprende, ou continuar planejando.",
+    html: "<div class=\"v-code\"><div data-t=\"0.3\">  Yes, and use auto mode</div><div data-t=\"2.6\"><span class=\"u\">❯ Yes, manually approve edits</span>  <span class=\"o\">← recomendado</span></div><div data-t=\"6\">  No, keep planning</div></div><p class=\"v-sub\" data-t=\"0.3\" style=\"text-align:center\">rótulos podem variar conforme a versão</p>" },
+  { fala: "Na tela de aprovação, Ctrl G abre o plano no seu editor para ajustar. Cuidado: ali, Shift Tab aprova o plano. Para sair sem aprovar, aperte Esc primeiro.",
+    html: "<div class=\"v-grade\"><div class=\"v-caixa acc\" data-t=\"0.3\"><span class=\"v-ic\">✏</span><b>Ctrl+G</b>edita o plano no seu editor</div><div class=\"v-caixa warn\" data-t=\"3.6\"><span class=\"v-ic\">⚠</span><b>Shift+Tab aprova!</b>para sair: Esc primeiro</div></div>" },
+  { fala: "Mudança grande ou código que você não conhece? Comece pelo plan mode.",
+    html: "<p class=\"v-sub\" data-t=\"0\">A regra prática</p><p class=\"v-titulo\" data-t=\"0.4\">Mudança grande? Plan mode primeiro.</p>" }
+] });
+Curso.passos("diag", {
+  nos: [{ ic: "⏸", rt: "Entrar" }, { ic: "🔎", rt: "Investigar" }, { ic: "📋", rt: "Plano" }, { ic: "✍", rt: "Ajustar" }, { ic: "▶", rt: "Aprovar" }],
+  passos: [
+    { ativos: [0], titulo: "Entrar no plan mode", texto: "<kbd>Shift</kbd>+<kbd>Tab</kbd> até <code>⏸ plan mode on</code>, ou <code>/plan sua tarefa</code>, ou <code>claude --permission-mode plan</code>." },
+    { ativos: [1], setas: [0], titulo: "O Claude investiga", texto: "Lê arquivos, busca, roda comandos de investigação. <strong>Edições bloqueadas.</strong> Você pode responder perguntas que ele fizer." },
+    { ativos: [2], setas: [1], titulo: "O plano aparece", texto: "Lista de passos: o que muda, onde, e como será verificado. Leia como se fosse revisar código de um colega." },
+    { ativos: [3], setas: [2], titulo: "Ajustar", texto: "<strong>No, keep planning</strong> + o que mudar, ou <kbd>Ctrl</kbd>+<kbd>G</kbd> para editar o plano no seu editor. Repita até ficar bom." },
+    { ativos: [4], setas: [3], titulo: "Aprovar e executar", texto: "Escolha como executar: com auto mode/aceitar edições, ou revisando cada edição. Ao aprovar, o plan mode termina e o Claude começa a editar." }
+  ]
+});
+Curso.player("demo", {
+  titulo: "Claude Code: plan mode (demonstração)", altura: 340,
+  passos: [
+    { t: "html", x: '<span class="t-dim">[Shift+Tab, Shift+Tab…]</span>   <span class="t-acc">⏸ plan mode on</span>', leg: "Entrou em plan mode" },
+    { t: "user", x: "quero que listar aceite --pendentes. proponha um plano", ms: 600 },
+    { t: "tool", x: "Read(tarefas.py)", leg: "Investiga, sem editar" },
+    { t: "tool", x: "Read(tests/test_tarefas.py)" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Plano</span>\n1. Adicionar --pendentes ao subcomando listar\n2. listar(somente_pendentes=False) filtra a lista\n3. Exibir com numeração renumerada\n4. 2 testes novos\n\n<span class="t-user">❯ Yes, and use auto mode</span>\n  Yes, manually approve edits\n  No, keep planning</span>', leg: "Leia com calma: o passo 3 é um problema", ms: 2200 },
+    { t: "html", x: '<span class="t-user">  › No, keep planning</span>' },
+    { t: "user", x: "não renumere: mostre o número real, senão concluir e remover quebram", leg: "Você corrige o plano com uma frase" },
+    { t: "html", x: '<span class="t-caixa"><span class="t-b">Plano revisado</span>\n3. Manter o número original de cada tarefa ao filtrar\n4. Teste: concluir usando o número exibido no filtro</span>', ms: 1600 },
+    { t: "html", x: '<span class="t-user">  › Yes, manually approve edits</span>', leg: "Aprovou revisando cada edição" },
+    { t: "tool", x: "Update(tarefas.py)" },
+    { t: "tool", x: "Bash(python -m unittest)" },
+    { t: "out", x: "Ran 8 tests\nOK" }
+  ]
+});
+(function () {
+  var modo = "manual", plano = 0;
+  function barra() { return modo === "plan" ? '<span class="t-acc">⏸ plan mode on</span>' : modo === "edits" ? '<span class="t-ok">⏵⏵ accept edits on</span>' : '<span class="t-dim">(modo manual)</span>'; }
+  Curso.terminal("term", {
+    titulo: "Claude Code: plan mode (simulação)", prompt: ">",
+    intro: '<span class="t-dim">Digite shift+tab para alternar o modo. Depois peça um plano.</span>',
+    metas: ["shift+tab", "plano para --pendentes", "no", "yes manual"],
+    comandos: {
+      "shift+tab": function () { modo = modo === "manual" ? "edits" : modo === "edits" ? "plan" : "manual"; return barra() + (modo === "edits" ? '\n<span class="t-dim">Ainda não é o plan mode. Aperte de novo.</span>' : ""); },
+      "plano para --pendentes": function () {
+        if (modo !== "plan") return '<span class="t-warn">Você não está em plan mode: o Claude poderia começar a editar direto.</span>\n<span class="t-dim">Use shift+tab até ver ⏸ plan mode on.</span>';
+        plano = 1; return '<span class="t-ok">●</span> Read(tarefas.py)\n<span class="t-caixa"><span class="t-b">Plano v1</span>\n1. --pendentes no listar\n2. Filtrar e renumerar a lista\n\n  yes auto · yes manual · no</span>';
+      },
+      "no": function () { if (!plano) return '<span class="t-dim">Peça o plano antes.</span>'; plano = 2; return '<span class="t-dim">No, keep planning.</span> O que mudar?\n<span class="t-acc">●</span> (simulado: você pediu para manter os números reais)\n<span class="t-caixa"><span class="t-b">Plano v2</span>\n1. --pendentes no listar\n2. Filtrar mantendo o número real\n3. Testes para filtro + concluir\n\n  yes auto · yes manual · no</span>'; },
+      "yes manual": function () { if (!plano) return '<span class="t-dim">Peça o plano antes.</span>'; if (plano === 1) return '<span class="t-warn">Aprovou o plano v1, que renumera a lista e quebraria concluir/remover. Digite no para ajustar antes.</span>'; modo = "manual"; plano = 0; return '<span class="t-ok">Plano aprovado. Plan mode desligado; você vai aprovar cada edição.</span>\n<span class="t-ok">●</span> Update(tarefas.py)  <span class="t-dim">← aguardando sua aprovação</span>'; },
+      "yes auto": function () { if (!plano) return '<span class="t-dim">Peça o plano antes.</span>'; return '<span class="t-dim">Válido, mas nesta prática escolha yes manual para revisar cada edição.</span>'; },
+      "ctrl+g": '<span class="t-dim">Abriria o plano no seu editor de texto padrão para você editar.</span>'
+    },
+    desconhecido: '<span class="t-dim">Comandos desta prática: shift+tab · plano para --pendentes · no · yes manual · yes auto · ctrl+g</span>'
+  });
+})();
+Curso.quiz("quiz", [
+  { p: "O que muda quando você está em plan mode?", op: ["O Claude não consegue ler arquivos", "O Claude investiga e propõe um plano, mas não edita seus arquivos antes da aprovação", "O Claude usa um modelo mais barato"], c: 1, ex: "Leitura e investigação liberadas; edições bloqueadas até você aprovar." },
+  { p: "Como abrir o plano proposto no seu editor de texto para ajustá-lo?", op: ["<kbd>Ctrl</kbd>+<kbd>G</kbd> na tela de aprovação", "<code>/edit</code>", "<kbd>Alt</kbd>+<kbd>P</kbd>"], c: 0, ex: "<kbd>Ctrl</kbd>+<kbd>G</kbd> abre o plano no editor padrão. Você edita e o Claude segue a versão nova." },
+  { p: "Na tela de aprovação, você quer sair do plan mode SEM aprovar. O que fazer?", op: ["Apertar <kbd>Shift</kbd>+<kbd>Tab</kbd>", "Apertar <kbd>Esc</kbd> e depois <kbd>Shift</kbd>+<kbd>Tab</kbd>", "Fechar o terminal"], c: 1, ex: "Na tela de aprovação, <kbd>Shift</kbd>+<kbd>Tab</kbd> aprova o plano. <kbd>Esc</kbd> primeiro fecha a tela." },
+  { p: "Enquanto aprende, qual opção de aprovação é mais indicada?", op: ["Yes, manually approve edits", "Yes, and use auto mode", "Sempre No"], c: 0, ex: "Revisar cada edição ensina como o Claude implementa o plano. Mais tarde, com confiança, você libera mais." },
+  { p: "Como começar uma sessão inteira já em plan mode?", op: ["<code>claude -p</code>", "<code>claude --permission-mode plan</code>", "<code>claude --plan-only</code>"], c: 1, ex: "A flag <code>--permission-mode plan</code> abre a sessão em plan mode." }
+]);
+Curso.checklist("check", [
+  "Entro em plan mode pelos três jeitos (atalho, <code>/plan</code>, flag)",
+  "Leio o plano procurando arquivos inesperados e casos de erro",
+  "Peço ajustes com <em>No, keep planning</em> e edito com <kbd>Ctrl</kbd>+<kbd>G</kbd>",
+  "Sei sair sem aprovar (<kbd>Esc</kbd> antes do <kbd>Shift</kbd>+<kbd>Tab</kbd>)",
+  "Implementei <code>listar --pendentes/--feitas</code> no TaskFlow via plan mode"
+]);
+</script>
+</body>
+</html>

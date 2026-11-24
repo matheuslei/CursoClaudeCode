@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides Módulo 7</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-voltar="../../index.html">
+<div class="slides">
+  <section class="slide">
+    <p class="capa-mod">Módulo 7 · Revisão</p>
+    <h1>Subagentes e paralelismo</h1>
+    <p style="color:var(--txt2)">Use ← → para navegar · F para tela cheia · Ctrl+P para salvar em PDF</p>
+  </section>
+  <section class="slide">
+    <h2>Subagente em uma frase</h2>
+    <p style="font-size:clamp(1.3rem,3vw,2rem)">Um ajudante com janela de contexto própria, que faz o trabalho pesado e devolve só o resultado.</p>
+    <ul>
+      <li>Arquivo em <code>.claude/agents/&lt;nome&gt;.md</code> (projeto) ou <code>~/.claude/agents/</code> (seu)</li>
+      <li><code>name</code> e <code>description</code> obrigatórios; <code>tools</code> omitido = herda tudo</li>
+      <li>Acionar: pelo nome, <code>@agent-&lt;nome&gt;</code> ou automático pela description</li>
+      <li>Primeiro arquivo numa pasta <code>agents</code> nova: reinicie a sessão</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Delegar ou fazer aqui?</h2>
+    <ul>
+      <li>✅ Delegar: muita leitura, busca ampla, checklist repetida</li>
+      <li>✋ Aqui: mudança pequena, vai e volta, pergunta sobre a conversa (<code>/btw</code>)</li>
+      <li>Prontos: <strong>Explore</strong>, <strong>Plan</strong>, <strong>general-purpose</strong></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Segundo plano e fork</h2>
+    <ul>
+      <li><kbd>Ctrl+B</kbd> manda para segundo plano · <code>/tasks</code> acompanha · <kbd>Ctrl+X</kbd> <kbd>Ctrl+K</kbd> para todos</li>
+      <li><code>/branch</code>: ramifica e troca · <code>/fork</code>: cópia em sessão paralela · <code>/subtask</code>: subagente com histórico</li>
+      <li>Fork copia a <strong>conversa</strong>, não os arquivos</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Worktrees</h2>
+    <div class="cod" style="max-width:820px"><code>claude -w exportar        # .claude/worktrees/exportar · branch worktree-exportar
+claude -w estatisticas    # em outro terminal
+git merge worktree-exportar
+git merge worktree-estatisticas
+python -m unittest</code></div>
+    <p>Precisa de Git · um arquivo, um dono · remover com mudanças apaga o trabalho</p>
+  </section>
+  <section class="slide">
+    <h2>Agent view</h2>
+    <ul>
+      <li><code>claude agents</code>: todas as sessões em segundo plano (research preview)</li>
+      <li><code>claude --bg "pedido"</code> · <code>/bg</code> · <kbd>←</kbd> com o campo vazio</li>
+      <li><kbd>Espaço</kbd> espia · <kbd>Enter</kbd> entra · <kbd>Ctrl+X</kbd> para</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>/goal</h2>
+    <div class="cod" style="max-width:900px"><code>/goal python -m unittest mostra OK nesta conversa, ou pare após 15 turnos</code></div>
+    <ul>
+      <li>O avaliador <strong>só lê a conversa</strong>: a prova precisa aparecer nela</li>
+      <li>Fim mensurável + prova + restrições + limite</li>
+      <li><code>/goal</code> mostra o status · <code>/goal clear</code> cancela</li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Três níveis de orquestração</h2>
+    <ul>
+      <li>🤖 <strong>Subagentes</strong>: tarefa focada, só o resultado importa (mais barato)</li>
+      <li>📁 <strong>Sessões paralelas</strong>: mudanças independentes, uma por worktree</li>
+      <li>👥 <strong>Equipe de agentes</strong>: discussão entre colegas (experimental, <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>)</li>
+      <li>Regra de ouro: o nível mais simples que resolve · meça com <code>/usage</code></li>
+    </ul>
+  </section>
+  <section class="slide">
+    <h2>Pronto para o Módulo 8?</h2>
+    <ul>
+      <li>✓ Criou e usou o subagente <code>revisor-taskflow</code></li>
+      <li>✓ Juntou duas mudanças feitas em worktrees paralelos</li>
+      <li>✓ Cumpriu um <code>/goal</code> verificável</li>
+    </ul>
+    <p>Próximo: <a href="../08-plugins/01-o-que-e-plugin.html"><strong>Módulo 8: Plugins</strong></a> →</p>
+  </section>
+</div>
+<script src="../../assets/curso.js"></script>
+<script>Curso.iniciarSlides();</script>
+</body>
+</html>

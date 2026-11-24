@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 7</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m7qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 7 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Subagentes e paralelismo</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 7</a>
+    <a class="prox" href="../08-plugins/01-o-que-e-plugin.html"><small>Próximo módulo →</small>Módulo 8: Plugins</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 7 · Subagentes e paralelismo › Quiz final");
+Curso.quiz("quiz", [{"p": "Você não escreveu <code>tools</code> no frontmatter. O que acontece?", "op": ["O subagente não pode usar nenhuma ferramenta", "Ele herda todas as ferramentas disponíveis para subagentes", "O arquivo é ignorado"], "c": 1, "ex": "Sem <code>tools</code>, herda tudo. Para um revisor, restrinja a leitura e testes. <span class=\"t-dim\">(aula: Subagentes customizados)</span>"}, {"p": "Você rodou <code>/branch</code> e pediu mudanças no código. O que acontece com os arquivos da conversa original?", "op": ["Nada: cada ramificação tem a sua cópia dos arquivos", "Eles também mudam: a ramificação é da conversa, não da pasta", "O Claude bloqueia a edição"], "c": 1, "ex": "Fork e branch copiam o histórico. Para separar arquivos, use worktrees. <span class=\"t-dim\">(aula: Segundo plano e fork)</span>"}, {"p": "Você sai de uma sessão em worktree que tem mudanças. O que acontece?", "op": ["Tudo é apagado", "O Claude Code pergunta se mantém ou remove", "As mudanças são juntadas na main sozinhas"], "c": 1, "ex": "Com mudanças, ele pergunta. Remover apaga a pasta e a branch. <span class=\"t-dim\">(aula: Worktrees)</span>"}, {"p": "O que o avaliador do <code>/goal</code> usa para decidir?", "op": ["Roda os testes por conta própria", "Lê a conversa", "Abre os arquivos alterados"], "c": 1, "ex": "Ele só julga o que apareceu na conversa. Por isso a condição precisa de uma prova visível. <span class=\"t-dim\">(aula: Agent view e /goal)</span>"}, {"p": "No Windows, sem tmux, como você vê a equipe?", "op": ["Não dá para usar", "No modo in-process, pelo painel abaixo do campo de texto", "Só pelo navegador"], "c": 1, "ex": "Split panes exige tmux ou iTerm2; o in-process funciona em qualquer terminal. <span class=\"t-dim\">(aula: Orquestração em escala)</span>"}, {"p": "Qual campo o Claude usa para decidir se delega sozinho?", "op": ["<code>name</code>", "<code>tools</code>", "<code>description</code>"], "c": 2, "ex": "A <code>description</code> diz quando usar. Se for vaga, a delegação automática erra. <span class=\"t-dim\">(aula: Subagentes customizados)</span>"}, {"p": "Onde você acompanha o trabalho em segundo plano?", "op": ["<code>/tasks</code>", "<kbd>Ctrl+T</kbd>", "<code>/context</code>"], "c": 0, "ex": "<code>/tasks</code> (ou <code>/bashes</code>). <kbd>Ctrl+T</kbd> mostra a lista de afazeres do Claude. <span class=\"t-dim\">(aula: Segundo plano e fork)</span>"}, {"p": "Onde o <code>claude --worktree exportar</code> cria a pasta?", "op": ["<code>.claude/worktrees/exportar/</code>", "<code>~/worktrees/exportar/</code>", "Na pasta pai do projeto"], "c": 0, "ex": "Na raiz do repositório, em <code>.claude/worktrees/</code>, na branch <code>worktree-exportar</code>. <span class=\"t-dim\">(aula: Worktrees)</span>"}, {"p": "Como criar uma sessão que já começa em segundo plano?", "op": ["<code>claude --bg \"pedido\"</code>", "<code>claude -w</code>", "<code>/tasks</code>"], "c": 0, "ex": "<code>--bg</code>; com <code>--name</code> ela ganha um rótulo. <span class=\"t-dim\">(aula: Agent view e /goal)</span>"}, {"p": "Como ligar as equipes de agentes?", "op": ["<code>/agents</code>", "Variável <code>CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1</code>", "Já vêm ligadas"], "c": 1, "ex": "No ambiente ou no bloco <code>env</code> do <code>settings.json</code>. É experimental. <span class=\"t-dim\">(aula: Orquestração em escala)</span>"}]);
+</script>
+</body>
+</html>

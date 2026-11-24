@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz final · Módulo 9</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link rel="stylesheet" href="../../assets/curso.css">
+</head>
+<body data-raiz="../../" data-aula="m9qf">
+<main>
+  <header class="cab-aula">
+    <span class="selo">Módulo 9 · Quiz final</span><span class="selo cinza">10 perguntas</span><span class="selo cinza">~10 min</span>
+    <h1>Quiz final: Automação</h1>
+    <p class="objetivo">Revise o módulo inteiro com 10 perguntas tiradas das aulas. A meta é acertar 7 ou mais de primeira; o seu melhor resultado fica salvo e aparece no índice e no certificado.</p>
+  </header>
+  <section class="bloco">
+    <div id="quiz"></div>
+    <p class="term-status">Errou alguma? A explicação diz de qual aula ela veio. Releia a aula e tente de novo: vale o melhor resultado.</p>
+  </section>
+  <nav class="nav-aulas" aria-label="Navegação">
+    <a class="ant" href="slides.html"><small>← Revisão</small>Slides do Módulo 9</a>
+    <a class="prox" href="../10-agent-sdk/01-loop-agente.html"><small>Próximo módulo →</small>Módulo 10: Agent SDK</a>
+  </nav>
+</main>
+<script src="../../assets/curso.js"></script>
+<script>
+Curso.iniciarPagina("Módulo 9 · Automação › Quiz final");
+Curso.quiz("quiz", [{"p": "Com <code>--output-format json</code>, em qual campo vem o texto da resposta?", "op": ["<code>result</code>", "<code>message</code>", "<code>structured_output</code>"], "c": 0, "ex": "<code>result</code> traz o texto. <code>structured_output</code> só aparece com <code>--json-schema</code>. <span class=\"t-dim\">(aula: Modo não interativo (claude -p))</span>"}, {"p": "Você usou <code>/code-review --fix</code> e não gostou das edições. O <code>/rewind</code> desfaz?", "op": ["Sim, sempre", "Não necessariamente: a revisão em segundo plano edita fora dos checkpoints; use o Git", "Só se você estiver no plan mode"], "c": 1, "ex": "Faça commit antes de usar <code>--fix</code> para poder voltar com o Git. <span class=\"t-dim\">(aula: Revisão de código com o Claude)</span>"}, {"p": "Com um <code>prompt</code> de texto, o Claude pode rodar <code>python -m unittest</code> no servidor?", "op": ["Sim, sempre", "Só se você liberar, por exemplo com <code>--allowedTools \"Bash(python -m unittest *)\"</code> em <code>claude_args</code>", "Nunca"], "c": 1, "ex": "No modo automação com prompt de texto, não há shell até você liberar as ferramentas. <span class=\"t-dim\">(aula: Claude Code no GitHub Actions)</span>"}, {"p": "Qual é a diferença central entre <code>/loop</code> e <code>/goal</code>?", "op": ["Nenhuma, são sinônimos", "<code>/loop</code> repete por intervalo de tempo; <code>/goal</code> continua até uma condição ser cumprida", "<code>/goal</code> só funciona na nuvem"], "c": 1, "ex": "Loop é tempo; goal é objetivo verificado por um avaliador. <span class=\"t-dim\">(aula: Tarefas agendadas e loops)</span>"}, {"p": "Num <code>claude -p</code> sem <code>--allowedTools</code>, o Claude tenta rodar um comando que precisa de aprovação. O que acontece?", "op": ["Ele espera você aprovar no terminal", "A chamada é negada, porque não há ninguém para aprovar", "O comando roda assim mesmo"], "c": 1, "ex": "No <code>-p</code> (modo Manual, a partir da v2.1.302), o que precisa de aprovação é negado, salvo regra, hook ou <code>--allowedTools</code>. <span class=\"t-dim\">(aula: Modo não interativo (claude -p))</span>"}, {"p": "Qual comando revisa só o arquivo <code>buscar.py</code> com esforço baixo?", "op": ["<code>/code-review low buscar.py</code>", "<code>/code-review buscar.py --low</code>", "<code>/review --file buscar.py</code>"], "c": 0, "ex": "Primeiro o nível, depois as flags, por fim o alvo. <span class=\"t-dim\">(aula: Revisão de código com o Claude)</span>"}, {"p": "Onde fica a chave da API?", "op": ["No YAML, entre aspas", "Nos GitHub Secrets, referenciada como <code>${{ secrets.ANTHROPIC_API_KEY }}</code>", "No <code>CLAUDE.md</code>"], "c": 1, "ex": "Nunca no código. Se uma chave vazar, revogue-a no Console. <span class=\"t-dim\">(aula: Claude Code no GitHub Actions)</span>"}, {"p": "Como parar um loop de intervalo fixo, como <code>/loop 5m</code>?", "op": ["Apertando <kbd>Esc</kbd>", "Pedindo ao Claude para cancelar (ou esperando expirar em 7 dias)", "Com <code>/goal clear</code>"], "c": 1, "ex": "<kbd>Esc</kbd> só para o loop de ritmo próprio. O fixo se cancela pelo ID, pedindo ao Claude. <span class=\"t-dim\">(aula: Tarefas agendadas e loops)</span>"}, {"p": "Por que não usar <code>--bare</code> com a sua assinatura do Claude?", "op": ["Porque ele desliga o JSON", "Porque ele não lê o login da assinatura e exige <code>ANTHROPIC_API_KEY</code>", "Porque ele só funciona no Linux"], "c": 1, "ex": "O modo bare pula OAuth e o chaveiro do sistema; precisa de uma chave de API no ambiente. <span class=\"t-dim\">(aula: Modo não interativo (claude -p))</span>"}, {"p": "O <code>/security-review</code> falhou com <code>ambiguous argument 'origin/HEAD...'</code>. Por quê?", "op": ["Falta um remoto <code>origin</code> com <code>origin/HEAD</code>", "O plano não inclui revisão de segurança", "O arquivo é grande demais"], "c": 0, "ex": "Ele compara com <code>origin/HEAD</code>. Crie o remoto (pode ser uma pasta local) e rode <code>git remote set-head origin main</code>. <span class=\"t-dim\">(aula: Revisão de código com o Claude)</span>"}]);
+</script>
+</body>
+</html>
