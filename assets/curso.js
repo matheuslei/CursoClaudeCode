@@ -36,7 +36,7 @@
       { id: "m5a2", arq: "02-skills.html", titulo: "Skills", min: 30 },
       { id: "m5a3", arq: "03-output-styles.html", titulo: "Output styles e status line", min: 15 },
       { id: "m5a4", arq: "04-hooks.html", titulo: "Hooks", min: 30 } ] },
-    { id: "m6", n: 6, pasta: "06-mcp", titulo: "MCP e integrações", nivel: "Intermediário", desc: "Servidores MCP, VS Code e Desktop", pronto: true, slides: true, aulas: [
+    { id: "m6", n: 6, pasta: "06-mcp", titulo: "MCP e integrações", nivel: "Intermediário", desc: "Servidores MCP, VS Code e Desktop", pronto: true, slides: true, podcast: { arq: "ep07-mcp.m4a", min: 14 }, aulas: [
       { id: "m6a1", arq: "01-o-que-e-mcp.html", titulo: "O que é MCP", min: 15 },
       { id: "m6a2", arq: "02-instalar-mcp.html", titulo: "Instalar e autenticar um servidor", min: 20 },
       { id: "m6a3", arq: "03-criar-mcp.html", titulo: "Criar um MCP em Python", min: 35 },

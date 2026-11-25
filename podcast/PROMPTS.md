@@ -27,6 +27,7 @@ Uma série de 11 episódios, um por módulo, para quem não tem tempo de ler a a
 | 4 · Fluxo profissional | `podcast/audio/ep04-fluxo.m4a` | 13 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio da spec e gancho) e é fiel à fonte: quatro etapas, /clear depois de duas correções, plan mode (Shift+Tab aprova, Esc antes, Ctrl+G), spec de cinco seções com entrevista, testes commitados antes, injetar o "hoje", evidência e /code-review; ressalva: simplifica ao dizer que o /rewind só desfaz a conversa (ele também desfaz as edições do Claude; quem fica de fora são as correções do --fix) |
 | 5 · Permissões e segurança | `podcast/audio/ep05-permissoes.m4a` | 15 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do deny no .env e gancho) e é fiel à fonte, inclusive em auto mode (3 seguidos ou 20 no total), ordem deny, ask, allow, sandbox só no WSL 2 e revogar segredo vazado; ressalvas: abre com uma cena inventada (o assistente apaga o banco) e fecha com uma reflexão |
 | 6 · Personalização | `podcast/audio/ep06-personalizacao.m4a` | 16 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio da skill revisar-taskflow e gancho) e é fiel à fonte: CLAUDE.md orienta e settings aplica, precedência, listas que se somam, JSON sem comentários, skills e description, disable-model-invocation, output styles com reinício, status line, hooks e códigos de saída, "pedir é CLAUDE.md, garantir é hook"; ressalvas: o exemplo põe o hook de sintaxe antes da edição (na aula é PostToolUse, depois), diz que o estilo Proactive "para de pedir permissão" (ele só começa a implementar; permissão é dos modos) e fecha com uma reflexão |
+| 7 · MCP e integrações | `podcast/audio/ep07-mcp.m4a` | 14 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do servidor de documentação e gancho) e é fiel à fonte: tomada padrão, ferramentas, recursos e prompts, STDIO e HTTP, tool search, servidores confiáveis e segurança da informação, os dois traços, escopos, aprovação do .mcp.json, Python 3.11+, nada de print, VS Code 1.94+ e app Desktop; ressalva: a abertura imagina o Claude consultando o banco de produção e resolvendo bugs sozinho, o que a fonte não diz |
 
 **Antes de usar, confira:**
 
@@ -132,12 +133,15 @@ Feche com três pontos-chave, o desafio de adicionar o servidor de documentaçã
 
 ## Episódio 8 de 11 · Subagentes e paralelismo (fonte: `modulo-07-subagentes.md`)
 
+Versão 2 (25/11/2026), no formato que funcionou nos episódios 2 a 6.
+
 ```text
 Episódio 8 de 11 da série "Claude Code: do zero ao avançado". Use apenas a fonte modulo-07-subagentes.
-Abra lembrando em uma frase o episódio anterior: MCP, servidores e integrações com VS Code e Desktop.
-Tema: sair de "um assistente" para "uma pequena equipe". Explique os subagentes customizados (especialistas com contexto próprio, que devolvem só a conclusão), o trabalho em segundo plano e o fork de conversa. Mostre os worktrees como cópias isoladas do projeto para tarefas paralelas sem conflito. Apresente o agent view, o barra goal e a orquestração em escala, avisando o que é experimental. Dê um critério simples de quando paralelizar e de quando o custo e a revisão não compensam.
-Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados, guardados ou usados para treinar a IA, a menos que a fonte diga; avise o que é opcional ou tem custo.
-Feche com três pontos-chave, um desafio prático curto e o gancho: no próximo episódio, empacotar tudo num plugin.
+Comece dizendo literalmente "Este é o episódio 8 de 11" e lembre em uma frase o episódio 7: MCP, servidores e as integrações com VS Code e Desktop.
+Tema: sair de "um assistente" para "uma pequena equipe", no nível avançado, com o TaskFlow. Siga a ordem das aulas: subagentes customizados; segundo plano e fork; worktrees; agent view e barra goal; orquestração em escala.
+Precisão: o subagente trabalha numa janela de contexto própria e devolve só o resultado, mas começa sem contexto e gasta os próprios tokens, então mudança pequena e conversa de vai e volta ficam na sessão principal; ele é um arquivo Markdown em ponto claude barra agents, com description e tools; Control B manda para o segundo plano e barra tasks mostra o que roda; cada trabalho paralelo gasta os próprios tokens, confira com barra usage; o worktree é uma segunda pasta com branch própria no mesmo repositório, e no fim você junta com git merge e roda os testes; no barra goal um modelo avaliador decide se a condição foi cumprida, então escreva uma condição verificável, com prova na conversa e limite de turnos; as equipes de agentes são experimentais. Regra de ouro: use o nível mais simples que resolve. Não especule sobre o futuro.
+Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados ou usados para treinar a IA. Duração: entre 15 e 20 minutos.
+Feche com três pontos-chave, o desafio de criar o subagente revisor-taskflow somente leitura e pedir que ele revise o tarefas.py, e o gancho: no episódio 9, empacotar tudo num plugin.
 ```
 
 ## Episódio 9 de 11 · Plugins (fonte: `modulo-08-plugins.md`)
