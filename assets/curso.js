@@ -19,7 +19,7 @@
       { id: "m2a3", arq: "03-memoria.html", titulo: "Memória automática e /memory", min: 15 },
       { id: "m2a4", arq: "04-clear-compact-rewind.html", titulo: "/clear, /compact e /rewind", min: 20 },
       { id: "m2a5", arq: "05-custo.html", titulo: "Custo, modelos e /usage", min: 15 } ] },
-    { id: "m3", n: 3, pasta: "03-fluxo", titulo: "Fluxo profissional", nivel: "Intermediário", desc: "Plan mode, Spec-Driven Development, TDD", pronto: true, slides: true, aulas: [
+    { id: "m3", n: 3, pasta: "03-fluxo", titulo: "Fluxo profissional", nivel: "Intermediário", desc: "Plan mode, Spec-Driven Development, TDD", pronto: true, slides: true, podcast: { arq: "ep04-fluxo.m4a", min: 13 }, aulas: [
       { id: "m3a1", arq: "01-explorar-planejar.html", titulo: "Explorar → Planejar → Codar → Commitar", min: 20 },
       { id: "m3a2", arq: "02-plan-mode.html", titulo: "Plan mode", min: 20 },
       { id: "m3a3", arq: "03-sdd.html", titulo: "Spec-Driven Development", min: 30 },
