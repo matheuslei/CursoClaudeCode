@@ -42,7 +42,7 @@
       { id: "m6a3", arq: "03-criar-mcp.html", titulo: "Criar um MCP em Python", min: 35 },
       { id: "m6a4", arq: "04-vscode-desktop.html", titulo: "VS Code e app Desktop", min: 20 } ] },
     // Aula sem "arq" aparece como "em breve" mesmo com o módulo pronto (entrega por partes).
-    { id: "m7", n: 7, pasta: "07-subagentes", titulo: "Subagentes e paralelismo", nivel: "Avançado", desc: "Subagentes, segundo plano, worktrees, agent view, /goal e equipes", pronto: true, slides: true, aulas: [
+    { id: "m7", n: 7, pasta: "07-subagentes", titulo: "Subagentes e paralelismo", nivel: "Avançado", desc: "Subagentes, segundo plano, worktrees, agent view, /goal e equipes", pronto: true, slides: true, podcast: { arq: "ep08-subagentes.m4a", min: 23 }, aulas: [
       { id: "m7a1", arq: "01-subagentes.html", titulo: "Subagentes customizados", min: 30 },
       { id: "m7a2", arq: "02-background-fork.html", titulo: "Segundo plano e fork", min: 20 },
       { id: "m7a3", arq: "03-worktrees.html", titulo: "Worktrees", min: 30 },
