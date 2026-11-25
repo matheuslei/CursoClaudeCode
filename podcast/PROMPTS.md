@@ -24,6 +24,7 @@ Uma série de 11 episódios, um por módulo, para quem não tem tempo de ler a a
 | 1 · Base | `podcast/audio/ep01-base.m4a` | 18 min | 23/11/2026: fiel à fonte; ressalva: diz que o Git guarda só as diferenças (na verdade guarda versões completas) |
 | 2 · Primeiros passos | `podcast/audio/ep02-primeiros-passos.m4a` | 11 min | 24/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do concluir e gancho) e corrigiu auto mode e erro 403; ressalvas: diz "barra invertida" para os comandos (é a barra /), dá exemplos de auto mode que a fonte não traz (ler é seguro, apagar pasta trava) e afirma que instalação mal feita é o "motivo número 1" de abandono; ficou abaixo dos 15 min pedidos |
 | 3 · Contexto é tudo | `podcast/audio/ep03-contexto.m4a` | 17 min | 24/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do /init e gancho) e é fiel à fonte; ressalvas: diz "custo entre 13 e 30 dólares por dia" (a fonte: média de ~US$ 13, abaixo de 30 para 90%), exagera regras conflitantes ("surta") e fecha com uma reflexão que repete "anota sem a gente ver" |
+| 5 · Permissões e segurança | `podcast/audio/ep05-permissoes.m4a` | 15 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do deny no .env e gancho) e é fiel à fonte, inclusive em auto mode (3 seguidos ou 20 no total), ordem deny, ask, allow, sandbox só no WSL 2 e revogar segredo vazado; ressalvas: abre com uma cena inventada (o assistente apaga o banco) e fecha com uma reflexão |
 
 **Antes de usar, confira:**
 
@@ -90,12 +91,15 @@ Feche com três pontos-chave, o desafio de pedir ao Claude que te entreviste e e
 
 ## Episódio 5 de 11 · Permissões e segurança (fonte: `modulo-04-permissoes.md`)
 
+Versão 2 (25/11/2026), no formato que funcionou nos episódios 2 e 3.
+
 ```text
 Episódio 5 de 11 da série "Claude Code: do zero ao avançado". Use apenas a fonte modulo-04-permissoes.
-Abra lembrando em uma frase o episódio anterior: explorar, planejar, codar e commitar, plan mode, SDD e TDD.
-Tema: deixar o Claude trabalhar sem perder o controle. Compare os modos de permissão com níveis de confiança num colega novo. Explique o auto mode e seus limites, as regras de allow, ask e deny com exemplos do TaskFlow e o que o sandbox protege. Dedique um bloco a segredos e dados pessoais: por que nunca colar senha, token ou dado de cliente no chat e como bloquear a leitura de arquivos sensíveis. Lembre que decisões de segurança e LGPD na empresa passam pela área responsável.
-Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados, guardados ou usados para treinar a IA, a menos que a fonte diga; avise o que é opcional ou tem custo.
-Feche com três pontos-chave, um desafio prático curto e o gancho: no próximo episódio, personalizar o Claude Code.
+Comece dizendo literalmente "Este é o episódio 5 de 11" e lembre em uma frase o episódio 4: plan mode, spec, TDD e revisão.
+Tema: deixar o Claude trabalhar sem perder o controle, no nível intermediário, com exemplos do TaskFlow. Siga a ordem das aulas: os modos de permissão; o auto mode; as regras allow, ask e deny; o sandbox; segredos e dados pessoais.
+Precisão: Shift Tab troca o modo; bypass só serve para ambientes isolados e descartáveis; o auto mode usa um classificador, volta a perguntar depois de três bloqueios seguidos ou vinte no total, reduz pedidos mas não garante segurança, e um combinado na conversa não vira regra; a ordem é deny, depois ask, depois allow, e o bloqueio vence; escrever no CLAUDE.md não impede nada, só deny impede; o sandbox não funciona no Windows nativo, só no WSL 2, e por padrão a leitura continua ampla; tudo o que entra no contexto vai pela rede ao modelo, então segredo fica no ponto env com regra deny, e se vazar, revogue e gere outro, porque apagar não tira do histórico do Git. Segurança e dados pessoais na empresa passam pela área responsável; diga que é boa prática, não orientação jurídica.
+Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; sobre envio de dados, diga só o que a fonte diz. Duração: entre 15 e 20 minutos. Não especule sobre o futuro.
+Feche com três pontos-chave, o desafio de criar uma regra deny para a leitura do ponto env no TaskFlow e conferir com barra permissions, e o gancho: no episódio 6, personalizar o Claude Code.
 ```
 
 ## Episódio 6 de 11 · Personalização (fonte: `modulo-05-personalizacao.md`)

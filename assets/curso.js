@@ -25,7 +25,7 @@
       { id: "m3a3", arq: "03-sdd.html", titulo: "Spec-Driven Development", min: 30 },
       { id: "m3a4", arq: "04-tdd.html", titulo: "TDD com o Claude", min: 25 },
       { id: "m3a5", arq: "05-verificacao.html", titulo: "Verificação e revisão", min: 20 } ] },
-    { id: "m4", n: 4, pasta: "04-permissoes", titulo: "Permissões e segurança", nivel: "Intermediário", desc: "Modos, auto mode, regras e sandbox", pronto: true, slides: true, aulas: [
+    { id: "m4", n: 4, pasta: "04-permissoes", titulo: "Permissões e segurança", nivel: "Intermediário", desc: "Modos, auto mode, regras e sandbox", pronto: true, slides: true, podcast: { arq: "ep05-permissoes.m4a", min: 15 }, aulas: [
       { id: "m4a1", arq: "01-modos.html", titulo: "Modos de permissão", min: 20 },
       { id: "m4a2", arq: "02-auto-mode.html", titulo: "Auto mode", min: 15 },
       { id: "m4a3", arq: "03-regras.html", titulo: "Regras allow, ask e deny", min: 25 },
