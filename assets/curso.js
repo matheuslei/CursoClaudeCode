@@ -48,12 +48,12 @@
       { id: "m7a3", arq: "03-worktrees.html", titulo: "Worktrees", min: 30 },
       { id: "m7a4", arq: "04-agent-view-goal.html", titulo: "Agent view e /goal", min: 25 },
       { id: "m7a5", arq: "05-orquestracao.html", titulo: "Orquestração em escala", min: 25 } ] },
-    { id: "m8", n: 8, pasta: "08-plugins", titulo: "Plugins", nivel: "Avançado", desc: "Instalar, criar, avaliar e compartilhar plugins", pronto: true, slides: true, aulas: [
+    { id: "m8", n: 8, pasta: "08-plugins", titulo: "Plugins", nivel: "Avançado", desc: "Instalar, criar, avaliar e compartilhar plugins", pronto: true, slides: true, podcast: { arq: "ep09-plugins.m4a", min: 22 }, aulas: [
       { id: "m8a1", arq: "01-o-que-e-plugin.html", titulo: "O que é um plugin, instalar e gerenciar", min: 25 },
       { id: "m8a2", arq: "02-criar-plugin.html", titulo: "Criar o plugin do TaskFlow", min: 35 },
       { id: "m8a3", arq: "03-plugin-eval.html", titulo: "Medir com claude plugin eval", min: 25 },
       { id: "m8a4", arq: "04-marketplace.html", titulo: "Marketplace local", min: 20 } ] },
-    { id: "m9", n: 9, pasta: "09-automacao", titulo: "Automação", nivel: "Avançado", desc: "claude -p em scripts, /code-review, GitHub Actions e agendamentos", pronto: true, slides: true, aulas: [
+    { id: "m9", n: 9, pasta: "09-automacao", titulo: "Automação", nivel: "Avançado", desc: "claude -p em scripts, /code-review, GitHub Actions e agendamentos", pronto: true, slides: true, podcast: { arq: "ep10-automacao.m4a", min: 14 }, aulas: [
       { id: "m9a1", arq: "01-claude-p.html", titulo: "Modo não interativo (claude -p)", min: 30 },
       { id: "m9a2", arq: "02-code-review.html", titulo: "Revisão de código com o Claude", min: 25 },
       { id: "m9a3", arq: "03-github-actions.html", titulo: "Claude Code no GitHub Actions", min: 30 },
