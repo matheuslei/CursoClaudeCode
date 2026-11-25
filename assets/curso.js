@@ -31,7 +31,7 @@
       { id: "m4a3", arq: "03-regras.html", titulo: "Regras allow, ask e deny", min: 25 },
       { id: "m4a4", arq: "04-sandbox.html", titulo: "Sandbox", min: 15 },
       { id: "m4a5", arq: "05-segredos.html", titulo: "Segredos e dados pessoais", min: 20 } ] },
-    { id: "m5", n: 5, pasta: "05-personalizacao", titulo: "Personalização", nivel: "Intermediário", desc: "settings, skills, output styles, hooks", pronto: true, slides: true, aulas: [
+    { id: "m5", n: 5, pasta: "05-personalizacao", titulo: "Personalização", nivel: "Intermediário", desc: "settings, skills, output styles, hooks", pronto: true, slides: true, podcast: { arq: "ep06-personalizacao.m4a", min: 16 }, aulas: [
       { id: "m5a1", arq: "01-settings.html", titulo: "settings.json e precedência", min: 20 },
       { id: "m5a2", arq: "02-skills.html", titulo: "Skills", min: 30 },
       { id: "m5a3", arq: "03-output-styles.html", titulo: "Output styles e status line", min: 15 },

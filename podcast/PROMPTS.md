@@ -26,6 +26,7 @@ Uma série de 11 episódios, um por módulo, para quem não tem tempo de ler a a
 | 3 · Contexto é tudo | `podcast/audio/ep03-contexto.m4a` | 17 min | 24/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do /init e gancho) e é fiel à fonte; ressalvas: diz "custo entre 13 e 30 dólares por dia" (a fonte: média de ~US$ 13, abaixo de 30 para 90%), exagera regras conflitantes ("surta") e fecha com uma reflexão que repete "anota sem a gente ver" |
 | 4 · Fluxo profissional | `podcast/audio/ep04-fluxo.m4a` | 13 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio da spec e gancho) e é fiel à fonte: quatro etapas, /clear depois de duas correções, plan mode (Shift+Tab aprova, Esc antes, Ctrl+G), spec de cinco seções com entrevista, testes commitados antes, injetar o "hoje", evidência e /code-review; ressalva: simplifica ao dizer que o /rewind só desfaz a conversa (ele também desfaz as edições do Claude; quem fica de fora são as correções do --fix) |
 | 5 · Permissões e segurança | `podcast/audio/ep05-permissoes.m4a` | 15 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio do deny no .env e gancho) e é fiel à fonte, inclusive em auto mode (3 seguidos ou 20 no total), ordem deny, ask, allow, sandbox só no WSL 2 e revogar segredo vazado; ressalvas: abre com uma cena inventada (o assistente apaga o banco) e fecha com uma reflexão |
+| 6 · Personalização | `podcast/audio/ep06-personalizacao.m4a` | 16 min | 25/11/2026 (versão 2 do prompt): seguiu a estrutura (abertura, três pontos-chave, desafio da skill revisar-taskflow e gancho) e é fiel à fonte: CLAUDE.md orienta e settings aplica, precedência, listas que se somam, JSON sem comentários, skills e description, disable-model-invocation, output styles com reinício, status line, hooks e códigos de saída, "pedir é CLAUDE.md, garantir é hook"; ressalvas: o exemplo põe o hook de sintaxe antes da edição (na aula é PostToolUse, depois), diz que o estilo Proactive "para de pedir permissão" (ele só começa a implementar; permissão é dos modos) e fecha com uma reflexão |
 
 **Antes de usar, confira:**
 
@@ -105,22 +106,28 @@ Feche com três pontos-chave, o desafio de criar uma regra deny para a leitura d
 
 ## Episódio 6 de 11 · Personalização (fonte: `modulo-05-personalizacao.md`)
 
+Versão 2 (25/11/2026), no formato que funcionou nos episódios 2 a 5.
+
 ```text
 Episódio 6 de 11 da série "Claude Code: do zero ao avançado". Use apenas a fonte modulo-05-personalizacao.
-Abra lembrando em uma frase o episódio anterior: modos de permissão, regras, sandbox e segredos.
-Tema: deixar o Claude Code com a cara do seu time. Explique o settings.json e a ordem de precedência (usuário, projeto e local), com um exemplo de conflito. Mostre as skills como receitas que o Claude segue quando o assunto aparece, incluindo a skill de verificação que exige provas antes de dizer "pronto". Fale rapidamente de output styles e da status line. Termine com os hooks, comandos que rodam sempre em certos momentos, e deixe clara a diferença: a skill orienta, o hook garante.
-Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados, guardados ou usados para treinar a IA, a menos que a fonte diga; avise o que é opcional ou tem custo.
-Feche com três pontos-chave, um desafio prático curto e o gancho: no próximo episódio, conectar o Claude a outros sistemas com MCP.
+Comece dizendo literalmente "Este é o episódio 6 de 11" e lembre em uma frase o episódio 5: modos de permissão, regras, sandbox e segredos.
+Tema: deixar o Claude Code com a cara do seu time, no nível intermediário, com exemplos do TaskFlow. Siga a ordem das aulas: o settings ponto json e a precedência; as skills; output styles e status line; os hooks.
+Precisão: o CLAUDE.md orienta, o settings é aplicado pela ferramenta; a ordem de precedência é gerenciado da organização, linha de comando, local, projeto e, por último, usuário; listas como permissões se somam entre os arquivos; o JSON não aceita comentários; o conteúdo completo da skill só entra no contexto quando ela é usada, e a description decide quando o Claude a usa; leia skills de terceiros antes de instalar; output style é instrução, não garantia, e no terminal pede reiniciar depois de criar um; o hook roda sempre, código de saída dois bloqueia no Pre Tool Use, e hooks rodam com as suas permissões sem pedir aprovação, então leia todo hook de projeto ou plugin. Resuma assim: pedir é CLAUDE.md, garantir é hook. Não especule sobre o futuro.
+Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados ou usados para treinar a IA. Duração: entre 15 e 20 minutos.
+Feche com três pontos-chave, o desafio de criar a skill revisar-taskflow e chamá-la com barra revisar-taskflow depois de uma pequena mudança, e o gancho: no episódio 7, conectar o Claude a outros sistemas com MCP.
 ```
 
 ## Episódio 7 de 11 · MCP e integrações (fonte: `modulo-06-mcp.md`)
 
+Versão 2 (25/11/2026), no formato que funcionou nos episódios 2 a 5.
+
 ```text
 Episódio 7 de 11 da série "Claude Code: do zero ao avançado". Use apenas a fonte modulo-06-mcp.
-Abra lembrando em uma frase o episódio anterior: settings, skills, output styles e hooks.
-Tema: conectar o Claude ao mundo de fora. Explique o MCP com a analogia de uma tomada padrão: um protocolo para o Claude usar ferramentas e dados de outros sistemas. Conte como instalar e autenticar um servidor, os cuidados com servidores de terceiros e como foi criar um servidor MCP simples em Python para o TaskFlow. Termine mostrando que o Claude Code também roda no VS Code e no app Desktop, e quando cada um é mais prático.
-Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados, guardados ou usados para treinar a IA, a menos que a fonte diga; avise o que é opcional ou tem custo.
-Feche com três pontos-chave, um desafio prático curto e o gancho: no próximo episódio, começa o nível avançado, com subagentes e trabalho em paralelo.
+Comece dizendo literalmente "Este é o episódio 7 de 11" e lembre em uma frase o episódio 6: settings, skills, output styles e hooks.
+Tema: conectar o Claude ao mundo de fora, no nível intermediário, com o TaskFlow. Siga a ordem das aulas: o que é MCP, com a analogia da tomada padrão; instalar e autenticar um servidor; criar um MCP em Python; VS Code e app Desktop.
+Precisão: um servidor oferece ferramentas, recursos que você menciona com arroba e prompts que viram comandos; ele conecta por S T D I O, na sua máquina, ou por H T T P, por uma URL; cada servidor ocupa contexto e o tool search só carrega as definições quando precisa, mas remova os que não usa; só conecte servidores confiáveis, porque conteúdo externo pode esconder instruções maliciosas, e na empresa isso é decisão da segurança da informação; no claude mcp add, tudo depois dos dois traços é o comando do servidor, e esquecer os dois traços é o erro mais comum; os escopos são local, o padrão, project, que vai para o Git, e user; servidores de um ponto mcp ponto json pedem aprovação antes de rodar; o SDK exige Python 3.11 ou superior; nunca use print num servidor S T D I O, porque corrompe o protocolo. Não especule sobre o futuro.
+Regras: português do Brasil, conversa entre um colega experiente e outro aprendendo; comandos falados como se pronunciam; não invente nada fora da fonte; não fale sobre como os dados são enviados ou usados para treinar a IA. Duração: entre 15 e 20 minutos.
+Feche com três pontos-chave, o desafio de adicionar o servidor de documentação do Claude Code e conferir com claude mcp list, e o gancho: no episódio 8, começa o nível avançado, com subagentes e trabalho em paralelo.
 ```
 
 ## Episódio 8 de 11 · Subagentes e paralelismo (fonte: `modulo-07-subagentes.md`)
